@@ -49,7 +49,7 @@ function Dropdown({
   children: React.ReactNode;
   open: boolean;
   onToggle: () => void;
-  panelRef: React.RefObject<HTMLDivElement | null>;
+  panelRef: React.RefObject<HTMLDivElement>;
 }) {
   return (
     <div className="relative" ref={panelRef}>
