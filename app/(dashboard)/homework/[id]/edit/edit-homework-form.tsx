@@ -3,22 +3,42 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-interface CreateHomeworkFormProps {
-  majlisList: { id: string; name: string }[];
-  defaultMajlisId: string | null;
-  isRegional: boolean;
+interface HomeworkData {
+  id: string;
+  majlis_id: string | null;
+  title: string;
+  description: string | null;
+  due_by: string;
+  links: string[];
 }
 
 type Scope = "region" | "majlis";
 
-export function CreateHomeworkForm({ majlisList, defaultMajlisId, isRegional }: CreateHomeworkFormProps) {
+interface EditHomeworkFormProps {
+  homework: HomeworkData;
+  majlisList: { id: string; name: string }[];
+  isRegional: boolean;
+  defaultMajlisId: string | null;
+}
+
+function toDatetimeLocal(iso: string): string {
+  const d = new Date(iso);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const h = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${y}-${m}-${day}T${h}:${min}`;
+}
+
+export function EditHomeworkForm({ homework, majlisList, isRegional, defaultMajlisId }: EditHomeworkFormProps) {
   const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [dueBy, setDueBy] = useState("");
-  const [linksText, setLinksText] = useState("");
-  const [scope, setScope] = useState<Scope>(isRegional ? "region" : "majlis");
-  const [majlisId, setMajlisId] = useState(defaultMajlisId ?? "");
+  const [title, setTitle] = useState(homework.title);
+  const [description, setDescription] = useState(homework.description ?? "");
+  const [dueBy, setDueBy] = useState(toDatetimeLocal(homework.due_by));
+  const [linksText, setLinksText] = useState((homework.links ?? []).join("\n"));
+  const [scope, setScope] = useState<Scope>(homework.majlis_id == null ? "region" : "majlis");
+  const [majlisId, setMajlisId] = useState(homework.majlis_id ?? defaultMajlisId ?? "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -30,27 +50,26 @@ export function CreateHomeworkForm({ majlisList, defaultMajlisId, isRegional }: 
       .split(/[\n,]/)
       .map((s) => s.trim())
       .filter(Boolean);
-    const payloadMajlisId = !isRegional ? (majlisId || null) : scope === "region" ? null : (majlisId || null);
+    const payloadMajlisId = isRegional ? (scope === "region" ? null : majlisId || null) : undefined;
     try {
-      const res = await fetch("/api/homework", {
-        method: "POST",
+      const res = await fetch(`/api/homework/${homework.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: title.trim(),
           description: description.trim() || null,
           due_by: dueBy,
           links,
-          majlis_id: payloadMajlisId,
+          ...(payloadMajlisId !== undefined && { majlis_id: payloadMajlisId }),
         }),
       });
       if (!res.ok) {
         const d = await res.json();
-        setError(d.error ?? "Failed to create");
+        setError(d.error ?? "Failed to update");
         setLoading(false);
         return;
       }
-      const d = await res.json();
-      router.push(`/homework/${d.id}`);
+      router.push(`/homework/${homework.id}`);
       router.refresh();
     } catch {
       setError("Something went wrong");
@@ -146,7 +165,7 @@ export function CreateHomeworkForm({ majlisList, defaultMajlisId, isRegional }: 
       )}
       {error && <p className="text-sm text-red-600">{error}</p>}
       <button type="submit" disabled={loading} className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors">
-        {loading ? "Creating…" : "Create homework"}
+        {loading ? "Saving…" : "Save changes"}
       </button>
     </form>
   );

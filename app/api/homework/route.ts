@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     .order("due_by", { ascending: true });
   if (session.user.role === "tifl") {
     if (!session.user.majlisId) return NextResponse.json({ error: "No Majlis" }, { status: 403 });
-    query = query.eq("majlis_id", session.user.majlisId);
+    query = query.or(`majlis_id.eq.${session.user.majlisId},majlis_id.is.null`);
   } else if (session.user.role === "local_nazim") {
     if (!session.user.majlisId) return NextResponse.json({ error: "No Majlis" }, { status: 403 });
     query = query.eq("majlis_id", session.user.majlisId);
@@ -31,8 +31,14 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { title, description, due_by, links, majlis_id } = body;
   if (!title || !due_by) return NextResponse.json({ error: "Title and due_by required" }, { status: 400 });
-  const majlisId = session.user.role === "regional_nazim" ? (majlis_id ?? session.user.majlisId) : session.user.majlisId;
-  if (!majlisId) return NextResponse.json({ error: "Majlis required" }, { status: 400 });
+  let majlisId: string | null;
+  if (session.user.role === "regional_nazim") {
+    majlisId = majlis_id === undefined ? session.user.majlisId : majlis_id;
+    if (majlisId !== null && !majlisId) majlisId = session.user.majlisId;
+  } else {
+    majlisId = session.user.majlisId;
+    if (!majlisId) return NextResponse.json({ error: "Majlis required" }, { status: 400 });
+  }
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from("homework")

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import Link from "next/link";
 import { CreateEventForm } from "./create-event-form";
+import { EventItemActions } from "./event-item-actions";
 
 const EVENT_TYPE_LABEL: Record<string, string> = {
   regional: "Regional",
@@ -32,6 +33,12 @@ export default async function EventsPage() {
   const { data: majlis } = await supabase.from("majlis").select("id, name");
   const majlisMap = new Map((majlis ?? []).map((m) => [m.id, m.name]));
   const canCreate = session.user.role === "local_nazim" || session.user.role === "regional_nazim";
+  const userMajlisId = session.user.majlisId ?? null;
+  function canEditEvent(e: { majlis_id: string | null }) {
+    if (session.user.role === "regional_nazim") return true;
+    if (session.user.role === "local_nazim" && userMajlisId && e.majlis_id === userMajlisId) return true;
+    return false;
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -57,8 +64,8 @@ export default async function EventsPage() {
         <ul className="space-y-4">
           {events.map((e) => (
             <li key={e.id} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4">
-              <div className="flex justify-between items-start">
-                <div>
+              <div className="flex justify-between items-start gap-4">
+                <div className="min-w-0">
                   <span className="font-semibold text-lg">{e.title}</span>
                   <span className="ml-2 px-2 py-0.5 rounded text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
                     {EVENT_TYPE_LABEL[e.event_type] ?? e.event_type}
@@ -72,6 +79,7 @@ export default async function EventsPage() {
                     </a>
                   )}
                 </div>
+                <EventItemActions eventId={e.id} canEdit={canEditEvent(e)} />
               </div>
             </li>
           ))}

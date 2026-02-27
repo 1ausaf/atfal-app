@@ -12,7 +12,7 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
   const supabase = createSupabaseServerClient();
   const { data: hw } = await supabase.from("homework").select("*").eq("id", id).single();
   if (!hw) notFound();
-  if (session.user.role === "tifl" && hw.majlis_id !== session.user.majlisId) notFound();
+  if (session.user.role === "tifl" && hw.majlis_id != null && hw.majlis_id !== session.user.majlisId) notFound();
   if (session.user.role === "local_nazim" && hw.majlis_id !== session.user.majlisId) notFound();
 
   let existingSubmission: { id: string; status: string } | null = null;
@@ -54,9 +54,16 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
           </div>
         )}
         {(session.user.role === "local_nazim" || session.user.role === "regional_nazim") && (
-          <Link href={`/homework/${id}/submissions`} className="mt-6 inline-block text-green-600 hover:underline">
-            View submissions
-          </Link>
+          <div className="mt-6 flex flex-wrap gap-4">
+            {(session.user.role === "regional_nazim" || (session.user.role === "local_nazim" && hw.majlis_id === session.user.majlisId)) && (
+              <Link href={`/homework/${id}/edit`} className="text-green-600 hover:underline">
+                Edit
+              </Link>
+            )}
+            <Link href={`/homework/${id}/submissions`} className="text-green-600 hover:underline">
+              View submissions
+            </Link>
+          </div>
         )}
       </article>
     </div>

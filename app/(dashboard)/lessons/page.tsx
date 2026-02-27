@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import Link from "next/link";
+import { LessonItemActions } from "./lesson-item-actions";
 
 export default async function LessonsPage() {
   const session = await getServerSession(authOptions);
@@ -35,11 +36,16 @@ export default async function LessonsPage() {
         <ul className="space-y-4">
           {activities.map((a) => (
             <li key={a.id} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4">
-              <Link href={`/lessons/${a.id}`} className="font-semibold text-lg hover:underline">
-                {a.title}
-              </Link>
-              <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{a.type}</span>
-              {a.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{a.description}</p>}
+              <div className="flex justify-between items-start gap-4">
+                <div className="min-w-0">
+                  <Link href={`/lessons/${a.id}`} className="font-semibold text-lg hover:underline">
+                    {a.title}
+                  </Link>
+                  <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{a.type}</span>
+                  {a.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{a.description}</p>}
+                </div>
+                <LessonItemActions activityId={a.id} canEdit={isRegional} />
+              </div>
             </li>
           ))}
         </ul>

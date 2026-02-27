@@ -12,12 +12,13 @@ export default async function HomeworkPage() {
   let query = supabase.from("homework").select("id, majlis_id, title, description, due_by, links, created_at").order("due_by", { ascending: true });
   if (session.user.role === "tifl") {
     if (!session.user.majlisId) return <p>Complete your profile to see homework.</p>;
-    query = query.eq("majlis_id", session.user.majlisId);
+    query = query.or(`majlis_id.eq.${session.user.majlisId},majlis_id.is.null`);
   } else if (session.user.role === "local_nazim") {
     if (!session.user.majlisId) return <p>No Majlis assigned.</p>;
     query = query.eq("majlis_id", session.user.majlisId);
   }
   const { data: homeworkList } = await query;
+  const { data: majlisList } = await supabase.from("majlis").select("id, name").order("name");
   const canCreate = session.user.role === "local_nazim" || session.user.role === "regional_nazim";
 
   return (
@@ -30,7 +31,7 @@ export default async function HomeworkPage() {
           </Link>
         )}
       </div>
-      <HomeworkList initialHomework={homeworkList ?? []} role={session.user.role} userId={session.user.id} />
+      <HomeworkList initialHomework={homeworkList ?? []} role={session.user.role} userId={session.user.id} userMajlisId={session.user.majlisId ?? null} majlisList={majlisList ?? []} />
     </div>
   );
 }
