@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 export function ThreadClient({
@@ -16,17 +16,16 @@ export function ThreadClient({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  async function load() {
+  const load = useCallback(async () => {
     const res = await fetch(`/api/conversations/${conversationId}/messages?limit=50`);
     const data = await res.json();
     if (res.ok) setMessages(data.messages ?? []);
     setLoading(false);
-  }
+  }, [conversationId]);
 
   useEffect(() => {
     load();
-  }, [conversationId]);
+  }, [load]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
