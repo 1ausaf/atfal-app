@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #0a0a0a;
+  --background: #fafafa;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: #ededed;
+    --background: #0a0a0a;
+  }
+}
+
+/* Salat section: kid-friendly palette (ages 7–15) */
+:root {
+  --salat-bg: #faf8f5;
+  --salat-bg-dark: #0f172a;
+  --salat-bg-dark-end: #0d1f1a;
+  --salat-card: #fffefb;
+  --salat-card-dark: #1e2e2a;
+  --salat-accent: #d97706;
+  --salat-accent-dark: #fbbf24;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --salat-bg: #0f172a;
+    --salat-bg-dark-end: #0d1f1a;
+    --salat-card: #1e2e2a;
+    --salat-accent: #fbbf24;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: linear-gradient(to bottom, var(--background) 0%, #f0fdf4 100%);
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(to bottom, var(--background) 0%, #022c22 100%);
+  }
+}
