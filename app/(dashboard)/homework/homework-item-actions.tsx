@@ -20,7 +20,9 @@ export function HomeworkItemActions({ homeworkId, canEdit }: HomeworkItemActions
       const res = await fetch(`/api/homework/${homeworkId}`, { method: "DELETE" });
       if (!res.ok) {
         const d = await res.json();
-        alert(d.error ?? "Failed to delete");
+        const isNotFound = res.status === 404;
+        alert(isNotFound ? "This homework may already have been deleted. The list will refresh." : (d.error ?? "Failed to delete"));
+        if (isNotFound) router.refresh();
         return;
       }
       router.refresh();

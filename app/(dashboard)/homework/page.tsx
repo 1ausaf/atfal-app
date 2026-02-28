@@ -5,6 +5,8 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import Link from "next/link";
 import { HomeworkList } from "./homework-list";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomeworkPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
