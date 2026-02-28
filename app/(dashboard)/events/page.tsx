@@ -34,9 +34,10 @@ export default async function EventsPage() {
   const majlisMap = new Map((majlis ?? []).map((m) => [m.id, m.name]));
   const canCreate = session.user.role === "local_nazim" || session.user.role === "regional_nazim";
   const userMajlisId = session.user.majlisId ?? null;
+  const role = session.user.role;
   function canEditEvent(e: { majlis_id: string | null }) {
-    if (session.user.role === "regional_nazim") return true;
-    if (session.user.role === "local_nazim" && userMajlisId && e.majlis_id === userMajlisId) return true;
+    if (role === "regional_nazim") return true;
+    if (role === "local_nazim" && userMajlisId && e.majlis_id === userMajlisId) return true;
     return false;
   }
 
