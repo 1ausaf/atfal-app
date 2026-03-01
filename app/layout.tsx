@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={amiri.variable}>
+    <html lang="en" className={`${amiri.variable} dark`}>
       <body className="antialiased">
         <Providers>{children}</Providers>
       </body>

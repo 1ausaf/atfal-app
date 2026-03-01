@@ -2,56 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark-only theme */
 :root {
-  --foreground: #0a0a0a;
-  --background: #fafafa;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground: #ededed;
-    --background: #0a0a0a;
-  }
+  --foreground: #ededed;
+  --background: #0a0a0a;
 }
 
 /* Salat section: kid-friendly palette (ages 7–15) */
 :root {
-  --salat-bg: #faf8f5;
+  --salat-bg: #0f172a;
   --salat-bg-dark: #0f172a;
   --salat-bg-dark-end: #0d1f1a;
-  --salat-card: #fffefb;
+  --salat-card: #1e2e2a;
   --salat-card-dark: #1e2e2a;
-  --salat-accent: #d97706;
+  --salat-accent: #fbbf24;
   --salat-accent-dark: #fbbf24;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --salat-bg: #0f172a;
-    --salat-bg-dark-end: #0d1f1a;
-    --salat-card: #1e2e2a;
-    --salat-accent: #fbbf24;
-  }
 }
 
 /* Child-friendly theme for non-Salat app areas */
 :root {
   --kid-card-radius: 1rem;
-  --kid-shadow: 0 4px 14px rgba(16, 185, 129, 0.08);
-  --kid-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.12);
-  --kid-accent: #059669;
-  --kid-accent-hover: #047857;
-  --kid-border: #e2e8f0;
-  --kid-bg-soft: #f0fdf4;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --kid-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-    --kid-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
-    --kid-accent: #34d399;
-    --kid-accent-hover: #6ee7b7;
-    --kid-border: #334155;
-    --kid-bg-soft: #022c22;
-  }
+  --kid-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  --kid-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+  --kid-accent: #34d399;
+  --kid-accent-hover: #6ee7b7;
+  --kid-border: #334155;
+  --kid-bg-soft: #022c22;
 }
 
 @layer components {
@@ -59,15 +35,9 @@
     border-radius: var(--kid-card-radius);
     border-width: 1px;
     border-color: var(--kid-border);
-    background: white;
+    background: #1e293b;
     box-shadow: var(--kid-shadow);
     transition: box-shadow 0.2s ease;
-  }
-  @media (prefers-color-scheme: dark) {
-    .card-kid {
-      background: #1e293b;
-      border-color: #334155;
-    }
   }
   .card-kid:hover {
     box-shadow: var(--kid-shadow-hover);
@@ -85,29 +55,16 @@
     box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
   }
   .link-kid {
-    color: #059669;
+    color: #34d399;
     transition: color 0.15s ease;
   }
   .link-kid:hover {
-    color: #047857;
+    color: #6ee7b7;
     text-decoration: underline;
-  }
-  @media (prefers-color-scheme: dark) {
-    .link-kid {
-      color: #34d399;
-    }
-    .link-kid:hover {
-      color: #6ee7b7;
-    }
   }
 }
 
 body {
   color: var(--foreground);
-  background: linear-gradient(160deg, var(--background) 0%, #ecfdf5 50%, #f0fdf4 100%);
-}
-@media (prefers-color-scheme: dark) {
-  body {
-    background: linear-gradient(160deg, var(--background) 0%, #064e3b 50%, #022c22 100%);
-  }
+  background: linear-gradient(160deg, var(--background) 0%, #064e3b 50%, #022c22 100%);
 }
