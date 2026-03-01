@@ -10,6 +10,7 @@ interface TiflRow {
   age_group: string | null;
   majlis_id: string | null;
   date_of_birth: string | null;
+  manual_points?: number;
   created_at: string;
 }
 
@@ -27,6 +28,9 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editDob, setEditDob] = useState("");
+  const [pointsEditingId, setPointsEditingId] = useState<string | null>(null);
+  const [pointsDelta, setPointsDelta] = useState("");
+  const [pointsSubmitting, setPointsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isRegional || !filterMajlis) {
@@ -81,6 +85,38 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
     } else {
       const d = await res.json();
       alert(d.error ?? "Failed to update");
+    }
+  }
+
+  function openPoints(t: TiflRow) {
+    setPointsEditingId(t.id);
+    setPointsDelta("");
+  }
+
+  async function savePoints(tiflId: string, currentPoints: number) {
+    const delta = Number(pointsDelta);
+    if (Number.isNaN(delta)) return;
+    const newValue = Math.max(0, currentPoints + delta);
+    setPointsSubmitting(true);
+    try {
+      const res = await fetch(`/api/tifls/${tiflId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ manual_points: newValue }),
+      });
+      if (res.ok) {
+        setTifls((prev) =>
+          prev.map((x) => (x.id === tiflId ? { ...x, manual_points: newValue } : x))
+        );
+        setPointsEditingId(null);
+        setPointsDelta("");
+        router.refresh();
+      } else {
+        const d = await res.json();
+        alert(d.error ?? "Failed to update points");
+      }
+    } finally {
+      setPointsSubmitting(false);
     }
   }
 
@@ -142,36 +178,74 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                     <span className="font-medium">{t.name ?? "—"}</span>
                     <span className="text-slate-500 dark:text-slate-400 ml-2">Age {t.age ?? "—"} · {t.age_group ?? "—"}</span>
                     <span className="block text-sm text-slate-500 dark:text-slate-400">{t.majlis_id ? majlisMap.get(t.majlis_id) : "—"}</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">{(t.manual_points ?? 0)} pts</span>
                   </div>
-                  {isRegional ? (
-                    <div className="flex items-center gap-2">
-                      <select
-                        defaultValue={t.majlis_id ?? ""}
-                        onChange={(e) => handleMove(t.id, e.target.value)}
-                        className="px-2 py-1 border rounded text-sm"
-                      >
-                        <option value="">Move to…</option>
-                        {majlisList.map((m) => (
-                          <option key={m.id} value={m.id}>{m.name}</option>
-                        ))}
-                      </select>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {pointsEditingId === t.id ? (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm text-slate-500 dark:text-slate-400">Current: {(t.manual_points ?? 0)}</span>
+                        <input
+                          type="number"
+                          value={pointsDelta}
+                          onChange={(e) => setPointsDelta(e.target.value)}
+                          placeholder="+5 or -3"
+                          className="w-24 px-2 py-1 border border-slate-300 dark:border-slate-600 rounded text-sm bg-white dark:bg-slate-700"
+                        />
+                        <button
+                          type="button"
+                          disabled={pointsSubmitting}
+                          onClick={() => savePoints(t.id, t.manual_points ?? 0)}
+                          className="px-3 py-1 bg-emerald-600 text-white text-sm rounded hover:bg-emerald-700 disabled:opacity-50"
+                        >
+                          Update
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setPointsEditingId(null); setPointsDelta(""); }}
+                          className="px-3 py-1 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 text-sm rounded hover:bg-slate-300 dark:hover:bg-slate-500"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
                       <button
                         type="button"
-                        onClick={() => handleDelete(t.id)}
-                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        onClick={() => openPoints(t)}
+                        className="px-3 py-1.5 bg-amber-500/80 text-white text-sm rounded-lg hover:bg-amber-600"
                       >
-                        Delete
+                        Points
                       </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => startEdit(t)}
-                      className="px-3 py-1.5 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 text-sm rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500"
-                    >
-                      Edit
-                    </button>
-                  )}
+                    )}
+                    {isRegional ? (
+                      <>
+                        <select
+                          defaultValue={t.majlis_id ?? ""}
+                          onChange={(e) => handleMove(t.id, e.target.value)}
+                          className="px-2 py-1 border rounded text-sm"
+                        >
+                          <option value="">Move to…</option>
+                          {majlisList.map((m) => (
+                            <option key={m.id} value={m.id}>{m.name}</option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(t.id)}
+                          className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        >
+                          Delete
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => startEdit(t)}
+                        className="px-3 py-1.5 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 text-sm rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
                 </>
               )}
             </li>

@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const supabase = createSupabaseServerClient();
   let query = supabase
     .from("users")
-    .select("id, name, age, age_group, majlis_id, created_at")
+    .select("id, name, age, age_group, majlis_id, manual_points, created_at")
     .eq("role", "tifl")
     .is("deleted_at", null);
   if (session.user.role === "local_nazim") {

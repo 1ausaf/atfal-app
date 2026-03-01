@@ -13,7 +13,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const body = await request.json();
-  const { majlis_id, deleted, name, date_of_birth } = body;
+  const { majlis_id, deleted, name, date_of_birth, manual_points } = body;
   const supabase = createSupabaseServerClient();
   const { data: user } = await supabase.from("users").select("id, role, majlis_id").eq("id", id).single();
   if (!user || user.role !== "tifl") return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -25,6 +25,7 @@ export async function PATCH(
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (name !== undefined) updates.name = name ? String(name).trim() : null;
     if (date_of_birth !== undefined) updates.date_of_birth = date_of_birth ? String(date_of_birth).trim() : null;
+    if (manual_points !== undefined) updates.manual_points = Math.max(0, Math.floor(Number(manual_points)));
     const { error } = await supabase.from("users").update(updates).eq("id", id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ ok: true });
@@ -34,6 +35,7 @@ export async function PATCH(
   if (majlis_id !== undefined) updates.majlis_id = majlis_id || null;
   if (deleted === true) updates.deleted_at = new Date().toISOString();
   if (deleted === false) updates.deleted_at = null;
+  if (manual_points !== undefined) updates.manual_points = Math.max(0, Math.floor(Number(manual_points)));
   const { error } = await supabase.from("users").update(updates).eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
