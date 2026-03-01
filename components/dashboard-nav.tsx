@@ -92,6 +92,7 @@ export function DashboardNav({
   const learnRef = useRef<HTMLDivElement>(null);
   const manageRef = useRef<HTMLDivElement>(null);
   const adminRef = useRef<HTMLDivElement>(null);
+  const activitiesRef = useRef<HTMLDivElement>(null);
 
   const isTifl = role === "tifl";
   const isLocalNazim = role === "local_nazim";
@@ -106,7 +107,8 @@ export function DashboardNav({
         !connectRef.current?.contains(target) &&
         !learnRef.current?.contains(target) &&
         !manageRef.current?.contains(target) &&
-        !adminRef.current?.contains(target)
+        !adminRef.current?.contains(target) &&
+        !activitiesRef.current?.contains(target)
       ) {
         setOpenDropdown(null);
       }
@@ -125,6 +127,16 @@ export function DashboardNav({
       <Link href="/profile" className={navLinkClass}>
         Profile
       </Link>
+
+      <Dropdown
+        label="Activities"
+        open={openDropdown === "activities"}
+        onToggle={() => setOpenDropdown((v) => (v === "activities" ? null : "activities"))}
+        panelRef={activitiesRef}
+      >
+        <DropdownItem href="/activities/read/newsletter" label="Newsletter" onNavigate={closeDropdown} />
+        <DropdownItem href="/activities/read/read" label="Read" onNavigate={closeDropdown} />
+      </Dropdown>
 
       {isTifl && (
         <Dropdown

@@ -50,8 +50,9 @@ export async function PATCH(request: Request) {
   const supabase = createSupabaseServerClient();
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (name !== undefined) updates.name = name ? String(name).trim() : null;
-  if (majlis_id !== undefined) updates.majlis_id = majlis_id || null;
   if (date_of_birth !== undefined) updates.date_of_birth = date_of_birth || null;
+  if (session.user.role === "regional_nazim" && majlis_id !== undefined)
+    updates.majlis_id = majlis_id || null;
   if (age !== undefined) updates.age = age;
   if (age_group !== undefined) updates.age_group = age_group;
 

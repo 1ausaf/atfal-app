@@ -15,9 +15,11 @@ type UserForm = {
 export function ProfileForm({
   user,
   majlisList,
+  canEditMajlis = false,
 }: {
   user: UserForm;
   majlisList: Majlis[];
+  canEditMajlis?: boolean;
 }) {
   const router = useRouter();
   const [name, setName] = useState(user.name);
@@ -27,20 +29,25 @@ export function ProfileForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const majlisName = user.majlis_id
+    ? majlisList.find((m) => m.id === user.majlis_id)?.name ?? "—"
+    : "—";
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSuccess(false);
     setLoading(true);
+    const body: { name: string | null; date_of_birth: string | null; majlis_id?: string | null } = {
+      name: name.trim() || null,
+      date_of_birth: dateOfBirth || null,
+    };
+    if (canEditMajlis) body.majlis_id = majlisId || null;
     try {
       const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim() || null,
-          date_of_birth: dateOfBirth || null,
-          majlis_id: majlisId || null,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -91,19 +98,28 @@ export function ProfileForm({
         <label htmlFor="majlis_id" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
           Majlis
         </label>
-        <select
-          id="majlis_id"
-          value={majlisId}
-          onChange={(e) => setMajlisId(e.target.value)}
-          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-        >
-          <option value="">Select majlis</option>
-          {majlisList.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.name}
-            </option>
-          ))}
-        </select>
+        {canEditMajlis ? (
+          <select
+            id="majlis_id"
+            value={majlisId}
+            onChange={(e) => setMajlisId(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+          >
+            <option value="">Select majlis</option>
+            {majlisList.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <p
+            id="majlis_id"
+            className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+          >
+            {majlisName}
+          </p>
+        )}
       </div>
       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       {success && <p className="text-sm text-emerald-600 dark:text-emerald-400">Profile saved.</p>}
