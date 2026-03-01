@@ -142,7 +142,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
       ) : (
         <ul className="space-y-3">
           {tifls.map((t) => (
-            <li key={t.id} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4 flex justify-between items-center flex-wrap gap-2">
+            <li key={t.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4 flex justify-between items-center flex-wrap gap-2">
               {editingId === t.id ? (
                 <div className="flex-1 space-y-2 min-w-0">
                   <div>
@@ -164,7 +164,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                     />
                   </div>
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => saveEdit(t.id)} className="px-3 py-1.5 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700">
+                    <button type="button" onClick={() => saveEdit(t.id)} className="px-3 py-1.5 btn-kid-primary text-sm rounded-xl">
                       Save
                     </button>
                     <button type="button" onClick={cancelEdit} className="px-3 py-1.5 bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 text-sm rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">
@@ -195,7 +195,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                           type="button"
                           disabled={pointsSubmitting}
                           onClick={() => savePoints(t.id, t.manual_points ?? 0)}
-                          className="px-3 py-1 bg-emerald-600 text-white text-sm rounded hover:bg-emerald-700 disabled:opacity-50"
+                          className="px-3 py-1.5 btn-kid-primary text-sm rounded-xl disabled:opacity-50 disabled:transform-none"
                         >
                           Update
                         </button>

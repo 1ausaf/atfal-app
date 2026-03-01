@@ -75,13 +75,13 @@ export function NewChatClient({
             placeholder="Search friends by name…"
             className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800"
           />
-          <button type="submit" disabled={loading} className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50">
+          <button type="submit" disabled={loading} className="px-4 py-2 btn-kid-primary rounded-xl disabled:opacity-50 disabled:transform-none">
             Search
           </button>
         </form>
       )}
       {role === "tifl" && users.length > 0 && (
-        <ul className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+        <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
           {users.map((u) => (
             <li key={u.id}>
               <button
@@ -100,7 +100,7 @@ export function NewChatClient({
         <p className="text-slate-500 dark:text-slate-400">No friends found. Add friends first from the Friends page.</p>
       )}
       {isNazim && tiflList.length > 0 && (
-        <ul className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+        <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
           <li className="px-4 py-2 text-sm text-slate-500 dark:text-slate-400">Select a Tifl to message</li>
           {tiflList.map((u) => (
             <li key={u.id}>

@@ -106,7 +106,7 @@ export function CreateUserForm({ majlisList }: CreateUserFormProps) {
         />
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <button type="submit" disabled={loading} className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors">
+      <button type="submit" disabled={loading} className="px-4 py-2 btn-kid-primary rounded-xl disabled:opacity-50 disabled:transform-none focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none">
         {loading ? "Creating…" : "Create user"}
       </button>
     </form>

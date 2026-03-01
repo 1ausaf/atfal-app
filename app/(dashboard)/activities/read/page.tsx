@@ -13,14 +13,14 @@ export default async function ReadPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href="/activities/read/newsletter"
-          className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-6 hover:border-emerald-500 dark:hover:border-emerald-600 transition-colors"
+          className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-6 hover:border-emerald-400 dark:hover:border-emerald-600 transition-colors"
         >
           <h2 className="font-semibold text-lg text-slate-900 dark:text-white">Newsletter</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Browse newsletter documents and PDFs</p>
         </Link>
         <Link
           href="/activities/read/read"
-          className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-6 hover:border-emerald-500 dark:hover:border-emerald-600 transition-colors"
+          className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-6 hover:border-emerald-400 dark:hover:border-emerald-600 transition-colors"
         >
           <h2 className="font-semibold text-lg text-slate-900 dark:text-white">Read</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">More reading content</p>

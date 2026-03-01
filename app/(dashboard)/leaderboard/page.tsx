@@ -52,7 +52,7 @@ export default async function LeaderboardPage({
           </Link>
         ))}
       </div>
-      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+      <div className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg overflow-hidden">
         {!rows?.length ? (
           <p className="p-6 text-slate-500 dark:text-slate-400">No scores in this group yet.</p>
         ) : (

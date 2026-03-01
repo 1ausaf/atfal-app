@@ -29,7 +29,7 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
   return (
     <div className="max-w-2xl mx-auto">
       <Link href="/homework" className="text-green-600 hover:underline mb-4 inline-block">Back to homework</Link>
-      <article className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-6">
+      <article className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-6">
         <h1 className="text-2xl font-bold">{hw.title}</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Due: {new Date(hw.due_by).toLocaleString()}</p>
         {hw.description && <p className="mt-4 text-slate-600 dark:text-slate-400">{hw.description}</p>}

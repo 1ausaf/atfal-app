@@ -35,7 +35,7 @@ export function GradeSubmissionButton({ submissionId }: { submissionId: string }
         type="button"
         onClick={handleGrade}
         disabled={loading}
-        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
+        className="px-3 py-1.5 btn-kid-primary text-sm rounded-xl disabled:opacity-50 disabled:transform-none"
       >
         Award points
       </button>

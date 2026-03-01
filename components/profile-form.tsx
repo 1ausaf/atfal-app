@@ -74,7 +74,7 @@ export function ProfileForm({
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+          className="w-full px-3 py-2 border-2 border-slate-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
         />
       </div>
       <div>
@@ -86,7 +86,7 @@ export function ProfileForm({
           type="date"
           value={dateOfBirth}
           onChange={(e) => setDateOfBirth(e.target.value)}
-          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+          className="w-full px-3 py-2 border-2 border-slate-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
         />
         {user.age != null && (
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -103,7 +103,7 @@ export function ProfileForm({
             id="majlis_id"
             value={majlisId}
             onChange={(e) => setMajlisId(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            className="w-full px-3 py-2 border-2 border-slate-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
           >
             <option value="">Select majlis</option>
             {majlisList.map((m) => (
@@ -115,7 +115,7 @@ export function ProfileForm({
         ) : (
           <p
             id="majlis_id"
-            className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+            className="w-full px-3 py-2 border-2 border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
           >
             {majlisName}
           </p>
@@ -126,7 +126,7 @@ export function ProfileForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-2 px-4 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+        className="w-full py-3 px-4 btn-kid-primary rounded-xl disabled:opacity-50 disabled:transform-none"
       >
         {loading ? "Saving…" : "Save"}
       </button>

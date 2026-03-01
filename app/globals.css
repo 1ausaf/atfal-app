@@ -33,12 +33,81 @@
   }
 }
 
+/* Child-friendly theme for non-Salat app areas */
+:root {
+  --kid-card-radius: 1rem;
+  --kid-shadow: 0 4px 14px rgba(16, 185, 129, 0.08);
+  --kid-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.12);
+  --kid-accent: #059669;
+  --kid-accent-hover: #047857;
+  --kid-border: #e2e8f0;
+  --kid-bg-soft: #f0fdf4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --kid-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    --kid-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+    --kid-accent: #34d399;
+    --kid-accent-hover: #6ee7b7;
+    --kid-border: #334155;
+    --kid-bg-soft: #022c22;
+  }
+}
+
+@layer components {
+  .card-kid {
+    border-radius: var(--kid-card-radius);
+    border-width: 1px;
+    border-color: var(--kid-border);
+    background: white;
+    box-shadow: var(--kid-shadow);
+    transition: box-shadow 0.2s ease;
+  }
+  @media (prefers-color-scheme: dark) {
+    .card-kid {
+      background: #1e293b;
+      border-color: #334155;
+    }
+  }
+  .card-kid:hover {
+    box-shadow: var(--kid-shadow-hover);
+  }
+  .btn-kid-primary {
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-kid-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+  }
+  .link-kid {
+    color: #059669;
+    transition: color 0.15s ease;
+  }
+  .link-kid:hover {
+    color: #047857;
+    text-decoration: underline;
+  }
+  @media (prefers-color-scheme: dark) {
+    .link-kid {
+      color: #34d399;
+    }
+    .link-kid:hover {
+      color: #6ee7b7;
+    }
+  }
+}
+
 body {
   color: var(--foreground);
-  background: linear-gradient(to bottom, var(--background) 0%, #f0fdf4 100%);
+  background: linear-gradient(160deg, var(--background) 0%, #ecfdf5 50%, #f0fdf4 100%);
 }
 @media (prefers-color-scheme: dark) {
   body {
-    background: linear-gradient(to bottom, var(--background) 0%, #022c22 100%);
+    background: linear-gradient(160deg, var(--background) 0%, #064e3b 50%, #022c22 100%);
   }
 }

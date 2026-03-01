@@ -13,12 +13,12 @@ export default async function AdminPage() {
       <h1 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">Admin</h1>
       <ul className="space-y-2">
         <li>
-          <Link href="/admin/analytics" className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
+          <Link href="/admin/analytics" className="link-kid font-medium">
             Analytics — Active Tifls by Majlis
           </Link>
         </li>
         <li>
-          <Link href="/admin/chats" className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
+          <Link href="/admin/chats" className="link-kid font-medium">
             All Chats — View all conversations
           </Link>
         </li>

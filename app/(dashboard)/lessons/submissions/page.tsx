@@ -40,7 +40,7 @@ export default async function LessonSubmissionsPage() {
           {submissions.map((s) => {
             const qList = questionsByActivity.get(s.activity_id) ?? [];
             return (
-              <li key={s.id} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4">
+              <li key={s.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="font-medium">{userMap.get(s.user_id) ?? s.user_id}</span>

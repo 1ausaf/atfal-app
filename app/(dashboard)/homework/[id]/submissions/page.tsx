@@ -33,7 +33,7 @@ export default async function HomeworkSubmissionsPage({ params }: { params: Prom
       ) : (
         <ul className="space-y-4">
           {submissions.map((s) => (
-            <li key={s.id} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4 flex justify-between items-center">
+            <li key={s.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4 flex justify-between items-center">
               <div>
                 <span className="font-medium">{userMap.get(s.user_id) ?? s.user_id}</span>
                 <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{new Date(s.submitted_at).toLocaleString()}</span>

@@ -101,12 +101,12 @@ export function FriendsPageClient({
             placeholder="Search by name…"
             className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800"
           />
-          <button type="submit" disabled={loading} className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50">
+          <button type="submit" disabled={loading} className="px-4 py-2 btn-kid-primary rounded-xl disabled:opacity-50 disabled:transform-none">
             Search
           </button>
         </form>
         {searchResults.length > 0 && (
-          <ul className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+          <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
             {searchResults.map((u) => (
               <li key={u.id} className="flex items-center justify-between px-4 py-3">
                 <span>{u.name ?? "—"}</span>
@@ -114,7 +114,7 @@ export function FriendsPageClient({
                   type="button"
                   onClick={() => sendRequest(u.id)}
                   disabled={sending === u.id}
-                  className="px-3 py-1.5 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+                  className="px-3 py-1.5 btn-kid-primary text-sm rounded-xl disabled:opacity-50 disabled:transform-none"
                 >
                   Send request
                 </button>
@@ -127,7 +127,7 @@ export function FriendsPageClient({
       {incoming.length > 0 && (
         <section>
           <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200 mb-2">Incoming requests</h2>
-          <ul className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+          <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
             {incoming.map((r) => (
               <li key={r.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div>
@@ -139,7 +139,7 @@ export function FriendsPageClient({
                     type="button"
                     onClick={() => respondToRequest(r.id, "accepted")}
                     disabled={responding === r.id}
-                    className="px-3 py-1.5 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+                    className="px-3 py-1.5 btn-kid-primary text-sm rounded-xl disabled:opacity-50 disabled:transform-none"
                   >
                     Accept
                   </button>
@@ -161,7 +161,7 @@ export function FriendsPageClient({
       {outgoing.length > 0 && (
         <section>
           <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200 mb-2">Outgoing requests</h2>
-          <ul className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+          <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
             {outgoing.map((r) => (
               <li key={r.id} className="flex items-center justify-between px-4 py-3">
                 <span>{r.to_name}</span>
@@ -177,7 +177,7 @@ export function FriendsPageClient({
         {friends.length === 0 ? (
           <p className="text-slate-500 dark:text-slate-400">No friends yet. Search and send a request.</p>
         ) : (
-          <ul className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+          <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
             {friends.map((u) => (
               <li key={u.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50">
                 <span className="font-medium">{u.name ?? "—"}</span>

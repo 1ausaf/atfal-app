@@ -38,10 +38,10 @@ export async function EventsWidget() {
         const majlisName = e.event_type === "local" && e.majlis_id ? majlisMap.get(e.majlis_id) : null;
         const typeDisplay = majlisName ? `${typeLabel} · ${majlisName}` : typeLabel;
         return (
-          <li key={e.id} className="flex justify-between items-start gap-2">
+          <li key={e.id} className="flex justify-between items-start gap-2 p-2 rounded-xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100/80 dark:border-emerald-800/30">
             <div>
-              <span className="font-medium text-slate-900 dark:text-white">{e.title}</span>
-              <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+              <span className="font-medium text-slate-800 dark:text-white">{e.title}</span>
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
                 {typeDisplay}
               </span>
             </div>

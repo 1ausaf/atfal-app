@@ -68,7 +68,7 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
           role === "regional_nazim" || (role === "local_nazim" && userMajlisId != null && h.majlis_id === userMajlisId);
         const tagLabel = h.majlis_id ? majlisMap.get(h.majlis_id) ?? h.majlis_id : "Regional";
         return (
-          <li key={h.id} className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+          <li key={h.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
             <div className="flex justify-between items-start gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">

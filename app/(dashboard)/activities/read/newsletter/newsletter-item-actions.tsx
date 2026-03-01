@@ -38,7 +38,7 @@ export function NewsletterItemActions({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card overflow-hidden group/card flex flex-col">
+    <div className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg overflow-hidden group/card flex flex-col">
       <a
         href={item.document_url}
         target="_blank"

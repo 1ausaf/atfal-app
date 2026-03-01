@@ -46,7 +46,7 @@ export default async function EventsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Upcoming events</h1>
         {canCreate && (
-          <Link href="/events/new" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+          <Link href="/events/new" className="px-4 py-2 btn-kid-primary rounded-xl inline-block">
             Create event
           </Link>
         )}
@@ -64,7 +64,7 @@ export default async function EventsPage() {
       ) : (
         <ul className="space-y-4">
           {events.map((e) => (
-            <li key={e.id} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4">
+            <li key={e.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
               <div className="flex justify-between items-start gap-4">
                 <div className="min-w-0">
                   <span className="font-semibold text-lg">{e.title}</span>

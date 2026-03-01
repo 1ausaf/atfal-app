@@ -39,46 +39,46 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white tracking-tight">Dashboard</h1>
       <div className="grid gap-6 md:grid-cols-2">
-        <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4">
-          <h2 className="font-semibold text-lg mb-3 text-slate-900 dark:text-white">Upcoming events</h2>
+        <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
+          <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Upcoming events</h2>
           <EventsWidget />
-          <Link href="/events" className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline mt-2 inline-block transition-colors">View all events</Link>
+          <Link href="/events" className="link-kid text-sm mt-2 inline-block">View all events</Link>
         </section>
-        <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4">
-          <h2 className="font-semibold text-lg mb-3 text-slate-900 dark:text-white">Leaderboard (Top 25)</h2>
+        <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
+          <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Leaderboard (Top 25)</h2>
           <LeaderboardWidget />
-          <Link href="/leaderboard" className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline mt-2 inline-block transition-colors">Full leaderboard</Link>
+          <Link href="/leaderboard" className="link-kid text-sm mt-2 inline-block">Full leaderboard</Link>
         </section>
       </div>
       {(session.user.role === "local_nazim" || session.user.role === "regional_nazim") && submissionsToMark.length > 0 && (
-        <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4 mt-6">
-          <h2 className="font-semibold text-lg mb-3 text-slate-900 dark:text-white">Submissions to mark</h2>
+        <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5 mt-6">
+          <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Submissions to mark</h2>
           <ul className="space-y-2">
             {submissionsToMark.map((h) => (
               <li key={h.id}>
-                <Link href={`/homework/${h.id}/submissions`} className="text-emerald-600 hover:text-emerald-700 hover:underline">
+                <Link href={`/homework/${h.id}/submissions`} className="link-kid">
                   {h.title}
                 </Link>
                 <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">({h.pendingCount} pending)</span>
               </li>
             ))}
           </ul>
-          <Link href="/homework" className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline mt-2 inline-block transition-colors">View all homework</Link>
+          <Link href="/homework" className="link-kid text-sm mt-2 inline-block">View all homework</Link>
         </section>
       )}
       {session.user.role === "tifl" && (
         <div className="grid gap-6 md:grid-cols-2 mt-6">
-          <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4">
-            <h2 className="font-semibold text-lg mb-3 text-slate-900 dark:text-white">Homework due</h2>
+          <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
+            <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Homework due</h2>
             <HomeworkDueWidget />
-            <Link href="/homework" className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline mt-2 inline-block transition-colors">View all homework</Link>
+            <Link href="/homework" className="link-kid text-sm mt-2 inline-block">View all homework</Link>
           </section>
-          <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4">
-            <h2 className="font-semibold text-lg mb-3 text-slate-900 dark:text-white">Lesson activities</h2>
+          <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
+            <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Lesson activities</h2>
             <LessonActivitiesWidget />
-            <Link href="/lessons" className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline mt-2 inline-block transition-colors">View all lessons</Link>
+            <Link href="/lessons" className="link-kid text-sm mt-2 inline-block">View all lessons</Link>
           </section>
         </div>
       )}

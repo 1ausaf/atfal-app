@@ -5,11 +5,11 @@ import Link from "next/link";
 import type { UserRole } from "@/lib/db-types";
 
 const navLinkClass =
-  "text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 inline-flex items-center gap-1 transition-colors";
+  "text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 inline-flex items-center gap-1 transition-colors py-1 px-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20";
 const dropdownPanelClass =
-  "absolute top-full left-0 mt-1 min-w-[10rem] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg py-1 z-50";
+  "absolute top-full left-0 mt-2 min-w-[10rem] rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/50 bg-white dark:bg-slate-800 shadow-xl py-2 z-50";
 const dropdownItemClass =
-  "block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors";
+  "block w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors rounded-lg mx-1";
 
 type NavCounts = { friends: number; messages: number; homework: number; lessons: number };
 
@@ -218,7 +218,7 @@ export function DashboardNav({
       </Link>
       <Link
         href="/signout"
-        className="text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+        className="text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors py-1 px-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
       >
         Sign out
       </Link>

@@ -90,7 +90,7 @@ export function ProfileCompleteForm({ majlisList }: { majlisList: Majlis[] }) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-2 px-4 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+        className="w-full py-3 px-4 btn-kid-primary rounded-xl disabled:opacity-50 disabled:transform-none"
       >
         {loading ? "Saving…" : "Save and continue"}
       </button>

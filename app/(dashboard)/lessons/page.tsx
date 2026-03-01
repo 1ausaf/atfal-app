@@ -35,7 +35,7 @@ export default async function LessonsPage() {
     return (
       <ul className="space-y-4">
         {items.map((a) => (
-          <li key={a.id} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card p-4">
+          <li key={a.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
             <div className="flex justify-between items-start gap-4">
               <div className="flex gap-4 min-w-0 flex-1">
                 {showThumb && a.thumbnail_url && (
@@ -71,10 +71,10 @@ export default async function LessonsPage() {
         <h1 className="text-2xl font-bold">Lesson activities</h1>
         {isRegional && (
           <>
-            <Link href="/lessons/new" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <Link href="/lessons/new" className="px-4 py-2 btn-kid-primary rounded-xl inline-block">
               Create lesson
             </Link>
-            <Link href="/lessons/submissions" className="px-4 py-2 border border-emerald-600 text-emerald-600 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950 transition-colors">
+            <Link href="/lessons/submissions" className="px-4 py-2 border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-colors inline-block">
               Grade submissions
             </Link>
           </>

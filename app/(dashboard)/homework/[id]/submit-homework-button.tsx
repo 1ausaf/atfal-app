@@ -36,7 +36,7 @@ export function SubmitHomeworkButton({ homeworkId }: { homeworkId: string }) {
         type="button"
         onClick={handleSubmit}
         disabled={loading}
-        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+        className="px-4 py-2 btn-kid-primary rounded-xl disabled:opacity-50 disabled:transform-none"
       >
         {loading ? "Submitting…" : "Mark as submitted"}
       </button>

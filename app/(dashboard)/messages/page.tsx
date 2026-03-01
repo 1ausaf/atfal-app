@@ -51,7 +51,7 @@ export default async function MessagesPage() {
         <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Messages</h1>
         <Link
           href="/messages/new"
-          className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+          className="px-4 py-2 btn-kid-primary rounded-xl text-sm font-medium"
         >
           New chat
         </Link>
@@ -60,7 +60,7 @@ export default async function MessagesPage() {
       {!conversations.length ? (
         <p className="text-slate-500 dark:text-slate-400">No conversations yet. Start a new chat.</p>
       ) : (
-        <ul className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+        <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
           {conversations.map((c) => (
             <li key={c.id}>
               <Link

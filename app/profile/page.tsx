@@ -26,7 +26,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <Link href="/dashboard" className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline mb-4 inline-block">
+      <Link href="/dashboard" className="link-kid text-sm mb-4 inline-block">
         ← Back to Dashboard
       </Link>
       <h1 className="text-2xl font-bold mb-2 text-slate-800 dark:text-slate-200">Profile</h1>

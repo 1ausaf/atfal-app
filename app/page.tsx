@@ -2,13 +2,13 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8 gap-6">
-      <h1 className="text-3xl font-bold">GTA Centre Atfal</h1>
-      <p className="text-gray-600 dark:text-gray-400">Digital Learning Platform</p>
-      <div className="flex gap-4">
+    <main className="min-h-screen flex flex-col items-center justify-center p-8 gap-6 bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-emerald-950/30 dark:via-slate-900 dark:to-teal-950/30">
+      <h1 className="text-4xl font-bold text-slate-800 dark:text-white tracking-tight">GTA Centre Atfal</h1>
+      <p className="text-lg text-slate-600 dark:text-slate-400">Digital Learning Platform</p>
+      <div className="flex gap-4 mt-2">
         <Link
           href="/login"
-          className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+          className="btn-kid-primary px-8 py-3 rounded-2xl text-lg inline-block"
         >
           Login
         </Link>
