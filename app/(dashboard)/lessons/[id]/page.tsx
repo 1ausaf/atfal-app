@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import Link from "next/link";
+import Image from "next/image";
 import { LessonContent } from "./lesson-content";
 
 export default async function LessonDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -31,6 +32,17 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
   return (
     <div className="max-w-3xl mx-auto">
       <Link href="/lessons" className="text-green-600 hover:underline mb-4 inline-block">Back to lessons</Link>
+      {activity.thumbnail_url && (
+        <div className="mb-4 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+          <Image
+            src={activity.thumbnail_url}
+            alt=""
+            width={640}
+            height={360}
+            className="w-full h-auto object-cover"
+          />
+        </div>
+      )}
       <h1 className="text-2xl font-bold">{activity.title}</h1>
       {activity.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{activity.description}</p>}
       <LessonContent

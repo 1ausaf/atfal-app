@@ -35,18 +35,22 @@ export async function PATCH(
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await request.json();
-  const { title, description, link, type } = body;
+  const { title, description, link, type, thumbnail_url } = body;
   if (!title) return NextResponse.json({ error: "Title required" }, { status: 400 });
   const activityType = type === "article" ? "article" : "video";
 
+  const updates: Record<string, unknown> = {
+    title: String(title).trim(),
+    description: description != null ? String(description).trim() : null,
+    link: link != null ? String(link).trim() : null,
+    type: activityType,
+  };
+  if (thumbnail_url !== undefined)
+    updates.thumbnail_url = thumbnail_url != null && thumbnail_url !== "" ? String(thumbnail_url).trim() : null;
+
   const { error: updateError } = await supabase
     .from("lesson_activities")
-    .update({
-      title: String(title).trim(),
-      description: description != null ? String(description).trim() : null,
-      link: link != null ? String(link).trim() : null,
-      type: activityType,
-    })
+    .update(updates)
     .eq("id", id);
   if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
   return NextResponse.json({ ok: true });
