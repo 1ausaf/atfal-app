@@ -47,8 +47,10 @@ export function NewsletterItemActions({
       >
         <div className="aspect-[3/4] bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
           {item.cover_url ? (
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={item.cover_url} alt="" className="w-full h-full object-cover" />
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={item.cover_url} alt="" className="w-full h-full object-cover" />
+            </>
           ) : (
             <span className="text-slate-400 dark:text-slate-500 text-4xl" aria-hidden>
               📄
