@@ -140,7 +140,7 @@ export function EditNewsletterForm({ item }: { item: Item }) {
           id="order"
           type="number"
           value={order}
-          onChange={(e) => setOrder(e.target.value)}
+          onChange={(e) => setOrder(Number(e.target.value) || 0)}
           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:outline-none transition-colors"
         />
       </div>
