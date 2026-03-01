@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8 gap-6">
       <h1 className="text-3xl font-bold">GTA Centre Atfal</h1>
-      <p className="text-gray-600 dark:text-gray-400">Gamified youth platform</p>
+      <p className="text-gray-600 dark:text-gray-400">Digital Learning Platform</p>
       <div className="flex gap-4">
         <Link
           href="/login"
