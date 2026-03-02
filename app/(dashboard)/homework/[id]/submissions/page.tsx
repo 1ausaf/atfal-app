@@ -8,7 +8,7 @@ import { ApproveSubmissionButtons } from "./approve-submission-buttons";
 export default async function HomeworkSubmissionsPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim") redirect("/homework");
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/homework");
   const { id } = await params;
   const supabase = createSupabaseServerClient();
   const { data: hw } = await supabase.from("homework").select("*").eq("id", id).single();

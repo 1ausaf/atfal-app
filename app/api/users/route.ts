@@ -7,12 +7,12 @@ import bcrypt from "bcryptjs";
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "regional_nazim")
-    return NextResponse.json({ error: "Only Regional Nazim can create users" }, { status: 403 });
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin")
+    return NextResponse.json({ error: "Only Regional Nazim or Admin can create users" }, { status: 403 });
   const body = await request.json();
   const { member_code, password, role, majlis_id, name } = body;
   if (!member_code || !password) return NextResponse.json({ error: "member_code and password required" }, { status: 400 });
-  if (!["tifl", "local_nazim"].includes(role)) return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+  if (!["tifl", "local_nazim", "admin"].includes(role)) return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   if (role === "local_nazim" && !majlis_id) return NextResponse.json({ error: "majlis_id required for Local Nazim" }, { status: 400 });
   const passwordHash = await bcrypt.hash(password, 10);
   const supabase = createSupabaseServerClient();

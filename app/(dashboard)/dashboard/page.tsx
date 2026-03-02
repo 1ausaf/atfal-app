@@ -9,7 +9,7 @@ import { LessonActivitiesWidget } from "@/components/lesson-activities-widget";
 import Link from "next/link";
 
 async function getSubmissionsToMark(role: string, majlisId: string | null) {
-  if (role !== "local_nazim" && role !== "regional_nazim") return [];
+  if (role !== "local_nazim" && role !== "regional_nazim" && role !== "admin") return [];
   const supabase = createSupabaseServerClient();
   let hwQuery = supabase.from("homework").select("id, title, majlis_id");
   if (role === "local_nazim" && majlisId) hwQuery = hwQuery.eq("majlis_id", majlisId);
@@ -33,7 +33,7 @@ export default async function DashboardPage() {
   if (!session) redirect("/login");
 
   const submissionsToMark =
-    session.user.role === "local_nazim" || session.user.role === "regional_nazim"
+    session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin"
       ? await getSubmissionsToMark(session.user.role, session.user.majlisId)
       : [];
 
@@ -52,7 +52,7 @@ export default async function DashboardPage() {
           <Link href="/leaderboard" className="link-kid text-sm mt-2 inline-block">Full leaderboard</Link>
         </section>
       </div>
-      {(session.user.role === "local_nazim" || session.user.role === "regional_nazim") && submissionsToMark.length > 0 && (
+      {(session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin") && submissionsToMark.length > 0 && (
         <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5 mt-6">
           <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Submissions to mark</h2>
           <ul className="space-y-2">

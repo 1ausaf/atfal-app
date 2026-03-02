@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   if (session.user.role === "local_nazim") {
     if (!session.user.majlisId) return NextResponse.json({ error: "No Majlis" }, { status: 403 });
     query = query.eq("majlis_id", session.user.majlisId);
-  } else if (session.user.role === "regional_nazim" && majlisId) {
+  } else if ((session.user.role === "regional_nazim" || session.user.role === "admin") && majlisId) {
     query = query.eq("majlis_id", majlisId);
   }
   const { data, error } = await query.order("name");

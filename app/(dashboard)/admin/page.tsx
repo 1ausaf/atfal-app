@@ -6,7 +6,7 @@ import Link from "next/link";
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "regional_nazim") redirect("/dashboard");
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/dashboard");
 
   return (
     <div className="max-w-2xl mx-auto">

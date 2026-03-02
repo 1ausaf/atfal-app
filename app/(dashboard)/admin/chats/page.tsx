@@ -7,7 +7,7 @@ import Link from "next/link";
 export default async function AdminChatsPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "regional_nazim") redirect("/dashboard");
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/dashboard");
 
   const supabase = createSupabaseServerClient();
   const { data: convs } = await supabase.from("conversations").select("id, created_at").order("created_at", { ascending: false }).limit(200);

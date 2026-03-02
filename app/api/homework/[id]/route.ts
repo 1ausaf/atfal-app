@@ -21,8 +21,8 @@ export async function GET(
 }
 
 function canEditHomework(role: string, userMajlisId: string | null, homeworkMajlisId: string | null): boolean {
-  if (role !== "local_nazim" && role !== "regional_nazim") return false;
-  if (role === "regional_nazim") return true;
+  if (role !== "local_nazim" && role !== "regional_nazim" && role !== "admin") return false;
+  if (role === "regional_nazim" || role === "admin") return true;
   return userMajlisId != null && homeworkMajlisId === userMajlisId;
 }
 
@@ -32,7 +32,7 @@ export async function PATCH(
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim")
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const supabase = createSupabaseServerClient();
@@ -44,7 +44,7 @@ export async function PATCH(
   const body = await request.json();
   const { title, description, due_by, links, majlis_id } = body;
   if (!title || !due_by) return NextResponse.json({ error: "Title and due_by required" }, { status: 400 });
-  const majlisId = session.user.role === "regional_nazim"
+  const majlisId = session.user.role === "regional_nazim" || session.user.role === "admin"
     ? (majlis_id !== undefined ? majlis_id : existing.majlis_id)
     : existing.majlis_id;
   if (session.user.role === "local_nazim" && majlisId !== session.user.majlisId)
@@ -71,7 +71,7 @@ export async function DELETE(
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim")
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const supabase = createSupabaseServerClient();

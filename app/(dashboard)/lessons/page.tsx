@@ -14,7 +14,7 @@ export default async function LessonsPage() {
     .from("lesson_activities")
     .select("id, title, description, link, type, thumbnail_url, created_at")
     .order("created_at", { ascending: false });
-  const isRegional = session.user.role === "regional_nazim";
+  const isRegional = session.user.role === "regional_nazim" || session.user.role === "admin";
   const isTifl = session.user.role === "tifl";
 
   let incompleteActivities = activities ?? [];

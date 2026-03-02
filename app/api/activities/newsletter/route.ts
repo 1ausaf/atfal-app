@@ -39,7 +39,7 @@ export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const role = session.user.role;
-  if (role !== "regional_nazim" && role !== "local_nazim")
+  if (role !== "regional_nazim" && role !== "local_nazim" && role !== "admin")
     return NextResponse.json({ error: "Only Regional or Local Nazim can add newsletter documents" }, { status: 403 });
   const body = await request.json();
   const { title, document_url, cover_url, order } = body;

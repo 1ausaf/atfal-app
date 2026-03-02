@@ -21,7 +21,7 @@ export default async function HomeworkPage() {
   }
   const { data: homeworkList } = await query;
   const { data: majlisList } = await supabase.from("majlis").select("id, name").order("name");
-  const canCreate = session.user.role === "local_nazim" || session.user.role === "regional_nazim";
+  const canCreate = session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin";
 
   return (
     <div className="max-w-4xl mx-auto">

@@ -8,8 +8,8 @@ function canEditEvent(
   userMajlisId: string | null,
   eventMajlisId: string | null
 ): boolean {
-  if (role !== "local_nazim" && role !== "regional_nazim") return false;
-  if (role === "regional_nazim") return true;
+  if (role !== "local_nazim" && role !== "regional_nazim" && role !== "admin") return false;
+  if (role === "regional_nazim" || role === "admin") return true;
   return userMajlisId != null && eventMajlisId === userMajlisId;
 }
 
@@ -41,7 +41,7 @@ export async function PATCH(
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim")
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const supabase = createSupabaseServerClient();
@@ -82,7 +82,7 @@ export async function DELETE(
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim")
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const supabase = createSupabaseServerClient();

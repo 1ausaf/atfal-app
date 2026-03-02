@@ -8,7 +8,7 @@ import { EditLessonForm } from "./edit-lesson-form";
 export default async function EditLessonPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "regional_nazim") redirect("/lessons");
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/lessons");
   const { id } = await params;
   const supabase = createSupabaseServerClient();
   const { data: activity, error } = await supabase.from("lesson_activities").select("*").eq("id", id).single();

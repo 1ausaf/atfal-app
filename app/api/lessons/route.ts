@@ -18,7 +18,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "regional_nazim")
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Only Regional Nazim can create lessons" }, { status: 403 });
   const body = await request.json();
   const { title, description, link, type, thumbnail_url } = body;

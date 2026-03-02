@@ -25,8 +25,8 @@ export default async function NewsletterPage() {
   }
   const { data: items } = await query;
   const list = items ?? [];
-  const canAdd = role === "regional_nazim" || role === "local_nazim";
-  const canEditAny = role === "regional_nazim";
+  const canAdd = role === "regional_nazim" || role === "local_nazim" || role === "admin";
+  const canEditAny = role === "regional_nazim" || role === "admin";
 
   return (
     <div className="max-w-5xl mx-auto">

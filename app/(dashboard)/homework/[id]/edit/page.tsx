@@ -8,7 +8,7 @@ import { EditHomeworkForm } from "./edit-homework-form";
 export default async function EditHomeworkPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim")
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin")
     redirect("/homework");
   const { id } = await params;
   const supabase = createSupabaseServerClient();
@@ -17,7 +17,7 @@ export default async function EditHomeworkPage({ params }: { params: Promise<{ i
   if (session.user.role === "local_nazim" && homework.majlis_id !== session.user.majlisId)
     notFound();
   const { data: majlis } = await supabase.from("majlis").select("id, name");
-  const isRegional = session.user.role === "regional_nazim";
+  const isRegional = session.user.role === "regional_nazim" || session.user.role === "admin";
 
   return (
     <div className="max-w-xl mx-auto">

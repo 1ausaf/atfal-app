@@ -11,7 +11,7 @@ export function CreateUserForm({ majlisList }: CreateUserFormProps) {
   const router = useRouter();
   const [memberCode, setMemberCode] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"tifl" | "local_nazim">("tifl");
+  const [role, setRole] = useState<"tifl" | "local_nazim" | "admin">("tifl");
   const [majlisId, setMajlisId] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
@@ -73,11 +73,12 @@ export function CreateUserForm({ majlisList }: CreateUserFormProps) {
         <label className="block text-sm font-medium mb-1">Role</label>
         <select
           value={role}
-          onChange={(e) => setRole(e.target.value as "tifl" | "local_nazim")}
+          onChange={(e) => setRole(e.target.value as "tifl" | "local_nazim" | "admin")}
           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors"
         >
           <option value="tifl">Tifl</option>
           <option value="local_nazim">Local Nazim Atfal</option>
+          <option value="admin">Admin</option>
         </select>
       </div>
       {role === "local_nazim" && (

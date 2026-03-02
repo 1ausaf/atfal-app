@@ -8,7 +8,7 @@ import { TiflsList } from "./tifls-list";
 export default async function TiflsPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim") redirect("/dashboard");
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/dashboard");
   const supabase = createSupabaseServerClient();
   let query = supabase
     .from("users")
@@ -28,19 +28,19 @@ export default async function TiflsPage() {
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Tifls</h1>
-        {session.user.role === "regional_nazim" && (
+        {(session.user.role === "regional_nazim" || session.user.role === "admin") && (
           <Link href="/tifls/new" className="px-4 py-2 btn-kid-primary rounded-xl inline-block">
             Create user
           </Link>
         )}
       </div>
-      {session.user.role === "regional_nazim" && (
+      {(session.user.role === "regional_nazim" || session.user.role === "admin") && (
         <p className="text-slate-600 dark:text-slate-400 mb-4">Select a Majlis to filter, or leave blank to see all.</p>
       )}
       <TiflsList
         initialTifls={tifls ?? []}
         majlisList={majlisList ?? []}
-        isRegional={session.user.role === "regional_nazim"}
+        isRegional={session.user.role === "regional_nazim" || session.user.role === "admin"}
         majlisMap={majlisMap}
       />
     </div>

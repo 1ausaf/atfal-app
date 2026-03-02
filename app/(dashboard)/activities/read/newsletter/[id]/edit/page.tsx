@@ -11,7 +11,7 @@ export default async function EditNewsletterPage({
 }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "regional_nazim") redirect("/activities/read/newsletter");
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/activities/read/newsletter");
   const { id } = await params;
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase

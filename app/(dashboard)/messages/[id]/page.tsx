@@ -21,7 +21,7 @@ export default async function MessageThreadPage({
     .eq("conversation_id", id);
   const userIds = (participants ?? []).map((p) => p.user_id);
   const canAccess =
-    userIds.includes(session.user.id) || session.user.role === "regional_nazim";
+    userIds.includes(session.user.id) || session.user.role === "regional_nazim" || session.user.role === "admin";
   if (!canAccess) notFound();
 
   const otherId = userIds.find((uid) => uid !== session.user.id);

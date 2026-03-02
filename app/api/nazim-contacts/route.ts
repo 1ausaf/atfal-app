@@ -25,7 +25,7 @@ export async function GET() {
     supabase
       .from("users")
       .select("id, name")
-      .eq("role", "regional_nazim")
+      .in("role", ["regional_nazim", "admin"])
       .is("deleted_at", null)
       .order("name")
       .limit(1)

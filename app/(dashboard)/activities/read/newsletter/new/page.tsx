@@ -6,7 +6,7 @@ import { AddNewsletterForm } from "./add-newsletter-form";
 export default async function NewNewsletterPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "regional_nazim" && session.user.role !== "local_nazim") redirect("/activities/read/newsletter");
+  if (session.user.role !== "regional_nazim" && session.user.role !== "local_nazim" && session.user.role !== "admin") redirect("/activities/read/newsletter");
 
   return (
     <div className="max-w-xl mx-auto">

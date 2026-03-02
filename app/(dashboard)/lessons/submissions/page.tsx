@@ -8,7 +8,7 @@ import { GradeSubmissionButton } from "./grade-submission-button";
 export default async function LessonSubmissionsPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "regional_nazim" && session.user.role !== "local_nazim") redirect("/lessons");
+  if (session.user.role !== "regional_nazim" && session.user.role !== "local_nazim" && session.user.role !== "admin") redirect("/lessons");
   const supabase = createSupabaseServerClient();
   const { data: submissions } = await supabase
     .from("lesson_submissions")

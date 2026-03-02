@@ -25,7 +25,7 @@ export async function GET(
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim")
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const body = await request.json();

@@ -15,7 +15,7 @@ async function canAccessConversation(
     .eq("conversation_id", conversationId);
   const userIds = (participants ?? []).map((p) => p.user_id);
   if (userIds.includes(userId)) return true;
-  if (role === "regional_nazim") return true;
+  if (role === "regional_nazim" || role === "admin") return true;
   return false;
 }
 

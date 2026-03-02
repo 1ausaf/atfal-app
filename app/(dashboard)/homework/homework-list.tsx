@@ -31,7 +31,7 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
   const majlisMap = useMemo(() => new Map(majlisList.map((m) => [m.id, m.name])), [majlisList]);
 
   const filteredHomework =
-    role === "regional_nazim"
+    (role === "regional_nazim" || role === "admin")
       ? homework.filter((h) => {
           if (majlisFilter === FILTER_ALL) return true;
           if (majlisFilter === FILTER_REGIONAL) return h.majlis_id == null;
@@ -43,7 +43,7 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
 
   return (
     <>
-      {role === "regional_nazim" && (
+      {(role === "regional_nazim" || role === "admin") && (
         <div className="mb-4 flex items-center gap-2">
           <label htmlFor="majlis-filter" className="text-sm font-medium text-slate-600 dark:text-slate-400">
             Filter by Majlis:
@@ -65,7 +65,7 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
       <ul className="space-y-4">
       {filteredHomework.map((h) => {
         const canEdit =
-          role === "regional_nazim" || (role === "local_nazim" && userMajlisId != null && h.majlis_id === userMajlisId);
+          (role === "regional_nazim" || role === "admin") || (role === "local_nazim" && userMajlisId != null && h.majlis_id === userMajlisId);
         const tagLabel = h.majlis_id ? majlisMap.get(h.majlis_id) ?? h.majlis_id : "Regional";
         return (
           <li key={h.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
@@ -95,7 +95,7 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
               </div>
               <div className="flex flex-col items-end gap-1 shrink-0">
                 <HomeworkItemActions homeworkId={h.id} canEdit={canEdit} />
-                {!canEdit && (role === "local_nazim" || role === "regional_nazim") && (
+                {!canEdit && (role === "local_nazim" || (role === "regional_nazim" || role === "admin")) && (
                   <Link href={`/homework/${h.id}/submissions`} className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline">
                     View submissions
                   </Link>
@@ -106,7 +106,7 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
         );
       })}
     </ul>
-    {role === "regional_nazim" && filteredHomework.length === 0 && homework.length > 0 && (
+    {(role === "regional_nazim" || role === "admin") && filteredHomework.length === 0 && homework.length > 0 && (
       <p className="text-slate-500 dark:text-slate-400">No homework match the selected filter.</p>
     )}
     </>

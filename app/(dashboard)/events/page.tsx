@@ -32,11 +32,11 @@ export default async function EventsPage() {
   const { data: events } = await query;
   const { data: majlis } = await supabase.from("majlis").select("id, name");
   const majlisMap = new Map((majlis ?? []).map((m) => [m.id, m.name]));
-  const canCreate = session.user.role === "local_nazim" || session.user.role === "regional_nazim";
+  const canCreate = session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin";
   const userMajlisId = session.user.majlisId ?? null;
   const role = session.user.role;
   function canEditEvent(e: { majlis_id: string | null }) {
-    if (role === "regional_nazim") return true;
+    if (role === "regional_nazim" || role === "admin") return true;
     if (role === "local_nazim" && userMajlisId && e.majlis_id === userMajlisId) return true;
     return false;
   }

@@ -18,7 +18,7 @@ export function NewChatClient({
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    if (role === "local_nazim" || role === "regional_nazim") {
+    if (role === "local_nazim" || role === "regional_nazim" || role === "admin") {
       fetch("/api/tifls")
         .then((r) => r.json())
         .then((data) => {
@@ -62,7 +62,7 @@ export function NewChatClient({
     }
   }
 
-  const isNazim = role === "local_nazim" || role === "regional_nazim";
+  const isNazim = role === "local_nazim" || role === "regional_nazim" || role === "admin";
 
   return (
     <div className="space-y-4">

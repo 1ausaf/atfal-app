@@ -6,7 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "regional_nazim")
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Regional Nazim only" }, { status: 403 });
 
   const { searchParams } = new URL(request.url);

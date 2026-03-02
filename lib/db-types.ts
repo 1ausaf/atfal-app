@@ -1,4 +1,4 @@
-export type UserRole = "tifl" | "local_nazim" | "regional_nazim";
+export type UserRole = "tifl" | "local_nazim" | "regional_nazim" | "admin";
 
 export interface User {
   id: string;

@@ -26,13 +26,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim")
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const body = await request.json();
   const { title, description, due_by, links, majlis_id } = body;
   if (!title || !due_by) return NextResponse.json({ error: "Title and due_by required" }, { status: 400 });
   let majlisId: string | null;
-  if (session.user.role === "regional_nazim") {
+  if (session.user.role === "regional_nazim" || session.user.role === "admin") {
     majlisId = majlis_id === undefined ? session.user.majlisId : majlis_id;
     if (majlisId !== null && !majlisId) majlisId = session.user.majlisId;
   } else {

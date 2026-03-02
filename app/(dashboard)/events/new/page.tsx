@@ -8,7 +8,7 @@ import { CreateEventForm } from "../create-event-form";
 export default async function NewEventPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim") redirect("/events");
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/events");
   const supabase = createSupabaseServerClient();
   const { data: majlisList } = await supabase.from("majlis").select("id, name").order("name");
   let majlisName: string | null = null;

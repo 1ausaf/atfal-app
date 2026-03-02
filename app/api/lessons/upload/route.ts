@@ -10,7 +10,7 @@ const MAX_SIZE = 2 * 1024 * 1024; // 2MB
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "regional_nazim")
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Only Regional Nazim can upload lesson thumbnails" }, { status: 403 });
 
   const formData = await request.formData();

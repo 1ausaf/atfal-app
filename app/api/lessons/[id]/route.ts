@@ -27,7 +27,7 @@ export async function PATCH(
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "regional_nazim")
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Only Regional Nazim can edit lessons" }, { status: 403 });
   const { id } = await params;
   const supabase = createSupabaseServerClient();
@@ -62,7 +62,7 @@ export async function DELETE(
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.role !== "regional_nazim")
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Only Regional Nazim can delete lessons" }, { status: 403 });
   const { id } = await params;
   const supabase = createSupabaseServerClient();

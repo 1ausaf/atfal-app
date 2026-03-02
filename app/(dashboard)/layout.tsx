@@ -67,7 +67,7 @@ export default async function DashboardLayout({
   const role: UserRole = session.user.role as UserRole;
   const isTifl = role === "tifl";
   const isLocalNazim = role === "local_nazim";
-  const isRegionalNazim = role === "regional_nazim";
+  const isRegionalNazim = role === "regional_nazim" || role === "admin";
 
   const navCounts = await getNavCounts(supabase, role, session.user.id, session.user.majlisId);
 

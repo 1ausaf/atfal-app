@@ -8,7 +8,7 @@ import { EditEventForm } from "./edit-event-form";
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim")
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin")
     redirect("/events");
   const { id } = await params;
   const supabase = createSupabaseServerClient();

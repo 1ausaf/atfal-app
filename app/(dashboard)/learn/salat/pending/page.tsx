@@ -8,7 +8,7 @@ import { SalatPendingList } from "./salat-pending-list";
 export default async function SalatPendingPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim") redirect("/dashboard");
+  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/dashboard");
 
   const supabase = createSupabaseServerClient();
   const { data: rows, error } = await supabase

@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const role = session.user.role;
-  if (role !== "regional_nazim" && role !== "local_nazim")
+  if (role !== "regional_nazim" && role !== "local_nazim" && role !== "admin")
     return NextResponse.json({ error: "Only Regional or Local Nazim can upload covers" }, { status: 403 });
 
   const formData = await request.formData();

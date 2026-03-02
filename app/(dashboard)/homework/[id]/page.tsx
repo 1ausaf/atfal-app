@@ -53,9 +53,9 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
             )}
           </div>
         )}
-        {(session.user.role === "local_nazim" || session.user.role === "regional_nazim") && (
+        {(session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin") && (
           <div className="mt-6 flex flex-wrap gap-4">
-            {(session.user.role === "regional_nazim" || (session.user.role === "local_nazim" && hw.majlis_id === session.user.majlisId)) && (
+            {((session.user.role === "regional_nazim" || session.user.role === "admin") || (session.user.role === "local_nazim" && hw.majlis_id === session.user.majlisId)) && (
               <Link href={`/homework/${id}/edit`} className="text-green-600 hover:underline">
                 Edit
               </Link>

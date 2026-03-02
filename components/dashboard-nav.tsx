@@ -96,7 +96,7 @@ export function DashboardNav({
 
   const isTifl = role === "tifl";
   const isLocalNazim = role === "local_nazim";
-  const isRegionalNazim = role === "regional_nazim";
+  const isRegionalNazim = role === "regional_nazim" || role === "admin";
   const isNazim = isLocalNazim || isRegionalNazim;
 
   useEffect(() => {

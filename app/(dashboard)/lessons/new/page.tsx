@@ -7,7 +7,7 @@ import { CreateLessonForm } from "./create-lesson-form";
 export default async function NewLessonPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "regional_nazim") redirect("/lessons");
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/lessons");
 
   return (
     <div className="max-w-xl mx-auto">

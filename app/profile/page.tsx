@@ -45,7 +45,7 @@ export default async function ProfilePage() {
           age_group: user.age_group,
         }}
         majlisList={majlisList ?? []}
-        canEditMajlis={session.user.role === "regional_nazim"}
+        canEditMajlis={session.user.role === "regional_nazim" || session.user.role === "admin"}
       />
     </div>
   );
