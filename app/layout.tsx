@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Amiri } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { Analytics } from "@vercel/analytics/next";
 
 const amiri = Amiri({
   weight: ["400", "700"],
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en" className={`${amiri.variable} dark`}>
       <body className="antialiased">
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
