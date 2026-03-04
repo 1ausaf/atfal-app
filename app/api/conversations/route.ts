@@ -8,11 +8,23 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const supabase = createSupabaseServerClient();
-  const { data: participants } = await supabase
-    .from("conversation_participants")
-    .select("conversation_id")
-    .eq("user_id", session.user.id);
-  const convIds = [...new Set((participants ?? []).map((p) => p.conversation_id))];
+  const isRegionalOrAdmin = session.user.role === "regional_nazim" || session.user.role === "admin";
+
+  let convIds: string[];
+  if (isRegionalOrAdmin) {
+    const { data: convs } = await supabase
+      .from("conversations")
+      .select("id, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    convIds = (convs ?? []).map((c) => c.id);
+  } else {
+    const { data: participants } = await supabase
+      .from("conversation_participants")
+      .select("conversation_id")
+      .eq("user_id", session.user.id);
+    convIds = [...new Set((participants ?? []).map((p) => p.conversation_id))];
+  }
   if (!convIds.length) return NextResponse.json({ conversations: [] });
 
   const { data: convs } = await supabase
@@ -24,13 +36,20 @@ export async function GET() {
     .from("conversation_participants")
     .select("conversation_id, user_id")
     .in("conversation_id", convIds);
+  const userIds = [...new Set((allParts ?? []).map((p) => p.user_id))];
+  const { data: users } = await supabase.from("users").select("id, name, role").in("id", userIds);
+  const userMap = new Map((users ?? []).map((u) => [u.id, u]));
+
+  const partsByConv = new Map<string, { name: string; role: string }[]>();
+  (allParts ?? []).forEach((p) => {
+    const u = userMap.get(p.user_id);
+    if (!partsByConv.has(p.conversation_id)) partsByConv.set(p.conversation_id, []);
+    partsByConv.get(p.conversation_id)!.push({ name: u?.name ?? "—", role: u?.role ?? "—" });
+  });
   const otherUserIdByConv = new Map<string, string>();
   (allParts ?? []).forEach((p) => {
     if (p.user_id !== session.user.id) otherUserIdByConv.set(p.conversation_id, p.user_id);
   });
-  const otherIds = [...otherUserIdByConv.values()];
-  const { data: users } = await supabase.from("users").select("id, name").in("id", otherIds);
-  const nameById = new Map((users ?? []).map((u) => [u.id, u.name]));
 
   const { data: lastMessages } = await supabase
     .from("messages")
@@ -43,12 +62,16 @@ export async function GET() {
   });
 
   const conversations = (convs ?? []).map((c) => {
-    const otherId = otherUserIdByConv.get(c.id);
     const last = lastByConv.get(c.id);
+    const participantsList = partsByConv.get(c.id) ?? [];
+    const other_name = isRegionalOrAdmin
+      ? participantsList.map((p) => `${p.name} (${p.role})`).join(" — ") || "—"
+      : (userMap.get(otherUserIdByConv.get(c.id) ?? "")?.name ?? "—");
+    const otherId = otherUserIdByConv.get(c.id) ?? null;
     return {
       id: c.id,
-      other_user_id: otherId ?? null,
-      other_name: otherId ? nameById.get(otherId) ?? "—" : "—",
+      other_user_id: otherId,
+      other_name,
       last_message: last?.body ?? null,
       last_at: last?.created_at ?? c.created_at,
     };

@@ -190,6 +190,7 @@ export function DashboardNav({
           onToggle={() => setOpenDropdown((v) => (v === "manage" ? null : "manage"))}
           panelRef={manageRef}
         >
+          <DropdownItem href="/messages" label="Messages" count={navCounts.messages} onNavigate={closeDropdown} />
           <DropdownItem href="/tifls" label="Tifls" onNavigate={closeDropdown} />
           <DropdownItem href="/homework" label="Homework" onNavigate={closeDropdown} />
           <DropdownItem href="/events" label="Events" onNavigate={closeDropdown} />
