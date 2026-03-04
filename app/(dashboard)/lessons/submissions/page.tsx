@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { formatDateTimeInToronto } from "@/lib/datetime";
 import Link from "next/link";
 import { GradeSubmissionButton } from "./grade-submission-button";
 
@@ -46,7 +47,7 @@ export default async function LessonSubmissionsPage() {
                     <span className="font-medium">{userMap.get(s.user_id) ?? s.user_id}</span>
                     <span className="mx-2">·</span>
                     <span>{activityMap.get(s.activity_id) ?? s.activity_id}</span>
-                    <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{new Date(s.created_at).toLocaleString()}</span>
+                    <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{formatDateTimeInToronto(s.created_at)}</span>
                   </div>
                   <GradeSubmissionButton submissionId={s.id} />
                 </div>

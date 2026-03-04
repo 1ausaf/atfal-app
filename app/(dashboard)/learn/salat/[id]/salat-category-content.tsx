@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatDateInToronto } from "@/lib/datetime";
 
 type Status = "not_started" | "ready_for_test" | "passed" | "failed";
 
@@ -80,7 +81,7 @@ export function SalatCategoryContent({
             </p>
             {requestedAt && (
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                Requested: {new Date(requestedAt).toLocaleDateString()}
+                Requested: {formatDateInToronto(requestedAt)}
               </p>
             )}
           </div>

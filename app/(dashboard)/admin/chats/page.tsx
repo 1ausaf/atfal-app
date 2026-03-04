@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { formatDateTimeInToronto } from "@/lib/datetime";
 import Link from "next/link";
 
 export default async function AdminChatsPage() {
@@ -49,7 +50,7 @@ export default async function AdminChatsPage() {
                   className="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50"
                 >
                   <p className="font-medium text-slate-800 dark:text-slate-200">{label || "—"}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{new Date(c.created_at).toLocaleString()}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{formatDateTimeInToronto(c.created_at)}</p>
                 </Link>
               </li>
             );

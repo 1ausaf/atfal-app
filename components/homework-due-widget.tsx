@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { formatDateInToronto } from "@/lib/datetime";
 
 export async function HomeworkDueWidget() {
   const session = await getServerSession(authOptions);
@@ -20,7 +21,7 @@ export async function HomeworkDueWidget() {
       {list.map((h) => (
         <li key={h.id} className="flex justify-between items-center p-2 rounded-xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100/80 dark:border-emerald-800/30">
           <span className="font-medium text-slate-800 dark:text-white">{h.title}</span>
-          <span className="text-sm text-slate-500 dark:text-slate-400">{new Date(h.due_by).toLocaleDateString()}</span>
+          <span className="text-sm text-slate-500 dark:text-slate-400">{formatDateInToronto(h.due_by)}</span>
         </li>
       ))}
     </ul>

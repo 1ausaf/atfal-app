@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { formatDateTimeInToronto } from "@/lib/datetime";
 import Link from "next/link";
 import { SubmitHomeworkButton } from "./submit-homework-button";
 
@@ -31,7 +32,7 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
       <Link href="/homework" className="text-green-600 hover:underline mb-4 inline-block">Back to homework</Link>
       <article className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-6">
         <h1 className="text-2xl font-bold">{hw.title}</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Due: {new Date(hw.due_by).toLocaleString()}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Due: {formatDateTimeInToronto(hw.due_by)}</p>
         {hw.description && <p className="mt-4 text-slate-600 dark:text-slate-400">{hw.description}</p>}
         {hw.links?.length > 0 && (
           <ul className="mt-4 space-y-1">

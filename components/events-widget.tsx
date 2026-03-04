@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { formatDateInToronto } from "@/lib/datetime";
 
 const EVENT_TYPE_LABEL: Record<string, string> = {
   regional: "Regional",
@@ -46,7 +47,7 @@ export async function EventsWidget() {
               </span>
             </div>
             <span className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">
-              {new Date(e.event_date).toLocaleDateString()}
+              {formatDateInToronto(e.event_date)}
             </span>
           </li>
         );

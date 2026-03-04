@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { formatDateTimeInToronto } from "@/lib/datetime";
 
 export function ThreadClient({
   conversationId,
@@ -71,7 +72,7 @@ export function ThreadClient({
               }`}
             >
               <p className="text-sm">{m.body}</p>
-              <p className="text-xs opacity-80 mt-1">{new Date(m.created_at).toLocaleString()}</p>
+              <p className="text-xs opacity-80 mt-1">{formatDateTimeInToronto(m.created_at)}</p>
             </div>
           </div>
         ))}

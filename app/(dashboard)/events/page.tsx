@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { formatDateTimeInToronto } from "@/lib/datetime";
 import Link from "next/link";
 import { CreateEventForm } from "./create-event-form";
 import { EventItemActions } from "./event-item-actions";
@@ -71,7 +72,7 @@ export default async function EventsPage() {
                   <span className="ml-2 px-2 py-0.5 rounded text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
                     {EVENT_TYPE_LABEL[e.event_type] ?? e.event_type}
                   </span>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{new Date(e.event_date).toLocaleString()}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{formatDateTimeInToronto(e.event_date)}</p>
                   {e.location && <p className="text-sm text-slate-600 dark:text-slate-400">Location: {e.location}</p>}
                   {e.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{e.description}</p>}
                   {e.link && (

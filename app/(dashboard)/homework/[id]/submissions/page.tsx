@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { formatDateTimeInToronto } from "@/lib/datetime";
 import Link from "next/link";
 import { ApproveSubmissionButtons } from "./approve-submission-buttons";
 
@@ -36,7 +37,7 @@ export default async function HomeworkSubmissionsPage({ params }: { params: Prom
             <li key={s.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4 flex justify-between items-center">
               <div>
                 <span className="font-medium">{userMap.get(s.user_id) ?? s.user_id}</span>
-                <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{new Date(s.submitted_at).toLocaleString()}</span>
+                <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{formatDateTimeInToronto(s.submitted_at)}</span>
                 <span className="ml-2 px-2 py-0.5 rounded text-sm bg-slate-200 dark:bg-slate-600">{s.status}</span>
                 {s.status === "approved" && <span className="ml-2 text-emerald-600 dark:text-emerald-400">{s.points_awarded} pts</span>}
               </div>

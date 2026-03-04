@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatDateInToronto } from "@/lib/datetime";
 
 type Item = { id: string; userName: string; categoryTitle: string; requestedAt: string };
 
@@ -40,7 +41,7 @@ export function SalatPendingList({ list }: { list: Item[] }) {
             <div>
               <p className="font-medium text-slate-800 dark:text-slate-200">{item.userName}</p>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                {item.categoryTitle} · Requested {new Date(item.requestedAt).toLocaleDateString()}
+                {item.categoryTitle} · Requested {formatDateInToronto(item.requestedAt)}
               </p>
             </div>
             <div className="flex gap-2">

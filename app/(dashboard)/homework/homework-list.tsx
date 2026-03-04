@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { formatDateTimeInToronto } from "@/lib/datetime";
 import { HomeworkItemActions } from "./homework-item-actions";
 
 interface HomeworkItem {
@@ -79,7 +80,7 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
                     {tagLabel}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">Due: {new Date(h.due_by).toLocaleString()}</p>
+                <p className="text-sm text-gray-500 mt-1">Due: {formatDateTimeInToronto(h.due_by)}</p>
                 {h.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{h.description}</p>}
                 {h.links?.length > 0 && (
                   <ul className="mt-2 flex flex-wrap gap-2">

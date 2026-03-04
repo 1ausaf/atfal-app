@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { getTodayToronto, getYesterdayToronto } from "@/lib/datetime";
 import bcrypt from "bcryptjs";
 
 declare module "next-auth" {
@@ -59,17 +60,54 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user }) {
-      if (user?.id) {
-        try {
-          const supabase = createSupabaseServerClient();
-          const today = new Date().toISOString().slice(0, 10);
-          await supabase.from("activity_log").upsert(
-            { user_id: user.id, activity_date: today, activity_type: "login" },
-            { onConflict: "user_id,activity_date,activity_type" }
-          );
-        } catch {
-          // activity_log table may not exist
+      if (!user?.id) return true;
+      try {
+        const supabase = createSupabaseServerClient();
+        const today = getTodayToronto();
+        await supabase.from("activity_log").upsert(
+          { user_id: user.id, activity_date: today, activity_type: "login" },
+          { onConflict: "user_id,activity_date,activity_type" }
+        );
+        const role = (user as { role?: string }).role;
+        if (role === "tifl") {
+          const { data: loginRow } = await supabase
+            .from("activity_log")
+            .select("points_awarded")
+            .eq("user_id", user.id)
+            .eq("activity_date", today)
+            .eq("activity_type", "login")
+            .single();
+          if (loginRow && loginRow.points_awarded === 0) {
+            const yesterday = getYesterdayToronto();
+            const { data: streakRow } = await supabase
+              .from("login_streak")
+              .select("last_activity_date, current_streak")
+              .eq("user_id", user.id)
+              .maybeSingle();
+            const newStreak =
+              streakRow?.last_activity_date === yesterday
+                ? (streakRow.current_streak ?? 0) + 1
+                : 1;
+            const points = newStreak >= 7 ? 1050 : 50;
+            const streakAfter = newStreak >= 7 ? 0 : newStreak;
+            await supabase
+              .from("activity_log")
+              .update({ points_awarded: points })
+              .eq("user_id", user.id)
+              .eq("activity_date", today)
+              .eq("activity_type", "login");
+            await supabase.from("login_streak").upsert(
+              {
+                user_id: user.id,
+                last_activity_date: today,
+                current_streak: streakAfter,
+              },
+              { onConflict: "user_id" }
+            );
+          }
         }
+      } catch {
+        // activity_log / login_streak may not exist
       }
       return true;
     },

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { getTodayToronto } from "@/lib/datetime";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -11,7 +12,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const dateParam = searchParams.get("date");
-  const date = dateParam ?? new Date().toISOString().slice(0, 10);
+  const date = dateParam ?? getTodayToronto();
 
   const supabase = createSupabaseServerClient();
   const { data: majlisList } = await supabase.from("majlis").select("id, name").order("name");

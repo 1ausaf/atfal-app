@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getTodayToronto } from "@/lib/datetime";
 
 type Row = { majlis_id: string; majlis_name: string; active_count: number };
 
 export function AnalyticsClient() {
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(() => getTodayToronto());
   const [data, setData] = useState<{ date: string; by_majlis: Row[] } | null>(null);
   const [loading, setLoading] = useState(true);
 
