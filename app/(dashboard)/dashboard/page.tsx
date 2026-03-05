@@ -90,7 +90,6 @@ export default async function DashboardPage() {
         </div>
         <section
           className="rounded-2xl border border-amber-200/80 dark:border-amber-700/50 bg-amber-50/60 dark:bg-amber-950/30 p-3 md:p-4 shrink-0 shadow-[0_0_24px_rgba(245,158,11,0.25)] dark:shadow-[0_0_24px_rgba(245,158,11,0.15)]"
-          style={{ maxHeight: "180px" }}
         >
           <h2 className="font-semibold text-sm mb-2 text-slate-800 dark:text-white">Salat course progress</h2>
           <SalatProgressWidget />
@@ -111,6 +110,13 @@ export default async function DashboardPage() {
               </div>
               <Link href="/homework" className="link-kid text-sm mt-1 inline-block">View all homework</Link>
             </section>
+            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
+              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Lesson activities</h2>
+              <div className="min-h-0">
+                <LessonActivitiesWidget limit={3} />
+              </div>
+              <Link href="/lessons" className="link-kid text-sm mt-1 inline-block">View all lessons</Link>
+            </section>
           </div>
           <div className="flex flex-col gap-4 min-h-0">
             <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
@@ -119,13 +125,6 @@ export default async function DashboardPage() {
                 <LeaderboardWidget limit={5} />
               </div>
               <Link href="/leaderboard" className="link-kid text-sm mt-1 inline-block">Full leaderboard</Link>
-            </section>
-            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
-              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Lesson activities</h2>
-              <div className="min-h-0">
-                <LessonActivitiesWidget limit={3} />
-              </div>
-              <Link href="/lessons" className="link-kid text-sm mt-1 inline-block">View all lessons</Link>
             </section>
           </div>
         </div>
