@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import Link from "next/link";
 import { AddQuestionForm } from "./add-question-form";
+import { EditQuestionPoints } from "./edit-question-points";
 
 export default async function LessonQuestionsPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -26,9 +27,14 @@ export default async function LessonQuestionsPage({ params }: { params: Promise<
       <AddQuestionForm activityId={id} />
       <ul className="mt-6 space-y-3">
         {(questions ?? []).map((q) => (
-          <li key={q.id} className="rounded-lg border p-3">
-            <span className="font-medium">{q.question_text}</span>
-            <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">({q.question_type})</span>
+          <li key={q.id} className="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+            <EditQuestionPoints
+              activityId={id}
+              questionId={q.id}
+              questionText={q.question_text}
+              questionType={q.question_type}
+              pointsValue={"points_value" in q && typeof (q as { points_value: number }).points_value === "number" ? (q as { points_value: number }).points_value : 1}
+            />
           </li>
         ))}
       </ul>

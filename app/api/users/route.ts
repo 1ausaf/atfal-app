@@ -16,13 +16,18 @@ export async function POST(request: Request) {
   if (role === "local_nazim" && !majlis_id) return NextResponse.json({ error: "majlis_id required for Local Nazim" }, { status: 400 });
   const passwordHash = await bcrypt.hash(password, 10);
   const supabase = createSupabaseServerClient();
+  let insertMajlisId: string | null = role === "local_nazim" ? majlis_id : null;
+  if (role === "tifl") {
+    const { data: unassigned } = await supabase.from("majlis").select("id").eq("name", "Unassigned").single();
+    insertMajlisId = unassigned?.id ?? null;
+  }
   const { data, error } = await supabase
     .from("users")
     .insert({
       member_code: String(member_code).trim(),
       password_hash: passwordHash,
       role,
-      majlis_id: role === "local_nazim" ? majlis_id : null,
+      majlis_id: insertMajlisId,
       name: name ? String(name).trim() : null,
       profile_completed: role !== "tifl",
     })

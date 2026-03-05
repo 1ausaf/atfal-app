@@ -9,6 +9,7 @@ interface Question {
   question_type: string;
   order: number;
   options: { correct?: string; options?: string[] } | null;
+  points_value?: number;
 }
 
 interface Activity {
@@ -21,7 +22,7 @@ interface Activity {
 interface LessonContentProps {
   activity: Activity;
   questions: Question[];
-  existingSubmission: { status: string; points_awarded: number } | null;
+  existingSubmission: { status: string; points_awarded: number; answers: Record<string, string>; auto_points: number } | null;
   isTifl: boolean;
 }
 
@@ -58,10 +59,51 @@ export function LessonContent({ activity, questions, existingSubmission, isTifl 
   }
 
   if (existingSubmission) {
+    const manualPoints = Math.max(0, existingSubmission.points_awarded - existingSubmission.auto_points);
     return (
-      <div className="mt-6 p-4 rounded-lg bg-gray-100 dark:bg-gray-700">
-        <p className="font-medium">You have already submitted this lesson.</p>
-        <p>Status: {existingSubmission.status} · Points: {existingSubmission.points_awarded}</p>
+      <div className="mt-6 space-y-4">
+        <div className="p-4 rounded-lg bg-gray-100 dark:bg-gray-700">
+          <p className="font-medium">You have already submitted this lesson.</p>
+          <p className="text-slate-600 dark:text-slate-300">
+            Status: {existingSubmission.status} · Total: {existingSubmission.points_awarded} pts
+            {existingSubmission.auto_points > 0 && ` (${existingSubmission.auto_points} from quiz)`}
+            {manualPoints > 0 && ` (${manualPoints} from manual grading)`}
+          </p>
+        </div>
+        <section>
+          <h2 className="font-semibold mb-3">Your answers and results</h2>
+          <ul className="space-y-4">
+            {questions.map((q) => {
+              const userAnswer = existingSubmission.answers[q.id] ?? "—";
+              const pointsVal = typeof q.points_value === "number" ? q.points_value : 1;
+              if (q.question_type === "short_quiz") {
+                const correct = q.options?.correct ?? "";
+                const isCorrect = correct !== "" && userAnswer === correct;
+                return (
+                  <li key={q.id} className="p-3 rounded-lg border border-slate-200 dark:border-slate-600 space-y-1">
+                    <p className="font-medium">{q.question_text}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Your answer: {userAnswer}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Correct answer: {correct || "—"}</p>
+                    <p className="text-sm">
+                      {isCorrect ? (
+                        <span className="text-emerald-600 dark:text-emerald-400">Correct · {pointsVal} pts</span>
+                      ) : (
+                        <span className="text-red-600 dark:text-red-400">Incorrect · 0 pts</span>
+                      )}
+                    </p>
+                  </li>
+                );
+              }
+              return (
+                <li key={q.id} className="p-3 rounded-lg border border-slate-200 dark:border-slate-600 space-y-1">
+                  <p className="font-medium">{q.question_text}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Your answer: {userAnswer}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Long answer · Manually graded</p>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       </div>
     );
   }

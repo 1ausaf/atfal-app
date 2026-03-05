@@ -52,6 +52,8 @@ export function CreateEventForm({ majlisList, role, defaultMajlisId, majlisName 
       setLocation("");
       setLink("");
       setEventDate("");
+      setLoading(false);
+      router.push("/events");
     } catch {
       setError("Something went wrong");
       setLoading(false);

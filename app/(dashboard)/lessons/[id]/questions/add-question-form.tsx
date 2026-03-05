@@ -9,6 +9,7 @@ export function AddQuestionForm({ activityId }: { activityId: string }) {
   const [questionType, setQuestionType] = useState<"short_quiz" | "long_answer">("short_quiz");
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [optionsText, setOptionsText] = useState("");
+  const [pointsValue, setPointsValue] = useState(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -35,6 +36,7 @@ export function AddQuestionForm({ activityId }: { activityId: string }) {
           question_type: questionType,
           order: 0,
           options,
+          points_value: pointsValue,
         }),
       });
       if (!res.ok) {
@@ -47,6 +49,7 @@ export function AddQuestionForm({ activityId }: { activityId: string }) {
       setQuestionText("");
       setCorrectAnswer("");
       setOptionsText("");
+      setPointsValue(1);
     } catch {
       setError("Something went wrong");
     }
@@ -76,6 +79,16 @@ export function AddQuestionForm({ activityId }: { activityId: string }) {
           <option value="short_quiz">Short quiz (auto-grade)</option>
           <option value="long_answer">Long answer (manual grade)</option>
         </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Points (value for this question)</label>
+        <input
+          type="number"
+          min={0}
+          value={pointsValue}
+          onChange={(e) => setPointsValue(Math.max(0, parseInt(e.target.value, 10) || 0))}
+          className="w-full max-w-[120px] px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors"
+        />
       </div>
       {questionType === "short_quiz" && (
         <>

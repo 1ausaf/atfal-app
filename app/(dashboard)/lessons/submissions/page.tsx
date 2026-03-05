@@ -13,7 +13,7 @@ export default async function LessonSubmissionsPage() {
   const supabase = createSupabaseServerClient();
   const { data: submissions } = await supabase
     .from("lesson_submissions")
-    .select("id, activity_id, user_id, answers, status, points_awarded, created_at")
+    .select("id, activity_id, user_id, answers, status, points_awarded, auto_points, created_at")
     .eq("status", "pending")
     .order("created_at", { ascending: false });
   const activityIds = Array.from(new Set((submissions ?? []).map((s) => s.activity_id)));
@@ -49,7 +49,10 @@ export default async function LessonSubmissionsPage() {
                     <span>{activityMap.get(s.activity_id) ?? s.activity_id}</span>
                     <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{formatDateTimeInToronto(s.created_at)}</span>
                   </div>
-                  <GradeSubmissionButton submissionId={s.id} />
+                  <GradeSubmissionButton
+                    submissionId={s.id}
+                    autoPoints={"auto_points" in s && typeof (s as { auto_points: number }).auto_points === "number" ? (s as { auto_points: number }).auto_points : 0}
+                  />
                 </div>
                 <div className="mt-3 space-y-2">
                   {qList.map((q) => (

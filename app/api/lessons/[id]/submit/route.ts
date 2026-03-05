@@ -20,13 +20,41 @@ export async function POST(
   const { data: activity } = await supabase.from("lesson_activities").select("id").eq("id", activityId).single();
   if (!activity) return NextResponse.json({ error: "Activity not found" }, { status: 404 });
 
+  const { data: questions } = await supabase
+    .from("lesson_questions")
+    .select("id, question_type, options, points_value")
+    .eq("activity_id", activityId)
+    .order("order", { ascending: true });
+
+  const answersMap = answers as Record<string, string>;
+  let autoPoints = 0;
+  let hasLongAnswer = false;
+  for (const q of questions ?? []) {
+    if (q.question_type === "long_answer") {
+      hasLongAnswer = true;
+      continue;
+    }
+    if (q.question_type === "short_quiz") {
+      const correct = (q.options as { correct?: string } | null)?.correct;
+      const userAnswer = answersMap[q.id];
+      const points = typeof (q as { points_value?: number }).points_value === "number" ? (q as { points_value: number }).points_value : 1;
+      if (correct != null && correct !== "" && userAnswer === correct) {
+        autoPoints += points;
+      }
+    }
+  }
+
+  const status = hasLongAnswer ? "pending" : "graded";
+
   const { data, error } = await supabase
     .from("lesson_submissions")
     .insert({
       activity_id: activityId,
       user_id: session.user.id,
       answers: answers as Record<string, unknown>,
-      status: "pending",
+      status,
+      auto_points: autoPoints,
+      points_awarded: autoPoints,
     })
     .select("id")
     .single();

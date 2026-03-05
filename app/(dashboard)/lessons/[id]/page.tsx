@@ -18,15 +18,22 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
     .select("*")
     .eq("activity_id", id)
     .order("order", { ascending: true });
-  let existingSubmission: { status: string; points_awarded: number } | null = null;
+  let existingSubmission: { status: string; points_awarded: number; answers: Record<string, string>; auto_points: number } | null = null;
   if (session.user.role === "tifl") {
     const { data: sub } = await supabase
       .from("lesson_submissions")
-      .select("status, points_awarded")
+      .select("status, points_awarded, answers, auto_points")
       .eq("activity_id", id)
       .eq("user_id", session.user.id)
       .single();
-    existingSubmission = sub;
+    if (sub) {
+      existingSubmission = {
+        status: sub.status,
+        points_awarded: sub.points_awarded ?? 0,
+        answers: (sub.answers as Record<string, string>) ?? {},
+        auto_points: typeof (sub as { auto_points?: number }).auto_points === "number" ? (sub as { auto_points: number }).auto_points : 0,
+      };
+    }
   }
 
   return (

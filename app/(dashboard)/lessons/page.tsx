@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { formatDateInToronto } from "@/lib/datetime";
 import Link from "next/link";
 import Image from "next/image";
 import { LessonItemActions } from "./lesson-item-actions";
@@ -20,47 +21,70 @@ export default async function LessonsPage() {
   let incompleteActivities = activities ?? [];
   let pastActivities: typeof activities = [];
 
+  let submissionByActivityId: Record<string, { points_awarded: number; created_at: string }> = {};
   if (isTifl && activities?.length) {
     const { data: submissions } = await supabase
       .from("lesson_submissions")
-      .select("activity_id")
+      .select("activity_id, points_awarded, created_at")
       .eq("user_id", session.user.id);
     const submittedIds = new Set((submissions ?? []).map((s) => s.activity_id));
     incompleteActivities = activities.filter((a) => !submittedIds.has(a.id));
     pastActivities = activities.filter((a) => submittedIds.has(a.id));
+    for (const s of submissions ?? []) {
+      submissionByActivityId[s.activity_id] = {
+        points_awarded: s.points_awarded ?? 0,
+        created_at: s.created_at ?? "",
+      };
+    }
   }
 
-  function LessonList({ items, showThumb }: { items: typeof activities; showThumb?: boolean }) {
+  function LessonList({
+    items,
+    showThumb,
+    submissionByActivityId: subMap,
+  }: {
+    items: typeof activities;
+    showThumb?: boolean;
+    submissionByActivityId?: Record<string, { points_awarded: number; created_at: string }>;
+  }) {
     if (!items?.length) return null;
     return (
       <ul className="space-y-4">
-        {items.map((a) => (
-          <li key={a.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
-            <div className="flex justify-between items-start gap-4">
-              <div className="flex gap-4 min-w-0 flex-1">
-                {showThumb && a.thumbnail_url && (
-                  <Link href={`/lessons/${a.id}`} className="shrink-0 block">
-                    <Image
-                      src={a.thumbnail_url}
-                      alt=""
-                      width={80}
-                      height={60}
-                      className="rounded object-cover w-20 h-[60px]"
-                    />
-                  </Link>
-                )}
-                <div className="min-w-0">
-                  <Link href={`/lessons/${a.id}`} className="font-semibold text-lg hover:underline">
-                    {a.title}
-                  </Link>
-                  <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{a.type}</span>
-                  {a.description && <p className="mt-2 text-slate-600 dark:text-slate-400 line-clamp-2">{a.description}</p>}
+        {items.map((a) => {
+          const sub = subMap?.[a.id];
+          return (
+            <li key={a.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex gap-4 min-w-0 flex-1">
+                  {showThumb && a.thumbnail_url && (
+                    <Link href={`/lessons/${a.id}`} className="shrink-0 block">
+                      <Image
+                        src={a.thumbnail_url}
+                        alt=""
+                        width={80}
+                        height={60}
+                        className="rounded object-cover w-20 h-[60px]"
+                      />
+                    </Link>
+                  )}
+                  <div className="min-w-0">
+                    <Link href={`/lessons/${a.id}`} className="font-semibold text-lg hover:underline">
+                      {a.title}
+                    </Link>
+                    <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{a.type}</span>
+                    {a.description && <p className="mt-2 text-slate-600 dark:text-slate-400 line-clamp-2">{a.description}</p>}
+                    {sub && (
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Submitted {formatDateInToronto(sub.created_at)} · {sub.points_awarded} pts
+                      </p>
+                    )}
+                  </div>
                 </div>
+                <LessonItemActions activityId={a.id} canEdit={isRegional} />
               </div>
-              <LessonItemActions activityId={a.id} canEdit={isRegional} />
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     );
   }
@@ -94,7 +118,7 @@ export default async function LessonsPage() {
           {pastActivities.length > 0 && (
             <section>
               <h2 className="text-lg font-semibold mb-3">Past lessons</h2>
-              <LessonList items={pastActivities} showThumb />
+              <LessonList items={pastActivities} showThumb submissionByActivityId={submissionByActivityId} />
             </section>
           )}
         </>

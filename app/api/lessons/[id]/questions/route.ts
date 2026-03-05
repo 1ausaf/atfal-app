@@ -13,8 +13,9 @@ export async function POST(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id: activityId } = await params;
   const body = await request.json();
-  const { question_text, question_type, order, options } = body;
+  const { question_text, question_type, order, options, points_value } = body;
   if (!question_text || !question_type) return NextResponse.json({ error: "question_text and question_type required" }, { status: 400 });
+  const pointsVal = typeof points_value === "number" && points_value >= 0 ? points_value : 1;
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from("lesson_questions")
@@ -24,6 +25,7 @@ export async function POST(
       question_type: question_type === "long_answer" ? "long_answer" : "short_quiz",
       order: typeof order === "number" ? order : 0,
       options: options ?? null,
+      points_value: pointsVal,
     })
     .select("id")
     .single();

@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function GradeSubmissionButton({ submissionId }: { submissionId: string }) {
+export function GradeSubmissionButton({ submissionId, autoPoints }: { submissionId: string; autoPoints: number }) {
   const router = useRouter();
-  const [points, setPoints] = useState(10);
+  const [manualPoints, setManualPoints] = useState(0);
   const [loading, setLoading] = useState(false);
 
   async function handleGrade() {
@@ -14,7 +14,7 @@ export function GradeSubmissionButton({ submissionId }: { submissionId: string }
       const res = await fetch(`/api/lessons/submissions/${submissionId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ points_awarded: points }),
+        body: JSON.stringify({ manual_points: manualPoints }),
       });
       if (res.ok) router.refresh();
     } finally {
@@ -23,13 +23,15 @@ export function GradeSubmissionButton({ submissionId }: { submissionId: string }
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-sm text-slate-600 dark:text-slate-400">Auto (MC): {autoPoints} pts</span>
       <input
         type="number"
         min={0}
-        value={points}
-        onChange={(e) => setPoints(parseInt(e.target.value, 10) || 0)}
-        className="w-16 px-2 py-1 border rounded text-sm"
+        value={manualPoints}
+        onChange={(e) => setManualPoints(Math.max(0, parseInt(e.target.value, 10) || 0))}
+        placeholder="Manual"
+        className="w-16 px-2 py-1 border border-slate-300 dark:border-slate-600 rounded text-sm bg-white dark:bg-slate-700"
       />
       <button
         type="button"
