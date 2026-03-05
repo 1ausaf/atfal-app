@@ -17,6 +17,7 @@ export default async function EditHomeworkPage({ params }: { params: Promise<{ i
   if (session.user.role === "local_nazim" && homework.majlis_id !== session.user.majlisId)
     notFound();
   const { data: majlis } = await supabase.from("majlis").select("id, name");
+  const { data: lessonList } = await supabase.from("lesson_activities").select("id, title").order("created_at", { ascending: false });
   const isRegional = session.user.role === "regional_nazim" || session.user.role === "admin";
 
   return (
@@ -26,6 +27,7 @@ export default async function EditHomeworkPage({ params }: { params: Promise<{ i
       <EditHomeworkForm
         homework={homework}
         majlisList={majlis ?? []}
+        lessonList={lessonList ?? []}
         isRegional={isRegional}
         defaultMajlisId={session.user.majlisId}
       />

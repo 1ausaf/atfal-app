@@ -6,6 +6,7 @@ import { formatDateInToronto } from "@/lib/datetime";
 import Link from "next/link";
 import Image from "next/image";
 import { LessonItemActions } from "./lesson-item-actions";
+import { PointsBadge } from "@/components/points-badge";
 
 export default async function LessonsPage() {
   const session = await getServerSession(authOptions);
@@ -38,20 +39,39 @@ export default async function LessonsPage() {
     }
   }
 
+  const activityIds = (activities ?? []).map((a) => a.id);
+  let pointsAvailableByActivityId: Record<string, number> = {};
+  if (activityIds.length > 0) {
+    const { data: questions } = await supabase
+      .from("lesson_questions")
+      .select("activity_id, points_value")
+      .in("activity_id", activityIds);
+    const map: Record<string, number> = {};
+    for (const q of questions ?? []) {
+      const id = q.activity_id;
+      const val = typeof (q as { points_value?: number }).points_value === "number" ? (q as { points_value: number }).points_value : 1;
+      map[id] = (map[id] ?? 0) + val;
+    }
+    pointsAvailableByActivityId = map;
+  }
+
   function LessonList({
     items,
     showThumb,
     submissionByActivityId: subMap,
+    pointsAvailableByActivityId: pointsMap,
   }: {
     items: typeof activities;
     showThumb?: boolean;
     submissionByActivityId?: Record<string, { points_awarded: number; created_at: string }>;
+    pointsAvailableByActivityId?: Record<string, number>;
   }) {
     if (!items?.length) return null;
     return (
       <ul className="space-y-4">
         {items.map((a) => {
           const sub = subMap?.[a.id];
+          const pointsAvailable = pointsMap?.[a.id] ?? 0;
           return (
             <li key={a.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
               <div className="flex justify-between items-start gap-4">
@@ -68,10 +88,13 @@ export default async function LessonsPage() {
                     </Link>
                   )}
                   <div className="min-w-0">
-                    <Link href={`/lessons/${a.id}`} className="font-semibold text-lg hover:underline">
-                      {a.title}
-                    </Link>
-                    <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{a.type}</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Link href={`/lessons/${a.id}`} className="font-semibold text-lg hover:underline">
+                        {a.title}
+                      </Link>
+                      {pointsAvailable > 0 && <PointsBadge points={pointsAvailable} />}
+                      <span className="text-sm text-slate-500 dark:text-slate-400">{a.type}</span>
+                    </div>
                     {a.description && <p className="mt-2 text-slate-600 dark:text-slate-400 line-clamp-2">{a.description}</p>}
                     {sub && (
                       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -112,13 +135,13 @@ export default async function LessonsPage() {
             {incompleteActivities.length === 0 ? (
               <p className="text-slate-500 dark:text-slate-400">No lesson activities to complete. Great work!</p>
             ) : (
-              <LessonList items={incompleteActivities} showThumb />
+              <LessonList items={incompleteActivities} showThumb pointsAvailableByActivityId={pointsAvailableByActivityId} />
             )}
           </section>
           {pastActivities.length > 0 && (
             <section>
               <h2 className="text-lg font-semibold mb-3">Past lessons</h2>
-              <LessonList items={pastActivities} showThumb submissionByActivityId={submissionByActivityId} />
+              <LessonList items={pastActivities} showThumb submissionByActivityId={submissionByActivityId} pointsAvailableByActivityId={pointsAvailableByActivityId} />
             </section>
           )}
         </>
@@ -127,7 +150,7 @@ export default async function LessonsPage() {
           {!activities?.length ? (
             <p className="text-slate-500 dark:text-slate-400">No lesson activities yet.</p>
           ) : (
-            <LessonList items={activities} showThumb />
+            <LessonList items={activities} showThumb pointsAvailableByActivityId={pointsAvailableByActivityId} />
           )}
         </>
       )}

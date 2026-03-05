@@ -12,6 +12,8 @@ interface HomeworkItem {
   description: string | null;
   due_by: string;
   links: string[];
+  release_at?: string | null;
+  lesson_activity_id?: string | null;
   created_at: string;
 }
 
@@ -21,15 +23,17 @@ interface HomeworkListProps {
   userId: string;
   userMajlisId: string | null;
   majlisList: { id: string; name: string }[];
+  lessonList?: { id: string; title: string }[];
 }
 
 const FILTER_ALL = "all";
 const FILTER_REGIONAL = "regional";
 
-export function HomeworkList({ initialHomework, role, userId, userMajlisId, majlisList }: HomeworkListProps) {
+export function HomeworkList({ initialHomework, role, userId, userMajlisId, majlisList, lessonList = [] }: HomeworkListProps) {
   const [homework, setHomework] = useState(initialHomework);
   const [majlisFilter, setMajlisFilter] = useState<string>(FILTER_ALL);
   const majlisMap = useMemo(() => new Map(majlisList.map((m) => [m.id, m.name])), [majlisList]);
+  const lessonMap = useMemo(() => new Map(lessonList.map((l) => [l.id, l.title])), [lessonList]);
 
   const filteredHomework =
     (role === "regional_nazim" || role === "admin")
@@ -79,8 +83,18 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
                   <span className="px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200 shrink-0">
                     {tagLabel}
                   </span>
+                  {(role === "local_nazim" || role === "regional_nazim" || role === "admin") && h.release_at != null && new Date(h.release_at) > new Date() && (
+                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200 shrink-0">
+                      Releases at {formatDateTimeInToronto(h.release_at)}
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-gray-500 mt-1">Due: {formatDateTimeInToronto(h.due_by)}</p>
+                {h.lesson_activity_id && lessonMap.get(h.lesson_activity_id) && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Lesson: <Link href={`/lessons/${h.lesson_activity_id}`} className="text-emerald-600 hover:underline">{lessonMap.get(h.lesson_activity_id)}</Link>
+                  </p>
+                )}
                 {h.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{h.description}</p>}
                 {h.links?.length > 0 && (
                   <ul className="mt-2 flex flex-wrap gap-2">

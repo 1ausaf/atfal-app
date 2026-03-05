@@ -11,16 +11,20 @@ export default async function HomeworkPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
   const supabase = createSupabaseServerClient();
-  let query = supabase.from("homework").select("id, majlis_id, title, description, due_by, links, created_at").order("due_by", { ascending: true });
+  let query = supabase.from("homework").select("id, majlis_id, title, description, due_by, links, release_at, lesson_activity_id, created_at").order("due_by", { ascending: true });
   if (session.user.role === "tifl") {
     if (!session.user.majlisId) return <p>Complete your profile to see homework.</p>;
-    query = query.or(`majlis_id.eq.${session.user.majlisId},majlis_id.is.null`);
+    const nowIso = new Date().toISOString();
+    query = query
+      .or(`majlis_id.eq.${session.user.majlisId},majlis_id.is.null`)
+      .or(`release_at.is.null,release_at.lte.${nowIso}`);
   } else if (session.user.role === "local_nazim") {
     if (!session.user.majlisId) return <p>No Majlis assigned.</p>;
     query = query.eq("majlis_id", session.user.majlisId);
   }
   const { data: homeworkList } = await query;
   const { data: majlisList } = await supabase.from("majlis").select("id, name").order("name");
+  const { data: lessonList } = await supabase.from("lesson_activities").select("id, title").order("created_at", { ascending: false });
   const canCreate = session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin";
 
   return (
@@ -33,7 +37,7 @@ export default async function HomeworkPage() {
           </Link>
         )}
       </div>
-      <HomeworkList initialHomework={homeworkList ?? []} role={session.user.role} userId={session.user.id} userMajlisId={session.user.majlisId ?? null} majlisList={majlisList ?? []} />
+      <HomeworkList initialHomework={homeworkList ?? []} role={session.user.role} userId={session.user.id} userMajlisId={session.user.majlisId ?? null} majlisList={majlisList ?? []} lessonList={lessonList ?? []} />
     </div>
   );
 }

@@ -10,6 +10,8 @@ interface HomeworkData {
   description: string | null;
   due_by: string;
   links: string[];
+  release_at?: string | null;
+  lesson_activity_id?: string | null;
 }
 
 type Scope = "region" | "majlis";
@@ -17,6 +19,7 @@ type Scope = "region" | "majlis";
 interface EditHomeworkFormProps {
   homework: HomeworkData;
   majlisList: { id: string; name: string }[];
+  lessonList: { id: string; title: string }[];
   isRegional: boolean;
   defaultMajlisId: string | null;
 }
@@ -31,12 +34,14 @@ function toDatetimeLocal(iso: string): string {
   return `${y}-${m}-${day}T${h}:${min}`;
 }
 
-export function EditHomeworkForm({ homework, majlisList, isRegional, defaultMajlisId }: EditHomeworkFormProps) {
+export function EditHomeworkForm({ homework, majlisList, lessonList, isRegional, defaultMajlisId }: EditHomeworkFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(homework.title);
   const [description, setDescription] = useState(homework.description ?? "");
   const [dueBy, setDueBy] = useState(toDatetimeLocal(homework.due_by));
+  const [releaseAt, setReleaseAt] = useState(homework.release_at ? toDatetimeLocal(homework.release_at) : "");
   const [linksText, setLinksText] = useState((homework.links ?? []).join("\n"));
+  const [lessonActivityId, setLessonActivityId] = useState(homework.lesson_activity_id ?? "");
   const [scope, setScope] = useState<Scope>(homework.majlis_id == null ? "region" : "majlis");
   const [majlisId, setMajlisId] = useState(homework.majlis_id ?? defaultMajlisId ?? "");
   const [error, setError] = useState("");
@@ -61,6 +66,8 @@ export function EditHomeworkForm({ homework, majlisList, isRegional, defaultMajl
           due_by: dueBy,
           links,
           ...(payloadMajlisId !== undefined && { majlis_id: payloadMajlisId }),
+          release_at: releaseAt.trim() ? releaseAt.trim() : null,
+          lesson_activity_id: lessonActivityId || null,
         }),
       });
       if (!res.ok) {
@@ -107,6 +114,28 @@ export function EditHomeworkForm({ homework, majlisList, isRegional, defaultMajl
           required
           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors"
         />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Release at (optional; leave empty to show to tifls immediately)</label>
+        <input
+          type="datetime-local"
+          value={releaseAt}
+          onChange={(e) => setReleaseAt(e.target.value)}
+          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Link to lesson (optional)</label>
+        <select
+          value={lessonActivityId}
+          onChange={(e) => setLessonActivityId(e.target.value)}
+          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors"
+        >
+          <option value="">None</option>
+          {lessonList.map((l) => (
+            <option key={l.id} value={l.id}>{l.title}</option>
+          ))}
+        </select>
       </div>
       <div>
         <label className="block text-sm font-medium mb-1">Links (one per line or comma-separated)</label>

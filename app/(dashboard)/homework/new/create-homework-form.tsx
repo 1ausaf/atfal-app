@@ -5,18 +5,21 @@ import { useRouter } from "next/navigation";
 
 interface CreateHomeworkFormProps {
   majlisList: { id: string; name: string }[];
+  lessonList: { id: string; title: string }[];
   defaultMajlisId: string | null;
   isRegional: boolean;
 }
 
 type Scope = "region" | "majlis";
 
-export function CreateHomeworkForm({ majlisList, defaultMajlisId, isRegional }: CreateHomeworkFormProps) {
+export function CreateHomeworkForm({ majlisList, lessonList, defaultMajlisId, isRegional }: CreateHomeworkFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueBy, setDueBy] = useState("");
+  const [releaseAt, setReleaseAt] = useState("");
   const [linksText, setLinksText] = useState("");
+  const [lessonActivityId, setLessonActivityId] = useState("");
   const [scope, setScope] = useState<Scope>(isRegional ? "region" : "majlis");
   const [majlisId, setMajlisId] = useState(defaultMajlisId ?? "");
   const [error, setError] = useState("");
@@ -41,6 +44,8 @@ export function CreateHomeworkForm({ majlisList, defaultMajlisId, isRegional }: 
           due_by: dueBy,
           links,
           majlis_id: payloadMajlisId,
+          release_at: releaseAt.trim() ? releaseAt.trim() : null,
+          lesson_activity_id: lessonActivityId || null,
         }),
       });
       if (!res.ok) {
@@ -88,6 +93,28 @@ export function CreateHomeworkForm({ majlisList, defaultMajlisId, isRegional }: 
           required
           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors"
         />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Release at (optional; leave empty to show to tifls immediately)</label>
+        <input
+          type="datetime-local"
+          value={releaseAt}
+          onChange={(e) => setReleaseAt(e.target.value)}
+          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Link to lesson (optional)</label>
+        <select
+          value={lessonActivityId}
+          onChange={(e) => setLessonActivityId(e.target.value)}
+          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors"
+        >
+          <option value="">None</option>
+          {lessonList.map((l) => (
+            <option key={l.id} value={l.id}>{l.title}</option>
+          ))}
+        </select>
       </div>
       <div>
         <label className="block text-sm font-medium mb-1">Links (one per line or comma-separated)</label>

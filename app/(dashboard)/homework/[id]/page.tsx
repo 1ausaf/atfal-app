@@ -13,8 +13,17 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
   const supabase = createSupabaseServerClient();
   const { data: hw } = await supabase.from("homework").select("*").eq("id", id).single();
   if (!hw) notFound();
-  if (session.user.role === "tifl" && hw.majlis_id != null && hw.majlis_id !== session.user.majlisId) notFound();
+  if (session.user.role === "tifl") {
+    if (hw.majlis_id != null && hw.majlis_id !== session.user.majlisId) notFound();
+    if (hw.release_at != null && new Date(hw.release_at) > new Date()) notFound();
+  }
   if (session.user.role === "local_nazim" && hw.majlis_id !== session.user.majlisId) notFound();
+
+  let linkedLessonTitle: string | null = null;
+  if (hw.lesson_activity_id) {
+    const { data: lesson } = await supabase.from("lesson_activities").select("id, title").eq("id", hw.lesson_activity_id).single();
+    linkedLessonTitle = lesson?.title ?? null;
+  }
 
   let existingSubmission: { id: string; status: string } | null = null;
   if (session.user.role === "tifl") {
@@ -33,6 +42,14 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
       <article className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-6">
         <h1 className="text-2xl font-bold">{hw.title}</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Due: {formatDateTimeInToronto(hw.due_by)}</p>
+        {(session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin") && hw.release_at != null && new Date(hw.release_at) > new Date() && (
+          <p className="mt-2 text-sm font-medium text-amber-600 dark:text-amber-400">Private until {formatDateTimeInToronto(hw.release_at)}</p>
+        )}
+        {linkedLessonTitle && (
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            Linked lesson: <Link href={`/lessons/${hw.lesson_activity_id}`} className="text-green-600 hover:underline">{linkedLessonTitle}</Link>
+          </p>
+        )}
         {hw.description && <p className="mt-4 text-slate-600 dark:text-slate-400">{hw.description}</p>}
         {hw.links?.length > 0 && (
           <ul className="mt-4 space-y-1">

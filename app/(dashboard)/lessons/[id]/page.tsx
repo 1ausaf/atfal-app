@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import Link from "next/link";
 import Image from "next/image";
 import { LessonContent } from "./lesson-content";
+import { PointsBadge } from "@/components/points-badge";
 
 export default async function LessonDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -36,6 +37,13 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
     }
   }
 
+  const totalPointsAvailable = (questions ?? []).reduce(
+    (sum, q) => sum + (typeof (q as { points_value?: number }).points_value === "number" ? (q as { points_value: number }).points_value : 1),
+    0
+  );
+  const isTifl = session.user.role === "tifl";
+  const showPointsAvailableBadge = isTifl && !existingSubmission && totalPointsAvailable > 0;
+
   return (
     <div className="max-w-3xl mx-auto">
       <Link href="/lessons" className="text-green-600 hover:underline mb-4 inline-block">Back to lessons</Link>
@@ -50,7 +58,10 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
           />
         </div>
       )}
-      <h1 className="text-2xl font-bold">{activity.title}</h1>
+      <div className="flex items-center gap-2 flex-wrap">
+        <h1 className="text-2xl font-bold">{activity.title}</h1>
+        {showPointsAvailableBadge && <PointsBadge points={totalPointsAvailable} variant="upTo" />}
+      </div>
       {activity.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{activity.description}</p>}
       {(session.user.role === "regional_nazim" || session.user.role === "admin") && (
         <p className="mt-3">

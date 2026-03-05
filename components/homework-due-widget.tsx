@@ -8,11 +8,13 @@ export async function HomeworkDueWidget() {
   if (!session || session.user.role !== "tifl" || !session.user.majlisId)
     return <p className="text-gray-500">No homework.</p>;
   const supabase = createSupabaseServerClient();
+  const nowIso = new Date().toISOString();
   const { data: list } = await supabase
     .from("homework")
     .select("id, title, due_by")
-    .eq("majlis_id", session.user.majlisId)
-    .gte("due_by", new Date().toISOString())
+    .or(`majlis_id.eq.${session.user.majlisId},majlis_id.is.null`)
+    .or(`release_at.is.null,release_at.lte.${nowIso}`)
+    .gte("due_by", nowIso)
     .order("due_by", { ascending: true })
     .limit(5);
   if (!list?.length) return <p className="text-slate-500 dark:text-slate-400">No homework due.</p>;

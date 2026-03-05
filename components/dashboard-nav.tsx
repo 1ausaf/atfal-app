@@ -195,9 +195,7 @@ export function DashboardNav({
           <DropdownItem href="/homework" label="Homework" onNavigate={closeDropdown} />
           <DropdownItem href="/events" label="Events" onNavigate={closeDropdown} />
           <DropdownItem href="/learn/salat/pending" label="Salat tests" onNavigate={closeDropdown} />
-          {isRegionalNazim && (
-            <DropdownItem href="/lessons" label="Lessons" onNavigate={closeDropdown} />
-          )}
+          <DropdownItem href="/lessons" label="Lessons" onNavigate={closeDropdown} />
         </Dropdown>
       )}
 
