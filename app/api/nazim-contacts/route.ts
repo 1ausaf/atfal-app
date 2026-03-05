@@ -22,14 +22,24 @@ export async function GET() {
           .limit(1)
           .maybeSingle()
       : Promise.resolve({ data: null }),
-    supabase
-      .from("users")
-      .select("id, name")
-      .in("role", ["regional_nazim", "admin"])
-      .is("deleted_at", null)
-      .order("name")
-      .limit(1)
-      .maybeSingle(),
+    (async () => {
+      const testuserRes = await supabase
+        .from("users")
+        .select("id, name")
+        .eq("member_code", "testuser")
+        .in("role", ["regional_nazim", "admin"])
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (testuserRes.data) return testuserRes;
+      return supabase
+        .from("users")
+        .select("id, name")
+        .in("role", ["regional_nazim", "admin"])
+        .is("deleted_at", null)
+        .order("name")
+        .limit(1)
+        .maybeSingle();
+    })(),
   ]);
 
   return NextResponse.json({
