@@ -26,7 +26,7 @@ export async function GET() {
       const testuserRes = await supabase
         .from("users")
         .select("id, name")
-        .eq("member_code", "testuser")
+        .eq("member_code", "regionalnazimatfal")
         .in("role", ["regional_nazim", "admin"])
         .is("deleted_at", null)
         .maybeSingle();
