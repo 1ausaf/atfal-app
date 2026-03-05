@@ -26,7 +26,7 @@ export default async function LeaderboardPage({
   const supabase = createSupabaseServerClient();
   const { data: rows } = await supabase
     .from("leaderboard")
-    .select("id, name, member_code, age, age_group, majlis_id, total_points")
+    .select("id, name, member_code, age, age_group, majlis_id, total_points, salat_star, salat_superstar")
     .eq("age_group", currentGroup)
     .order("total_points", { ascending: false })
     .limit(100);
@@ -57,22 +57,37 @@ export default async function LeaderboardPage({
           <p className="p-6 text-slate-500 dark:text-slate-400">No scores in this group yet.</p>
         ) : (
           <ol className="divide-y divide-slate-200 dark:divide-slate-700">
-            {rows.map((r, i) => (
-              <li key={r.id} className="flex justify-between items-center gap-4 px-4 py-3">
-                <div className="min-w-0">
-                  <span className="font-medium text-slate-800 dark:text-slate-200">
-                    {i + 1}. {r.name ?? "—"}
+            {rows.map((r, i) => {
+              const row = r as { salat_star?: boolean; salat_superstar?: boolean; member_code?: string };
+              const showSuperstar = row.salat_superstar === true;
+              const showStar = !showSuperstar && row.salat_star === true;
+              return (
+                <li key={r.id} className="flex justify-between items-center gap-4 px-4 py-3">
+                  <div className="min-w-0">
+                    <span className="font-medium text-slate-800 dark:text-slate-200">
+                      {i + 1}. {r.name ?? "—"}
+                      {showSuperstar && (
+                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
+                          Salat Superstar
+                        </span>
+                      )}
+                      {showStar && (
+                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200">
+                          Salat Star
+                        </span>
+                      )}
+                    </span>
+                    <span className="block text-sm text-slate-500 dark:text-slate-400">
+                      @{row.member_code ?? "—"}
+                    </span>
+                  </div>
+                  <span className="text-sm text-slate-500 dark:text-slate-400 shrink-0">
+                    Age {r.age ?? "—"} · {r.majlis_id ? majlisMap.get(r.majlis_id) : "—"}
                   </span>
-                  <span className="block text-sm text-slate-500 dark:text-slate-400">
-                    @{(r as { member_code?: string }).member_code ?? "—"}
-                  </span>
-                </div>
-                <span className="text-sm text-slate-500 dark:text-slate-400 shrink-0">
-                  Age {r.age ?? "—"} · {r.majlis_id ? majlisMap.get(r.majlis_id) : "—"}
-                </span>
-                <span className="font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">{r.total_points} pts</span>
-              </li>
-            ))}
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">{r.total_points} pts</span>
+                </li>
+              );
+            })}
           </ol>
         )}
       </div>
