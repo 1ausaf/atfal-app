@@ -52,6 +52,13 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
       )}
       <h1 className="text-2xl font-bold">{activity.title}</h1>
       {activity.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{activity.description}</p>}
+      {(session.user.role === "regional_nazim" || session.user.role === "admin") && (
+        <p className="mt-3">
+          <Link href={`/lessons/${id}/questions`} className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
+            Manage questions
+          </Link>
+        </p>
+      )}
       <LessonContent
         activity={activity}
         questions={questions ?? []}

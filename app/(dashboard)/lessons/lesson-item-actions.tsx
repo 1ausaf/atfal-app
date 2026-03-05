@@ -33,8 +33,14 @@ export function LessonItemActions({ activityId, canEdit }: LessonItemActionsProp
   return (
     <div className="flex items-center gap-2 shrink-0">
       <Link
+        href={`/lessons/${activityId}/questions`}
+        className="text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 hover:underline"
+      >
+        Questions
+      </Link>
+      <Link
         href={`/lessons/${activityId}/edit`}
-        className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline"
+        className="text-sm text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 hover:underline"
       >
         Edit
       </Link>

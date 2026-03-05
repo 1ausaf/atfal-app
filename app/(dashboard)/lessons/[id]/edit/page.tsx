@@ -17,6 +17,11 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
   return (
     <div className="max-w-xl mx-auto">
       <Link href={`/lessons/${id}`} className="text-green-600 hover:underline mb-4 inline-block">Back to lesson</Link>
+      <p className="mb-4">
+        <Link href={`/lessons/${id}/questions`} className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">
+          Edit questions
+        </Link>
+      </p>
       <h1 className="text-2xl font-bold mb-6">Edit lesson activity</h1>
       <EditLessonForm activity={activity} />
     </div>
