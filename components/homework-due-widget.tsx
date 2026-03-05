@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { formatDateInToronto } from "@/lib/datetime";
 
-export async function HomeworkDueWidget() {
+export async function HomeworkDueWidget({ limit = 5 }: { limit?: number }) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "tifl" || !session.user.majlisId)
     return <p className="text-gray-500">No homework.</p>;
@@ -16,7 +16,7 @@ export async function HomeworkDueWidget() {
     .or(`release_at.is.null,release_at.lte.${nowIso}`)
     .gte("due_by", nowIso)
     .order("due_by", { ascending: true })
-    .limit(5);
+    .limit(limit);
   if (!list?.length) return <p className="text-slate-500 dark:text-slate-400">No homework due.</p>;
   return (
     <ul className="space-y-2">

@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { PointsBadge } from "@/components/points-badge";
 
-export async function LessonActivitiesWidget() {
+export async function LessonActivitiesWidget({ limit = 5 }: { limit?: number }) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "tifl") return <p className="text-gray-500">No lessons.</p>;
   const supabase = createSupabaseServerClient();
@@ -18,7 +18,7 @@ export async function LessonActivitiesWidget() {
     .select("activity_id")
     .eq("user_id", session.user.id);
   const submittedIds = new Set((submissions ?? []).map((s) => s.activity_id));
-  const incomplete = (activities ?? []).filter((a) => !submittedIds.has(a.id)).slice(0, 5);
+  const incomplete = (activities ?? []).filter((a) => !submittedIds.has(a.id)).slice(0, limit);
   if (!incomplete.length) return <p className="text-slate-500 dark:text-slate-400">No lesson activities to complete.</p>;
 
   const incompleteIds = incomplete.map((a) => a.id);

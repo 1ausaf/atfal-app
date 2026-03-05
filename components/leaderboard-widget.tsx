@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 
-export async function LeaderboardWidget() {
+export async function LeaderboardWidget({ limit = 10 }: { limit?: number }) {
   const session = await getServerSession(authOptions);
   if (!session) return <p className="text-gray-500">Sign in to see leaderboard.</p>;
   const supabase = createSupabaseServerClient();
@@ -10,7 +10,7 @@ export async function LeaderboardWidget() {
     .from("leaderboard")
     .select("*")
     .order("total_points", { ascending: false })
-    .limit(10);
+    .limit(limit);
   const { data: majlis } = await supabase.from("majlis").select("id, name");
   const majlisMap = new Map((majlis ?? []).map((m) => [m.id, m.name]));
 

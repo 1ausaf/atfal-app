@@ -75,22 +75,67 @@ export default async function DashboardPage() {
       ? await getLoginRewardAndStreak(supabase, session.user.id, today)
       : { pointsAwardedToday: 0, currentStreak: 0 };
 
-  return (
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white tracking-tight">Dashboard</h1>
-      {session.user.role === "tifl" && (
-        <>
+  if (session.user.role === "tifl") {
+    return (
+      <div className="max-w-6xl mx-auto min-h-dvh grid grid-rows-[auto_auto_1fr] gap-3 p-3 md:p-4">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <h1 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">Dashboard</h1>
           <LoginRewardBanner
             pointsAwardedToday={loginReward.pointsAwardedToday}
             currentStreak={loginReward.currentStreak}
             streakBonusAwarded={loginReward.pointsAwardedToday === 1050}
             todayKey={today}
           />
-          <div className="mb-6">
-            <LoginStreakDisplay currentStreak={loginReward.currentStreak} />
+          <LoginStreakDisplay currentStreak={loginReward.currentStreak} />
+        </div>
+        <section
+          className="rounded-2xl border border-amber-200/80 dark:border-amber-700/50 bg-amber-50/60 dark:bg-amber-950/30 p-3 md:p-4 shrink-0 shadow-[0_0_24px_rgba(245,158,11,0.25)] dark:shadow-[0_0_24px_rgba(245,158,11,0.15)]"
+          style={{ maxHeight: "180px" }}
+        >
+          <h2 className="font-semibold text-sm mb-2 text-slate-800 dark:text-white">Salat course progress</h2>
+          <SalatProgressWidget />
+        </section>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
+          <div className="flex flex-col gap-4 min-h-0">
+            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
+              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Upcoming events</h2>
+              <div className="min-h-0">
+                <EventsWidget limit={2} />
+              </div>
+              <Link href="/events" className="link-kid text-sm mt-1 inline-block">View all events</Link>
+            </section>
+            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
+              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Homework due</h2>
+              <div className="min-h-0">
+                <HomeworkDueWidget limit={3} />
+              </div>
+              <Link href="/homework" className="link-kid text-sm mt-1 inline-block">View all homework</Link>
+            </section>
           </div>
-        </>
-      )}
+          <div className="flex flex-col gap-4 min-h-0">
+            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
+              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Leaderboard (Top 5)</h2>
+              <div className="min-h-0">
+                <LeaderboardWidget limit={5} />
+              </div>
+              <Link href="/leaderboard" className="link-kid text-sm mt-1 inline-block">Full leaderboard</Link>
+            </section>
+            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
+              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Lesson activities</h2>
+              <div className="min-h-0">
+                <LessonActivitiesWidget limit={3} />
+              </div>
+              <Link href="/lessons" className="link-kid text-sm mt-1 inline-block">View all lessons</Link>
+            </section>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white tracking-tight">Dashboard</h1>
       <div className="grid gap-6 md:grid-cols-2">
         <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
           <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Upcoming events</h2>
@@ -118,26 +163,6 @@ export default async function DashboardPage() {
           </ul>
           <Link href="/homework" className="link-kid text-sm mt-2 inline-block">View all homework</Link>
         </section>
-      )}
-      {session.user.role === "tifl" && (
-        <>
-          <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5 mt-6">
-            <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Salat course progress</h2>
-            <SalatProgressWidget />
-          </section>
-          <div className="grid gap-6 md:grid-cols-2 mt-6">
-            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
-              <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Homework due</h2>
-              <HomeworkDueWidget />
-              <Link href="/homework" className="link-kid text-sm mt-2 inline-block">View all homework</Link>
-            </section>
-            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
-              <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Lesson activities</h2>
-              <LessonActivitiesWidget />
-              <Link href="/lessons" className="link-kid text-sm mt-2 inline-block">View all lessons</Link>
-            </section>
-          </div>
-        </>
       )}
     </div>
   );

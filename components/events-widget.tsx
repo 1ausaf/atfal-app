@@ -9,7 +9,7 @@ const EVENT_TYPE_LABEL: Record<string, string> = {
   national: "National",
 };
 
-export async function EventsWidget() {
+export async function EventsWidget({ limit = 5 }: { limit?: number }) {
   const session = await getServerSession(authOptions);
   if (!session) return <p className="text-gray-500">Sign in to see events.</p>;
   const supabase = createSupabaseServerClient();
@@ -19,7 +19,7 @@ export async function EventsWidget() {
     .select("id, title, event_type, event_date, majlis_id")
     .gte("event_date", threshold)
     .order("event_date", { ascending: true })
-    .limit(5);
+    .limit(limit);
   if (session.user.role === "tifl" && session.user.majlisId) {
     query = query.or(
       `event_type.eq.regional,event_type.eq.national,majlis_id.eq.${session.user.majlisId}`
