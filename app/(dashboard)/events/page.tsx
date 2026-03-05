@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { formatDateTimeInToronto } from "@/lib/datetime";
+import { formatDateTimeInToronto, getStartOfTodayTorontoISO } from "@/lib/datetime";
 import Link from "next/link";
 import { CreateEventForm } from "./create-event-form";
 import { EventItemActions } from "./event-item-actions";
@@ -17,10 +17,11 @@ export default async function EventsPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
   const supabase = createSupabaseServerClient();
+  const threshold = getStartOfTodayTorontoISO();
   let query = supabase
     .from("events")
     .select("id, title, description, location, link, event_type, majlis_id, event_date")
-    .gte("event_date", new Date().toISOString())
+    .gte("event_date", threshold)
     .order("event_date", { ascending: true });
   if (session.user.role === "tifl" && session.user.majlisId) {
     query = query.or(

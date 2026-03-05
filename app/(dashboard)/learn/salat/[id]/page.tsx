@@ -25,11 +25,13 @@ export default async function SalatCategoryPage({
 
   const { data: progressRows } = await supabase
     .from("salat_progress")
-    .select("id, status, requested_at")
+    .select("id, status, requested_at, passed_arabic, passed_translation")
     .eq("user_id", session.user.id)
     .eq("category_id", id);
   const progress = progressRows?.[0] ?? null;
   const status = progress?.status ?? "not_started";
+  const passedArabic = progress?.passed_arabic === true;
+  const passedTranslation = progress?.passed_translation === true;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -100,6 +102,8 @@ export default async function SalatCategoryPage({
         categoryId={category.id}
         status={status}
         requestedAt={progress?.requested_at ?? null}
+        passedArabic={passedArabic}
+        passedTranslation={passedTranslation}
       />
     </div>
   );

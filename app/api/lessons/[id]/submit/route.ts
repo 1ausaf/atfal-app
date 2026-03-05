@@ -45,6 +45,9 @@ export async function POST(
   }
 
   const status = hasLongAnswer ? "pending" : "graded";
+  const { data: userRow } = await supabase.from("users").select("salat_star, salat_superstar").eq("id", session.user.id).single();
+  const hasBadge = (userRow as { salat_star?: boolean; salat_superstar?: boolean } | null)?.salat_star === true || (userRow as { salat_superstar?: boolean } | null)?.salat_superstar === true;
+  const pointsAwarded = autoPoints + (hasBadge ? 100 : 0);
 
   const { data, error } = await supabase
     .from("lesson_submissions")
@@ -54,7 +57,7 @@ export async function POST(
       answers: answers as Record<string, unknown>,
       status,
       auto_points: autoPoints,
-      points_awarded: autoPoints,
+      points_awarded: status === "graded" ? pointsAwarded : 0,
     })
     .select("id")
     .single();

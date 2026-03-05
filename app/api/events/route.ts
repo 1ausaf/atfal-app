@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { getStartOfTodayTorontoISO, parseDateTimeLocalAsToronto } from "@/lib/datetime";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +12,11 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const limit = Math.min(parseInt(searchParams.get("limit") ?? "10", 10), 50);
   const supabase = createSupabaseServerClient();
+  const threshold = getStartOfTodayTorontoISO();
   let query = supabase
     .from("events")
     .select("id, title, description, location, link, event_type, majlis_id, event_date, created_at")
-    .gte("event_date", new Date().toISOString())
+    .gte("event_date", threshold)
     .order("event_date", { ascending: true })
     .limit(limit);
   if (session.user.role === "tifl" && session.user.majlisId) {
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
       link: link ? String(link).trim() : null,
       event_type,
       majlis_id: majlisId,
-      event_date: new Date(event_date).toISOString(),
+      event_date: parseDateTimeLocalAsToronto(event_date),
       created_by: session.user.id,
     })
     .select("id")

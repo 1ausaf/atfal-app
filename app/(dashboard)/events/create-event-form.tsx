@@ -41,8 +41,14 @@ export function CreateEventForm({ majlisList, role, defaultMajlisId, majlisName 
         }),
       });
       if (!res.ok) {
-        const d = await res.json();
-        setError(d.error ?? "Failed to create");
+        let msg = "Failed to create";
+        try {
+          const d = await res.json();
+          if (d?.error && typeof d.error === "string") msg = d.error;
+        } catch {
+          msg = res.status === 401 ? "Unauthorized" : res.status === 403 ? "Forbidden" : `Error ${res.status}`;
+        }
+        setError(msg);
         setLoading(false);
         return;
       }

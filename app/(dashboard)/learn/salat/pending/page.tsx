@@ -2,36 +2,47 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import Link from "next/link";
 import { SalatPendingList } from "./salat-pending-list";
 
 export default async function SalatPendingPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/dashboard");
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/dashboard");
 
   const supabase = createSupabaseServerClient();
-  const { data: rows, error } = await supabase
+  const { data: rowsReady, error: errReady } = await supabase
     .from("salat_progress")
-    .select("id, user_id, category_id, status, requested_at")
+    .select("id, user_id, category_id, status, requested_at, passed_arabic, passed_translation")
     .eq("status", "ready_for_test")
     .order("requested_at", { ascending: true });
-  if (error) {
+  const { data: rowsArabicDone, error: errArabic } = await supabase
+    .from("salat_progress")
+    .select("id, user_id, category_id, status, requested_at, passed_arabic, passed_translation")
+    .eq("passed_arabic", true)
+    .or("passed_translation.is.null,passed_translation.eq.false");
+  if (errReady || errArabic) {
     return (
       <div className="max-w-4xl mx-auto">
         <p className="text-red-600 dark:text-red-400">Failed to load pending tests.</p>
       </div>
     );
   }
-  let list = rows ?? [];
-  if (session.user.role === "local_nazim" && session.user.majlisId) {
-    const { data: usersInMajlis } = await supabase
-      .from("users")
-      .select("id")
-      .eq("majlis_id", session.user.majlisId);
-    const ids = new Set((usersInMajlis ?? []).map((u) => u.id));
-    list = list.filter((r) => ids.has(r.user_id));
-  }
+  const seen = new Set<string>();
+  const list: typeof rowsReady = [];
+  (rowsReady ?? []).forEach((r) => {
+    if (!seen.has(r.id)) {
+      seen.add(r.id);
+      list.push(r);
+    }
+  });
+  (rowsArabicDone ?? []).forEach((r) => {
+    if (!seen.has(r.id)) {
+      seen.add(r.id);
+      list.push(r);
+    }
+  });
+  list.sort((a, b) => (a.requested_at || "").localeCompare(b.requested_at || ""));
+
   const userIds = [...new Set(list.map((r) => r.user_id))];
   const categoryIds = [...new Set(list.map((r) => r.category_id))];
   const [userRes, catRes] = await Promise.all([
@@ -45,7 +56,7 @@ export default async function SalatPendingPage() {
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">Salat test requests</h1>
       <p className="text-slate-600 dark:text-slate-400 mb-6">
-        Tifls who requested to be tested. Mark Pass or Fail after testing.
+        Mark each section as Pass or Fail: <strong>Arabic Only</strong> and <strong>Arabic with Translation</strong>.
       </p>
       <SalatPendingList
         list={list.map((r) => {
@@ -56,6 +67,8 @@ export default async function SalatPendingPage() {
             userMemberCode: (u as { member_code?: string } | undefined)?.member_code ?? "—",
             categoryTitle: categoriesMap.get(r.category_id)?.title ?? "—",
             requestedAt: r.requested_at ?? "",
+            passedArabic: r.passed_arabic === true,
+            passedTranslation: r.passed_translation === true,
           };
         })}
       />

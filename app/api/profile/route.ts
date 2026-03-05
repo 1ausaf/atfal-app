@@ -11,7 +11,7 @@ export async function GET() {
   const supabase = createSupabaseServerClient();
   const { data: user, error } = await supabase
     .from("users")
-    .select("id, name, age, age_group, majlis_id, date_of_birth, salat_superstar")
+    .select("id, name, age, age_group, majlis_id, date_of_birth, salat_star, salat_superstar")
     .eq("id", session.user.id)
     .single();
 

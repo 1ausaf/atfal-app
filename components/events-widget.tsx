@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { formatDateInToronto } from "@/lib/datetime";
+import { formatDateInToronto, getStartOfTodayTorontoISO } from "@/lib/datetime";
 
 const EVENT_TYPE_LABEL: Record<string, string> = {
   regional: "Regional",
@@ -13,10 +13,11 @@ export async function EventsWidget() {
   const session = await getServerSession(authOptions);
   if (!session) return <p className="text-gray-500">Sign in to see events.</p>;
   const supabase = createSupabaseServerClient();
+  const threshold = getStartOfTodayTorontoISO();
   let query = supabase
     .from("events")
     .select("id, title, event_type, event_date, majlis_id")
-    .gte("event_date", new Date().toISOString())
+    .gte("event_date", threshold)
     .order("event_date", { ascending: true })
     .limit(5);
   if (session.user.role === "tifl" && session.user.majlisId) {

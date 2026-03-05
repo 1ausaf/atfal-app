@@ -18,9 +18,13 @@ export default async function ProfilePage() {
 
   if (!user) redirect("/dashboard");
 
+  let salatStar = false;
   let salatSuperstar = false;
-  const { data: u, error: _e } = await supabase.from("users").select("salat_superstar").eq("id", session.user.id).single();
-  if (!_e && u && (u as { salat_superstar?: boolean }).salat_superstar === true) salatSuperstar = true;
+  const { data: u, error: _e } = await supabase.from("users").select("salat_star, salat_superstar").eq("id", session.user.id).single();
+  if (!_e && u) {
+    salatStar = (u as { salat_star?: boolean }).salat_star === true;
+    salatSuperstar = (u as { salat_superstar?: boolean }).salat_superstar === true;
+  }
 
   const { data: majlisList } = await supabase.from("majlis").select("id, name").order("name");
 
@@ -30,11 +34,22 @@ export default async function ProfilePage() {
         ← Back to Dashboard
       </Link>
       <h1 className="text-2xl font-bold mb-2 text-slate-800 dark:text-slate-200">Profile</h1>
+      {salatStar && (
+        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+          <span className="text-emerald-600 dark:text-emerald-400 text-xl" aria-hidden>★</span>
+          <span className="font-medium text-emerald-800 dark:text-emerald-200">Salat Star</span>
+        </div>
+      )}
       {salatSuperstar && (
-        <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
           <span className="text-amber-600 dark:text-amber-400 text-xl" aria-hidden>★</span>
           <span className="font-medium text-amber-800 dark:text-amber-200">Salat Superstar</span>
         </div>
+      )}
+      {(salatStar || salatSuperstar) && (
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+          You earn +100 bonus points on every homework and lesson you complete.
+        </p>
       )}
       <ProfileForm
         user={{

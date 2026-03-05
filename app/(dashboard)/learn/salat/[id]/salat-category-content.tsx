@@ -10,10 +10,14 @@ export function SalatCategoryContent({
   categoryId,
   status,
   requestedAt,
+  passedArabic,
+  passedTranslation,
 }: {
   categoryId: string;
   status: Status;
   requestedAt: string | null;
+  passedArabic?: boolean;
+  passedTranslation?: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -60,11 +64,13 @@ export function SalatCategoryContent({
   const buttonClass =
     "px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-xl shadow-card hover:bg-emerald-700 hover:shadow-card-hover disabled:opacity-50 transition-all duration-200";
 
-  if (status === "passed") {
+  if (status === "passed" || passedArabic) {
     return (
-      <div className="rounded-xl border border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 p-4 flex items-center gap-3">
+      <div className="rounded-xl border border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 p-4 flex flex-wrap items-center gap-3">
         <span className="text-emerald-600 dark:text-emerald-400 text-lg" aria-hidden>✓</span>
-        <span className="font-medium text-emerald-800 dark:text-emerald-200">Passed</span>
+        <span className="font-medium text-emerald-800 dark:text-emerald-200">
+          {passedTranslation ? "Passed (Arabic + Translation)" : "Passed (Arabic only)"}
+        </span>
       </div>
     );
   }
@@ -77,7 +83,7 @@ export function SalatCategoryContent({
           <div>
             <p className="font-medium text-amber-800 dark:text-amber-200">Pending test</p>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              Your Local Nazim Atfal will test you on a video call or in person. You will be notified when this is confirmed.
+              Regional Nazim Atfal will test you (Arabic only and/or with translation) on a video call or in person.
             </p>
             {requestedAt && (
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">

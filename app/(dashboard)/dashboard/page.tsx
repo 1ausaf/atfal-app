@@ -8,6 +8,7 @@ import { LeaderboardWidget } from "@/components/leaderboard-widget";
 import { HomeworkDueWidget } from "@/components/homework-due-widget";
 import { LessonActivitiesWidget } from "@/components/lesson-activities-widget";
 import { LoginRewardBanner, LoginStreakDisplay } from "@/components/login-reward-banner";
+import { SalatProgressWidget } from "@/components/salat-progress-widget";
 import Link from "next/link";
 
 async function getSubmissionsToMark(role: string, majlisId: string | null) {
@@ -119,18 +120,24 @@ export default async function DashboardPage() {
         </section>
       )}
       {session.user.role === "tifl" && (
-        <div className="grid gap-6 md:grid-cols-2 mt-6">
-          <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
-            <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Homework due</h2>
-            <HomeworkDueWidget />
-            <Link href="/homework" className="link-kid text-sm mt-2 inline-block">View all homework</Link>
+        <>
+          <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5 mt-6">
+            <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Salat course progress</h2>
+            <SalatProgressWidget />
           </section>
-          <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
-            <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Lesson activities</h2>
-            <LessonActivitiesWidget />
-            <Link href="/lessons" className="link-kid text-sm mt-2 inline-block">View all lessons</Link>
-          </section>
-        </div>
+          <div className="grid gap-6 md:grid-cols-2 mt-6">
+            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
+              <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Homework due</h2>
+              <HomeworkDueWidget />
+              <Link href="/homework" className="link-kid text-sm mt-2 inline-block">View all homework</Link>
+            </section>
+            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
+              <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Lesson activities</h2>
+              <LessonActivitiesWidget />
+              <Link href="/lessons" className="link-kid text-sm mt-2 inline-block">View all lessons</Link>
+            </section>
+          </div>
+        </>
       )}
     </div>
   );

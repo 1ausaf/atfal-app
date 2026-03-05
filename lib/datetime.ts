@@ -56,3 +56,35 @@ export function getYesterdayToronto(): string {
   const day = parts.find((p) => p.type === "day")!.value;
   return `${y}-${m}-${day}`;
 }
+
+/** Start of today in Toronto as ISO string (for DB filters). Events with event_date >= this stay visible all day in Toronto. */
+export function getStartOfTodayTorontoISO(): string {
+  const now = new Date();
+  const h = parseInt(new Intl.DateTimeFormat("en-CA", { timeZone: TORONTO_TZ, hour: "2-digit", hour12: false }).format(now), 10);
+  const min = parseInt(new Intl.DateTimeFormat("en-CA", { timeZone: TORONTO_TZ, minute: "2-digit" }).format(now), 10);
+  const s = parseInt(new Intl.DateTimeFormat("en-CA", { timeZone: TORONTO_TZ, second: "2-digit" }).format(now), 10);
+  const ms = now.getMilliseconds();
+  const startOfDay = new Date(now.getTime() - (h * 3600 + min * 60 + s) * 1000 - ms);
+  return startOfDay.toISOString();
+}
+
+/**
+ * Parse a datetime-local value (YYYY-MM-DDTHH:mm) as Toronto time and return ISO string for DB.
+ * Ensures created events use Toronto time so they stay visible until the correct local time.
+ */
+export function parseDateTimeLocalAsToronto(dateTimeLocal: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(dateTimeLocal.trim());
+  if (!match) return new Date(dateTimeLocal).toISOString();
+  const [, y, m, d, h, min] = match.map(Number);
+  const utcNoon = Date.UTC(y, m - 1, d, 12, 0, 0);
+  const torontoNoon = new Intl.DateTimeFormat("en-CA", {
+    timeZone: TORONTO_TZ,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(utcNoon));
+  const [torontoH] = torontoNoon.split(":").map(Number);
+  const offsetHours = 12 - torontoH;
+  const utcMs = Date.UTC(y, m - 1, d, h, min, 0) + offsetHours * 3600 * 1000;
+  return new Date(utcMs).toISOString();
+}

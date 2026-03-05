@@ -10,6 +10,7 @@ export interface User {
   age_group: string | null;
   profile_completed: boolean;
   date_of_birth?: string | null;
+  salat_star?: boolean;
   salat_superstar?: boolean;
   created_at?: string;
   updated_at?: string;

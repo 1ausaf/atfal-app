@@ -15,12 +15,15 @@ export async function PATCH(
   const body = await request.json();
   const { manual_points } = body;
   const supabase = createSupabaseServerClient();
-  const { data: sub } = await supabase.from("lesson_submissions").select("id, status, auto_points").eq("id", id).single();
+  const { data: sub } = await supabase.from("lesson_submissions").select("id, status, auto_points, user_id").eq("id", id).single();
   if (!sub) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (sub.status === "graded") return NextResponse.json({ error: "Already graded" }, { status: 400 });
   const autoPoints = typeof (sub as { auto_points?: number }).auto_points === "number" ? (sub as { auto_points: number }).auto_points : 0;
   const manualPts = Math.max(0, Number(manual_points) ?? 0);
-  const totalPoints = autoPoints + manualPts;
+  let totalPoints = autoPoints + manualPts;
+  const { data: u } = await supabase.from("users").select("salat_star, salat_superstar").eq("id", (sub as { user_id: string }).user_id).single();
+  const hasBadge = (u as { salat_star?: boolean; salat_superstar?: boolean } | null)?.salat_star === true || (u as { salat_superstar?: boolean } | null)?.salat_superstar === true;
+  if (hasBadge) totalPoints += 100;
   const { error } = await supabase
     .from("lesson_submissions")
     .update({

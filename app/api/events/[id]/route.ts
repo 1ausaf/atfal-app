@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { parseDateTimeLocalAsToronto } from "@/lib/datetime";
 
 function canEditEvent(
   role: string,
@@ -69,7 +70,7 @@ export async function PATCH(
       link: link != null ? String(link).trim() : null,
       event_type,
       majlis_id: majlisId,
-      event_date: new Date(event_date).toISOString(),
+      event_date: parseDateTimeLocalAsToronto(event_date),
     })
     .eq("id", id);
   if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
