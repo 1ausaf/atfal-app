@@ -19,19 +19,24 @@ export async function GET() {
   const userIds = [...new Set((rows ?? []).flatMap((r) => [r.from_user_id, r.to_user_id]))].filter(
     (id) => id !== session.user.id
   );
-  const { data: users } = await supabase.from("users").select("id, name").in("id", userIds);
+  const { data: users } = await supabase.from("users").select("id, name, member_code").in("id", userIds);
   const usersMap = new Map((users ?? []).map((u) => [u.id, u]));
 
-  const list = (rows ?? []).map((r) => ({
-    id: r.id,
-    from_user_id: r.from_user_id,
-    to_user_id: r.to_user_id,
-    status: r.status,
-    initial_message: r.initial_message,
-    created_at: r.created_at,
-    other_name: usersMap.get(r.from_user_id === session.user.id ? r.to_user_id : r.from_user_id)?.name ?? "—",
-    direction: r.from_user_id === session.user.id ? "outgoing" : "incoming",
-  }));
+  const list = (rows ?? []).map((r) => {
+    const otherId = r.from_user_id === session.user.id ? r.to_user_id : r.from_user_id;
+    const other = usersMap.get(otherId);
+    return {
+      id: r.id,
+      from_user_id: r.from_user_id,
+      to_user_id: r.to_user_id,
+      status: r.status,
+      initial_message: r.initial_message,
+      created_at: r.created_at,
+      other_name: other?.name ?? "—",
+      other_member_code: (other as { member_code?: string } | undefined)?.member_code ?? "—",
+      direction: r.from_user_id === session.user.id ? "outgoing" : "incoming",
+    };
+  });
 
   return NextResponse.json({ list });
 }

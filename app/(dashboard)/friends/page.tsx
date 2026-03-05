@@ -22,7 +22,7 @@ export default async function FriendsPage() {
   });
   const { data: friends } = await supabase
     .from("users")
-    .select("id, name")
+    .select("id, name, member_code")
     .in("id", [...friendIds]);
 
   const { data: requests } = await supabase
@@ -33,8 +33,8 @@ export default async function FriendsPage() {
   const reqUserIds = [...new Set((requests ?? []).flatMap((r) => [r.from_user_id, r.to_user_id]))].filter(
     (id) => id !== session.user.id
   );
-  const { data: reqUsers } = await supabase.from("users").select("id, name").in("id", reqUserIds);
-  const reqUsersMap = new Map((reqUsers ?? []).map((u) => [u.id, u.name]));
+  const { data: reqUsers } = await supabase.from("users").select("id, name, member_code").in("id", reqUserIds);
+  const reqUsersMap = new Map((reqUsers ?? []).map((u) => [u.id, { name: u.name, member_code: (u as { member_code?: string }).member_code }]));
 
   const incoming = (requests ?? []).filter((r) => r.to_user_id === session.user.id && r.status === "pending");
   const outgoing = (requests ?? []).filter((r) => r.from_user_id === session.user.id && r.status === "pending");
@@ -44,19 +44,27 @@ export default async function FriendsPage() {
       <h1 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">Friends</h1>
       <FriendsPageClient
         friends={friends ?? []}
-        incoming={incoming.map((r) => ({
-          id: r.id,
-          from_user_id: r.from_user_id,
-          from_name: reqUsersMap.get(r.from_user_id) ?? "—",
-          initial_message: r.initial_message,
-          created_at: r.created_at ?? "",
-        }))}
-        outgoing={outgoing.map((r) => ({
-          id: r.id,
-          to_user_id: r.to_user_id,
-          to_name: reqUsersMap.get(r.to_user_id) ?? "—",
-          created_at: r.created_at ?? "",
-        }))}
+        incoming={incoming.map((r) => {
+          const info = reqUsersMap.get(r.from_user_id);
+          return {
+            id: r.id,
+            from_user_id: r.from_user_id,
+            from_name: info?.name ?? "—",
+            from_member_code: info?.member_code ?? "—",
+            initial_message: r.initial_message,
+            created_at: r.created_at ?? "",
+          };
+        })}
+        outgoing={outgoing.map((r) => {
+          const info = reqUsersMap.get(r.to_user_id);
+          return {
+            id: r.id,
+            to_user_id: r.to_user_id,
+            to_name: info?.name ?? "—",
+            to_member_code: info?.member_code ?? "—",
+            created_at: r.created_at ?? "",
+          };
+        })}
       />
     </div>
   );

@@ -26,7 +26,7 @@ export default async function LeaderboardPage({
   const supabase = createSupabaseServerClient();
   const { data: rows } = await supabase
     .from("leaderboard")
-    .select("id, name, age, age_group, majlis_id, total_points")
+    .select("id, name, member_code, age, age_group, majlis_id, total_points")
     .eq("age_group", currentGroup)
     .order("total_points", { ascending: false })
     .limit(100);
@@ -59,13 +59,18 @@ export default async function LeaderboardPage({
           <ol className="divide-y divide-slate-200 dark:divide-slate-700">
             {rows.map((r, i) => (
               <li key={r.id} className="flex justify-between items-center gap-4 px-4 py-3">
-                <span className="font-medium text-slate-800 dark:text-slate-200">
-                  {i + 1}. {r.name ?? "—"}
-                </span>
-                <span className="text-sm text-slate-500 dark:text-slate-400">
+                <div className="min-w-0">
+                  <span className="font-medium text-slate-800 dark:text-slate-200">
+                    {i + 1}. {r.name ?? "—"}
+                  </span>
+                  <span className="block text-sm text-slate-500 dark:text-slate-400">
+                    @{(r as { member_code?: string }).member_code ?? "—"}
+                  </span>
+                </div>
+                <span className="text-sm text-slate-500 dark:text-slate-400 shrink-0">
                   Age {r.age ?? "—"} · {r.majlis_id ? majlisMap.get(r.majlis_id) : "—"}
                 </span>
-                <span className="font-semibold text-emerald-600 dark:text-emerald-400">{r.total_points} pts</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">{r.total_points} pts</span>
               </li>
             ))}
           </ol>

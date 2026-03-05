@@ -39,7 +39,7 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from("users")
-    .select("id, name")
+    .select("id, name, member_code")
     .eq("role", "tifl")
     .neq("id", session.user.id)
     .is("deleted_at", null)

@@ -19,10 +19,10 @@ export default async function LessonSubmissionsPage() {
   const activityIds = Array.from(new Set((submissions ?? []).map((s) => s.activity_id)));
   const userIds = Array.from(new Set((submissions ?? []).map((s) => s.user_id)));
   const { data: activities } = await supabase.from("lesson_activities").select("id, title").in("id", activityIds);
-  const { data: users } = await supabase.from("users").select("id, name").in("id", userIds);
+  const { data: users } = await supabase.from("users").select("id, name, member_code").in("id", userIds);
   const { data: questions } = await supabase.from("lesson_questions").select("id, activity_id, question_text, question_type").in("activity_id", activityIds);
   const activityMap = new Map((activities ?? []).map((a) => [a.id, a.title]));
-  const userMap = new Map((users ?? []).map((u) => [u.id, u.name]));
+  const userInfoMap = new Map((users ?? []).map((u) => [u.id, { name: u.name, member_code: (u as { member_code?: string }).member_code }]));
   const questionsByActivity = new Map<string, { id: string; activity_id: string; question_text: string; question_type: string }[]>();
   for (const q of questions ?? []) {
     const list = questionsByActivity.get(q.activity_id) ?? [];
@@ -44,7 +44,8 @@ export default async function LessonSubmissionsPage() {
               <li key={s.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="font-medium">{userMap.get(s.user_id) ?? s.user_id}</span>
+                    <span className="font-medium">{userInfoMap.get(s.user_id)?.name ?? s.user_id}</span>
+                    <span className="block text-sm text-slate-500 dark:text-slate-400">@{userInfoMap.get(s.user_id)?.member_code ?? "—"}</span>
                     <span className="mx-2">·</span>
                     <span>{activityMap.get(s.activity_id) ?? s.activity_id}</span>
                     <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{formatDateTimeInToronto(s.created_at)}</span>

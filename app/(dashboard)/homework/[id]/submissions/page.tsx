@@ -22,8 +22,8 @@ export default async function HomeworkSubmissionsPage({ params }: { params: Prom
     .eq("homework_id", id)
     .order("submitted_at", { ascending: false });
   const userIds = Array.from(new Set((submissions ?? []).map((s) => s.user_id)));
-  const { data: users } = await supabase.from("users").select("id, name").in("id", userIds);
-  const userMap = new Map((users ?? []).map((u) => [u.id, u.name]));
+  const { data: users } = await supabase.from("users").select("id, name, member_code").in("id", userIds);
+  const userInfoMap = new Map((users ?? []).map((u) => [u.id, { name: u.name, member_code: (u as { member_code?: string }).member_code }]));
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -36,7 +36,8 @@ export default async function HomeworkSubmissionsPage({ params }: { params: Prom
           {submissions.map((s) => (
             <li key={s.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4 flex justify-between items-center">
               <div>
-                <span className="font-medium">{userMap.get(s.user_id) ?? s.user_id}</span>
+                <span className="font-medium">{userInfoMap.get(s.user_id)?.name ?? s.user_id}</span>
+                <span className="block text-sm text-slate-500 dark:text-slate-400">@{userInfoMap.get(s.user_id)?.member_code ?? "—"}</span>
                 <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">{formatDateTimeInToronto(s.submitted_at)}</span>
                 <span className="ml-2 px-2 py-0.5 rounded text-sm bg-slate-200 dark:bg-slate-600">{s.status}</span>
                 {s.status === "approved" && <span className="ml-2 text-emerald-600 dark:text-emerald-400">{s.points_awarded} pts</span>}

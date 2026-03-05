@@ -26,9 +26,11 @@ export default async function MessageThreadPage({
 
   const otherId = userIds.find((uid) => uid !== session.user.id);
   let otherName = "—";
+  let otherMemberCode = "—";
   if (otherId) {
-    const { data: u } = await supabase.from("users").select("name").eq("id", otherId).single();
+    const { data: u } = await supabase.from("users").select("name, member_code").eq("id", otherId).single();
     otherName = u?.name ?? "—";
+    otherMemberCode = (u as { member_code?: string } | null)?.member_code ?? "—";
   }
 
   return (
@@ -36,7 +38,8 @@ export default async function MessageThreadPage({
       <Link href="/messages" className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline mb-4 inline-block">
         ← Back to Messages
       </Link>
-      <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4">{otherName}</h1>
+      <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-1">{otherName}</h1>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">@{otherMemberCode}</p>
       <ThreadClient conversationId={id} currentUserId={session.user.id} />
     </div>
   );

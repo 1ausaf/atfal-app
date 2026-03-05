@@ -35,7 +35,7 @@ export default async function SalatPendingPage() {
   const userIds = [...new Set(list.map((r) => r.user_id))];
   const categoryIds = [...new Set(list.map((r) => r.category_id))];
   const [userRes, catRes] = await Promise.all([
-    userIds.length ? supabase.from("users").select("id, name").in("id", userIds) : { data: [] },
+    userIds.length ? supabase.from("users").select("id, name, member_code").in("id", userIds) : { data: [] },
     categoryIds.length ? supabase.from("salat_categories").select("id, title").in("id", categoryIds) : { data: [] },
   ]);
   const usersMap = new Map((userRes.data ?? []).map((u) => [u.id, u]));
@@ -48,12 +48,16 @@ export default async function SalatPendingPage() {
         Tifls who requested to be tested. Mark Pass or Fail after testing.
       </p>
       <SalatPendingList
-        list={list.map((r) => ({
-          id: r.id,
-          userName: usersMap.get(r.user_id)?.name ?? "—",
-          categoryTitle: categoriesMap.get(r.category_id)?.title ?? "—",
-          requestedAt: r.requested_at ?? "",
-        }))}
+        list={list.map((r) => {
+          const u = usersMap.get(r.user_id);
+          return {
+            id: r.id,
+            userName: u?.name ?? "—",
+            userMemberCode: (u as { member_code?: string } | undefined)?.member_code ?? "—",
+            categoryTitle: categoriesMap.get(r.category_id)?.title ?? "—",
+            requestedAt: r.requested_at ?? "",
+          };
+        })}
       />
     </div>
   );

@@ -28,24 +28,26 @@ export default async function MessagesPage() {
     convIds = [...new Set((participants ?? []).map((p) => p.conversation_id))];
   }
 
-  let conversations: { id: string; other_name: string; last_message: string | null }[] = [];
+  let conversations: { id: string; other_name: string; other_member_code: string; last_message: string | null }[] = [];
   if (convIds.length) {
     const { data: allParts } = await supabase
       .from("conversation_participants")
       .select("conversation_id, user_id")
       .in("conversation_id", convIds);
     const userIds = [...new Set((allParts ?? []).map((p) => p.user_id))];
-    const { data: users } = await supabase.from("users").select("id, name, role").in("id", userIds);
+    const { data: users } = await supabase.from("users").select("id, name, role, member_code").in("id", userIds);
     const userMap = new Map((users ?? []).map((u) => [u.id, u]));
 
-    const partsByConv = new Map<string, { user_id: string; name: string; role: string }[]>();
+    const partsByConv = new Map<string, { user_id: string; name: string; role: string; member_code: string }[]>();
     (allParts ?? []).forEach((p) => {
       const u = userMap.get(p.user_id);
+      const mc = (u as { member_code?: string } | undefined)?.member_code ?? "—";
       if (!partsByConv.has(p.conversation_id)) partsByConv.set(p.conversation_id, []);
       partsByConv.get(p.conversation_id)!.push({
         user_id: p.user_id,
         name: u?.name ?? "—",
         role: u?.role ?? "—",
+        member_code: mc,
       });
     });
 
@@ -62,12 +64,17 @@ export default async function MessagesPage() {
 
     conversations = convIds.map((cid) => {
       const participantsList = partsByConv.get(cid) ?? [];
+      const otherParticipant = participantsList.find((p) => p.user_id !== session.user.id);
       const label = isRegionalOrAdmin
         ? participantsList.map((p) => `${p.name} (${p.role})`).join(" — ")
-        : participantsList.find((p) => p.user_id !== session.user.id)?.name ?? "—";
+        : otherParticipant?.name ?? "—";
+      const memberCodeLabel = isRegionalOrAdmin
+        ? participantsList.map((p) => `@${p.member_code}`).join(" · ")
+        : otherParticipant ? `@${otherParticipant.member_code}` : "—";
       return {
         id: cid,
         other_name: label || "—",
+        other_member_code: memberCodeLabel,
         last_message: lastByConv.get(cid)?.body ?? null,
       };
     });
@@ -101,6 +108,7 @@ export default async function MessagesPage() {
                 className="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
               >
                 <p className="font-medium text-slate-800 dark:text-slate-200">{c.other_name}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{c.other_member_code}</p>
                 {c.last_message && (
                   <p className="text-sm text-slate-500 dark:text-slate-400 truncate mt-0.5">{c.last_message}</p>
                 )}

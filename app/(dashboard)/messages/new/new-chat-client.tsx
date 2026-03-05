@@ -12,8 +12,8 @@ export function NewChatClient({
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [users, setUsers] = useState<{ id: string; name: string | null }[]>([]);
-  const [tiflList, setTiflList] = useState<{ id: string; name: string | null }[]>([]);
+  const [users, setUsers] = useState<{ id: string; name: string | null; member_code?: string }[]>([]);
+  const [tiflList, setTiflList] = useState<{ id: string; name: string | null; member_code?: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
 
@@ -23,7 +23,7 @@ export function NewChatClient({
         .then((r) => r.json())
         .then((data) => {
           const list = Array.isArray(data) ? data : data?.users ?? data?.list ?? [];
-          setTiflList(list.map((u: { id: string; name?: string | null }) => ({ id: u.id, name: u.name ?? null })));
+          setTiflList(list.map((u: { id: string; name?: string | null; member_code?: string }) => ({ id: u.id, name: u.name ?? null, member_code: u.member_code ?? undefined })));
         })
         .catch(() => setTiflList([]));
     }
@@ -90,7 +90,8 @@ export function NewChatClient({
                 disabled={creating}
                 className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 disabled:opacity-50"
               >
-                {u.name ?? "—"}
+                <span>{u.name ?? "—"}</span>
+                <span className="block text-sm text-slate-500 dark:text-slate-400">@{u.member_code ?? "—"}</span>
               </button>
             </li>
           ))}
@@ -110,7 +111,8 @@ export function NewChatClient({
                 disabled={creating}
                 className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 disabled:opacity-50"
               >
-                {u.name ?? "—"}
+                <span>{u.name ?? "—"}</span>
+                <span className="block text-sm text-slate-500 dark:text-slate-400">@{u.member_code ?? "—"}</span>
               </button>
             </li>
           ))}

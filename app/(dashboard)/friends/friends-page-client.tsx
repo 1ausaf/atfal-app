@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Friend = { id: string; name: string | null };
-type Incoming = { id: string; from_user_id: string; from_name: string; initial_message: string | null; created_at: string };
-type Outgoing = { id: string; to_user_id: string; to_name: string; created_at: string };
+type Friend = { id: string; name: string | null; member_code?: string };
+type Incoming = { id: string; from_user_id: string; from_name: string; from_member_code?: string; initial_message: string | null; created_at: string };
+type Outgoing = { id: string; to_user_id: string; to_name: string; to_member_code?: string; created_at: string };
 
 export function FriendsPageClient({
   friends,
@@ -18,7 +18,7 @@ export function FriendsPageClient({
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<{ id: string; name: string | null }[]>([]);
+  const [searchResults, setSearchResults] = useState<{ id: string; name: string | null; member_code?: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState<string | null>(null);
   const [responding, setResponding] = useState<string | null>(null);
@@ -109,7 +109,10 @@ export function FriendsPageClient({
           <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
             {searchResults.map((u) => (
               <li key={u.id} className="flex items-center justify-between px-4 py-3">
-                <span>{u.name ?? "—"}</span>
+                <div>
+                  <span>{u.name ?? "—"}</span>
+                  <span className="block text-sm text-slate-500 dark:text-slate-400">@{u.member_code ?? "—"}</span>
+                </div>
                 <button
                   type="button"
                   onClick={() => sendRequest(u.id)}
@@ -132,6 +135,7 @@ export function FriendsPageClient({
               <li key={r.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div>
                   <p className="font-medium">{r.from_name}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">@{r.from_member_code ?? "—"}</p>
                   {r.initial_message && <p className="text-sm text-slate-500 dark:text-slate-400">{r.initial_message}</p>}
                 </div>
                 <div className="flex gap-2">
@@ -164,7 +168,10 @@ export function FriendsPageClient({
           <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
             {outgoing.map((r) => (
               <li key={r.id} className="flex items-center justify-between px-4 py-3">
-                <span>{r.to_name}</span>
+                <div>
+                  <span>{r.to_name}</span>
+                  <span className="block text-sm text-slate-500 dark:text-slate-400">@{r.to_member_code ?? "—"}</span>
+                </div>
                 <span className="text-sm text-slate-500 dark:text-slate-400">Pending</span>
               </li>
             ))}
@@ -180,7 +187,10 @@ export function FriendsPageClient({
           <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
             {friends.map((u) => (
               <li key={u.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                <span className="font-medium">{u.name ?? "—"}</span>
+                <div>
+                  <span className="font-medium">{u.name ?? "—"}</span>
+                  <span className="block text-sm text-slate-500 dark:text-slate-400">@{u.member_code ?? "—"}</span>
+                </div>
                 <button
                   type="button"
                   onClick={() => openChat(u.id)}

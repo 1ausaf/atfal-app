@@ -18,17 +18,19 @@ export default async function AdminChatsPage() {
     .select("conversation_id, user_id")
     .in("conversation_id", convIds);
   const userIds = [...new Set((parts ?? []).map((p) => p.user_id))];
-  const { data: users } = await supabase.from("users").select("id, name, role").in("id", userIds);
+  const { data: users } = await supabase.from("users").select("id, name, role, member_code").in("id", userIds);
   const userMap = new Map((users ?? []).map((u) => [u.id, u]));
-  const participantsByConv = new Map<string, { user_id: string; name: string; role: string }[]>();
+  const participantsByConv = new Map<string, { user_id: string; name: string; role: string; member_code: string }[]>();
   (parts ?? []).forEach((p) => {
     const u = userMap.get(p.user_id);
+    const mc = (u as { member_code?: string } | undefined)?.member_code ?? "—";
     if (!participantsByConv.has(p.conversation_id))
       participantsByConv.set(p.conversation_id, []);
     participantsByConv.get(p.conversation_id)!.push({
       user_id: p.user_id,
       name: u?.name ?? "—",
       role: u?.role ?? "—",
+      member_code: mc,
     });
   });
 
@@ -43,6 +45,7 @@ export default async function AdminChatsPage() {
           {(convs ?? []).map((c) => {
             const participants = participantsByConv.get(c.id) ?? [];
             const label = participants.map((p) => `${p.name} (${p.role})`).join(" — ");
+            const memberCodes = participants.map((p) => `@${p.member_code}`).join(" · ");
             return (
               <li key={c.id}>
                 <Link
@@ -50,6 +53,7 @@ export default async function AdminChatsPage() {
                   className="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50"
                 >
                   <p className="font-medium text-slate-800 dark:text-slate-200">{label || "—"}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{memberCodes}</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">{formatDateTimeInToronto(c.created_at)}</p>
                 </Link>
               </li>

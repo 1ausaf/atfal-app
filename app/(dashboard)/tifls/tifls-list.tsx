@@ -176,6 +176,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                 <>
                   <div>
                     <span className="font-medium">{t.name ?? "—"}</span>
+                    <span className="block text-sm text-slate-500 dark:text-slate-400">@{"member_code" in t ? (t as { member_code?: string }).member_code ?? "—" : "—"}</span>
                     <span className="text-slate-500 dark:text-slate-400 ml-2">Age {t.age ?? "—"} · {t.age_group ?? "—"}</span>
                     <span className="block text-sm text-slate-500 dark:text-slate-400">{t.majlis_id ? majlisMap.get(t.majlis_id) : "—"}</span>
                     <span className="text-sm text-slate-600 dark:text-slate-300">{(t.manual_points ?? 0)} pts</span>

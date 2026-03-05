@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDateInToronto } from "@/lib/datetime";
 
-type Item = { id: string; userName: string; categoryTitle: string; requestedAt: string };
+type Item = { id: string; userName: string; userMemberCode?: string; categoryTitle: string; requestedAt: string };
 
 export function SalatPendingList({ list }: { list: Item[] }) {
   const router = useRouter();
@@ -40,6 +40,7 @@ export function SalatPendingList({ list }: { list: Item[] }) {
           <li key={item.id} className="flex flex-wrap items-center justify-between gap-4 px-4 py-3">
             <div>
               <p className="font-medium text-slate-800 dark:text-slate-200">{item.userName}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">@{item.userMemberCode ?? "—"}</p>
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 {item.categoryTitle} · Requested {formatDateInToronto(item.requestedAt)}
               </p>
