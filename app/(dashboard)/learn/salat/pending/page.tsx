@@ -7,7 +7,8 @@ import { SalatPendingList } from "./salat-pending-list";
 export default async function SalatPendingPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
-  if (session.user.role !== "regional_nazim" && session.user.role !== "admin") redirect("/dashboard");
+  const role = session.user.role;
+  if (role !== "regional_nazim" && role !== "local_nazim" && role !== "admin") redirect("/dashboard");
 
   const supabase = createSupabaseServerClient();
   const { data: rowsReady, error: errReady } = await supabase
@@ -46,11 +47,20 @@ export default async function SalatPendingPage() {
   const userIds = [...new Set(list.map((r) => r.user_id))];
   const categoryIds = [...new Set(list.map((r) => r.category_id))];
   const [userRes, catRes] = await Promise.all([
-    userIds.length ? supabase.from("users").select("id, name, member_code").in("id", userIds) : { data: [] },
+    userIds.length ? supabase.from("users").select("id, name, member_code, majlis_id").in("id", userIds) : { data: [] },
     categoryIds.length ? supabase.from("salat_categories").select("id, title").in("id", categoryIds) : { data: [] },
   ]);
   const usersMap = new Map((userRes.data ?? []).map((u) => [u.id, u]));
   const categoriesMap = new Map((catRes.data ?? []).map((c) => [c.id, c]));
+
+  // Local nazim: only show Tifls from their majlis
+  const filteredList =
+    role === "local_nazim" && session.user.majlisId
+      ? list.filter((r) => {
+          const u = usersMap.get(r.user_id) as { majlis_id?: string } | undefined;
+          return u?.majlis_id === session.user.majlisId;
+        })
+      : list;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -59,7 +69,7 @@ export default async function SalatPendingPage() {
         Mark each section as Pass or Fail: <strong>Arabic Only</strong> and <strong>Arabic with Translation</strong>.
       </p>
       <SalatPendingList
-        list={list.map((r) => {
+        list={filteredList.map((r) => {
           const u = usersMap.get(r.user_id);
           return {
             id: r.id,

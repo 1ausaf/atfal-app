@@ -12,8 +12,8 @@ export async function PATCH(
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const role = session.user.role;
-  if (role !== "regional_nazim" && role !== "admin")
-    return NextResponse.json({ error: "Only Regional Nazim can mark Salat pass/fail" }, { status: 403 });
+  if (role !== "regional_nazim" && role !== "local_nazim" && role !== "admin")
+    return NextResponse.json({ error: "Only Regional or Local Nazim can mark Salat pass/fail" }, { status: 403 });
 
   const { id } = await params;
   const body = await request.json();
@@ -27,6 +27,17 @@ export async function PATCH(
     .single();
 
   if (fetchError || !row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Local nazim: may only mark Tifls from their majlis
+  if (role === "local_nazim" && session.user.majlisId) {
+    const { data: tifl } = await supabase
+      .from("users")
+      .select("majlis_id")
+      .eq("id", row.user_id)
+      .single();
+    if ((tifl as { majlis_id?: string } | null)?.majlis_id !== session.user.majlisId)
+      return NextResponse.json({ error: "You can only mark Salat tests for Tifls in your Majlis" }, { status: 403 });
+  }
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
 
