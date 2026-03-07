@@ -73,22 +73,22 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b-2 border-emerald-100 dark:border-emerald-900/50 bg-white dark:bg-slate-800 shadow-md rounded-b-2xl mx-2 md:mx-4 mt-0">
+      <header className="border-b border-gta-border bg-gta-surface/95 shadow-gta rounded-b-2xl mx-2 md:mx-4 mt-0">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/dashboard" className="font-semibold text-lg tracking-tight text-slate-800 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <Link href="/dashboard" className="font-semibold text-lg tracking-tight text-gta-text hover:text-gta-primary transition-colors">
             GTA Centre Atfal
           </Link>
           <DashboardNav role={role} navCounts={navCounts} />
         </div>
         <div className="max-w-6xl mx-auto px-4 pb-2">
-          <span className="text-sm text-slate-500 dark:text-slate-400">
+          <span className="text-sm text-gta-textSecondary">
             {isRegionalNazim && "Regional Nazim Atfal"}
             {isLocalNazim && majlisName && `Local Nazim Atfal (${majlisName})`}
             {isTifl && "Tifl"}
           </span>
         </div>
       </header>
-      <main className="flex-1 p-4 md:p-8 bg-gradient-to-b from-transparent to-emerald-50/30 dark:to-emerald-950/20">{children}</main>
+      <main className="flex-1 p-4 md:p-8 bg-gradient-to-b from-transparent to-gta-surfaceSecondary/50">{children}</main>
     </div>
   );
 }

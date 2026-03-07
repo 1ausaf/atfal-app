@@ -36,27 +36,27 @@ export default async function LeaderboardPage({
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">Leaderboard</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gta-text">Leaderboard</h1>
       <div className="flex gap-2 mb-6 flex-wrap">
         {AGE_GROUPS.map((g) => (
           <Link
             key={g.value}
             href={`/leaderboard?age_group=${g.value}`}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-gta-sm text-sm font-semibold transition-colors ${
               currentGroup === g.value
-                ? "bg-emerald-600 text-white"
-                : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
+                ? "bg-gta-primary text-[#1a2e0a]"
+                : "bg-gta-surfaceSecondary text-gta-text hover:bg-gta-border"
             }`}
           >
             {g.label}
           </Link>
         ))}
       </div>
-      <div className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg overflow-hidden">
+      <div className="card-kid overflow-hidden p-0">
         {!rows?.length ? (
-          <p className="p-6 text-slate-500 dark:text-slate-400">No scores in this group yet.</p>
+          <p className="p-6 text-gta-textSecondary">No scores in this group yet.</p>
         ) : (
-          <ol className="divide-y divide-slate-200 dark:divide-slate-700">
+          <ol className="divide-y divide-gta-border">
             {rows.map((r, i) => {
               const row = r as { salat_star?: boolean; salat_superstar?: boolean; member_code?: string };
               const showSuperstar = row.salat_superstar === true;
@@ -64,27 +64,27 @@ export default async function LeaderboardPage({
               return (
                 <li key={r.id} className="flex justify-between items-center gap-4 px-4 py-3">
                   <div className="min-w-0">
-                    <span className="font-medium text-slate-800 dark:text-slate-200">
+                    <span className="font-bold text-gta-text">
                       {i + 1}. {r.name ?? "—"}
                       {showSuperstar && (
-                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
+                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500 text-white">
                           Salat Superstar
                         </span>
                       )}
                       {showStar && (
-                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200">
+                        <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-300 text-purple-900">
                           Salat Star
                         </span>
                       )}
                     </span>
-                    <span className="block text-sm text-slate-500 dark:text-slate-400">
+                    <span className="block text-sm text-gta-textSecondary">
                       @{row.member_code ?? "—"}
                     </span>
                   </div>
-                  <span className="text-sm text-slate-500 dark:text-slate-400 shrink-0">
+                  <span className="text-sm text-gta-textSecondary shrink-0">
                     Age {r.age ?? "—"} · {r.majlis_id ? majlisMap.get(r.majlis_id) : "—"}
                   </span>
-                  <span className="font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">{r.total_points} pts</span>
+                  <span className="font-bold text-gta-primary shrink-0">{r.total_points} pts</span>
                 </li>
               );
             })}

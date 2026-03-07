@@ -88,29 +88,29 @@ export default async function MessagesPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Messages</h1>
+        <h1 className="text-2xl font-bold text-gta-text">Messages</h1>
         <Link
           href="/messages/new"
-          className="px-4 py-2 btn-kid-primary rounded-xl text-sm font-medium"
+          className="px-4 py-2 btn-kid-primary rounded-gta text-sm font-medium"
         >
           New chat
         </Link>
       </div>
       {session.user.role === "tifl" && <NazimContactButtons />}
       {!conversations.length ? (
-        <p className="text-slate-500 dark:text-slate-400">No conversations yet. Start a new chat.</p>
+        <p className="text-gta-textSecondary">No conversations yet. Start a new chat.</p>
       ) : (
-        <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+        <ul className="card-kid divide-y divide-gta-border overflow-hidden p-0">
           {conversations.map((c) => (
             <li key={c.id}>
               <Link
                 href={`/messages/${c.id}`}
-                className="block px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                className="block px-4 py-3 hover:bg-gta-surfaceSecondary/80 transition-colors"
               >
-                <p className="font-medium text-slate-800 dark:text-slate-200">{c.other_name}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{c.other_member_code}</p>
+                <p className="font-semibold text-gta-text">{c.other_name}</p>
+                <p className="text-sm text-gta-textSecondary">{c.other_member_code}</p>
                 {c.last_message && (
-                  <p className="text-sm text-slate-500 dark:text-slate-400 truncate mt-0.5">{c.last_message}</p>
+                  <p className="text-sm text-gta-textSecondary truncate mt-0.5">{c.last_message}</p>
                 )}
               </Link>
             </li>

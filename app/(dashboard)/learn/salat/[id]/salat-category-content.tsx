@@ -62,13 +62,13 @@ export function SalatCategoryContent({
   }
 
   const buttonClass =
-    "px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-xl shadow-card hover:bg-emerald-700 hover:shadow-card-hover disabled:opacity-50 transition-all duration-200";
+    "px-5 py-2.5 btn-kid-primary rounded-gta disabled:opacity-50 transition-all duration-200";
 
   if (status === "passed" || passedArabic) {
     return (
-      <div className="rounded-xl border border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 p-4 flex flex-wrap items-center gap-3">
-        <span className="text-emerald-600 dark:text-emerald-400 text-lg" aria-hidden>✓</span>
-        <span className="font-medium text-emerald-800 dark:text-emerald-200">
+      <div className="rounded-gta border-2 border-gta-primary bg-gta-surfaceSecondary p-4 flex flex-wrap items-center gap-3">
+        <span className="text-gta-primary text-lg" aria-hidden>✓</span>
+        <span className="font-bold text-gta-text">
           {passedTranslation ? "Passed (Arabic + Translation)" : "Passed (Arabic only)"}
         </span>
       </div>
@@ -77,16 +77,16 @@ export function SalatCategoryContent({
 
   if (status === "ready_for_test") {
     return (
-      <div className="rounded-xl border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 p-4">
+      <div className="rounded-gta border-2 border-gta-secondary bg-gta-surfaceSecondary p-4">
         <div className="flex items-start gap-3">
-          <span className="text-amber-600 dark:text-amber-400 shrink-0 text-lg" aria-hidden>✓</span>
+          <span className="text-gta-secondary shrink-0 text-lg" aria-hidden>✓</span>
           <div>
-            <p className="font-medium text-amber-800 dark:text-amber-200">Pending test</p>
-            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+            <p className="font-bold text-gta-text">Pending test</p>
+            <p className="text-sm text-gta-textSecondary mt-1">
               Regional Nazim Atfal will test you (Arabic only and/or with translation) on a video call or in person.
             </p>
             {requestedAt && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+              <p className="text-xs text-gta-textSecondary mt-2">
                 Requested: {formatDateInToronto(requestedAt)}
               </p>
             )}
@@ -99,10 +99,10 @@ export function SalatCategoryContent({
   if (status === "failed") {
     return (
       <div className="space-y-3">
-        <div className="rounded-xl border border-slate-200 dark:border-emerald-800/50 bg-[var(--salat-card)] dark:bg-[var(--salat-card)] p-4 shadow-card">
-          <p className="text-slate-600 dark:text-slate-400">You can request to be tested again when you are ready.</p>
+        <div className="card-kid p-4">
+          <p className="text-gta-textSecondary">You can request to be tested again when you are ready.</p>
         </div>
-        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
         <button type="button" onClick={handleRequestAgain} disabled={loading} className={buttonClass}>
           {loading ? "Requesting…" : "Request test again"}
         </button>
@@ -112,7 +112,7 @@ export function SalatCategoryContent({
 
   return (
     <div className="space-y-3">
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
       <button type="button" onClick={handleRequestTest} disabled={loading} className={buttonClass}>
         {loading ? "Submitting…" : "I have successfully memorized and I am ready to be tested"}
       </button>

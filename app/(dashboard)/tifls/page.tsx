@@ -27,15 +27,15 @@ export default async function TiflsPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Tifls</h1>
+        <h1 className="text-2xl font-bold text-gta-text">Tifls</h1>
         {(session.user.role === "regional_nazim" || session.user.role === "admin") && (
-          <Link href="/tifls/new" className="px-4 py-2 btn-kid-primary rounded-xl inline-block">
+          <Link href="/tifls/new" className="px-4 py-2 btn-kid-primary rounded-gta inline-block">
             Create user
           </Link>
         )}
       </div>
       {(session.user.role === "regional_nazim" || session.user.role === "admin") && (
-        <p className="text-slate-600 dark:text-slate-400 mb-4">Select a Majlis to filter, or leave blank to see all.</p>
+        <p className="text-gta-textSecondary mb-4">Select a Majlis to filter, or leave blank to see all.</p>
       )}
       <TiflsList
         initialTifls={tifls ?? []}

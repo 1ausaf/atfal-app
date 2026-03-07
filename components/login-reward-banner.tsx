@@ -46,7 +46,7 @@ export function LoginRewardBanner({
     {
       role: "alert",
       className:
-        "mb-6 rounded-2xl border-2 border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3",
+        "mb-6 rounded-gta border-2 border-amber-400 bg-[rgba(255,215,0,0.25)] p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3",
     },
     React.createElement(
       "div",
@@ -56,20 +56,20 @@ export function LoginRewardBanner({
             React.Fragment,
             null,
             React.createElement("p", {
-              className: "font-medium text-emerald-800 dark:text-emerald-200",
+              className: "font-bold text-gta-text",
             }, "You earned 1050 points (50 daily login + 1000 streak bonus)!"),
             React.createElement("p", {
-              className: "text-sm text-emerald-700 dark:text-emerald-300 mt-0.5",
+              className: "text-sm text-gta-textSecondary mt-0.5",
             }, "Your streak has reset — log in 7 days in a row again for another 1000 pts.")
           )
         : React.createElement(
             React.Fragment,
             null,
             React.createElement("p", {
-              className: "font-medium text-emerald-800 dark:text-emerald-200",
+              className: "font-bold text-gta-text",
             }, "You earned 50 points for daily login!"),
             React.createElement("p", {
-              className: "text-sm text-emerald-700 dark:text-emerald-300 mt-0.5",
+              className: "text-sm text-gta-textSecondary mt-0.5",
             }, `Current streak: ${currentStreak}/7 days. Log in ${Math.max(0, 7 - currentStreak)} more days in a row for 1000 bonus points.`)
           )
     ),
@@ -79,7 +79,7 @@ export function LoginRewardBanner({
         type: "button",
         onClick: handleDismiss,
         className:
-          "shrink-0 px-3 py-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 rounded-lg transition-colors",
+          "shrink-0 px-3 py-1.5 text-sm font-semibold text-green-800 hover:bg-amber-200/50 rounded-gta-sm transition-colors",
         "aria-label": "Dismiss",
       },
       "Dismiss"
@@ -97,14 +97,14 @@ export function LoginStreakDisplay({
     "div",
     {
       className:
-        "rounded-xl border border-emerald-200 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/20 px-4 py-2.5 inline-flex items-center gap-2",
+        "rounded-gta-sm border border-amber-400 bg-[rgba(255,215,0,0.25)] px-4 py-2.5 inline-flex items-center gap-2",
     },
     React.createElement("span", {
-      className: "text-sm font-medium text-emerald-800 dark:text-emerald-200",
+      className: "text-sm font-semibold text-gta-text",
     }, `Login streak: ${currentStreak}/7 days`),
     currentStreak < 7 &&
       React.createElement("span", {
-        className: "text-xs text-emerald-600 dark:text-emerald-400",
+        className: "text-xs text-green-800 font-medium",
       }, `${remaining} more for 1000 pts`)
   );
 }

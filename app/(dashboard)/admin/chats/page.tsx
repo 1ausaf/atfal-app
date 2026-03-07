@@ -40,7 +40,7 @@ export default async function AdminChatsPage() {
         ← Admin
       </Link>
       <h1 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">All Chats</h1>
-      <div className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 overflow-hidden">
+      <div className="card-kid overflow-hidden p-0">
         <ul className="divide-y divide-slate-200 dark:divide-slate-700">
           {(convs ?? []).map((c) => {
             const participants = participantsByConv.get(c.id) ?? [];

@@ -68,12 +68,12 @@ export default async function LessonsPage() {
   }) {
     if (!items?.length) return null;
     return (
-      <ul className="space-y-4">
+      <ul className="flex flex-col gap-3">
         {items.map((a) => {
           const sub = subMap?.[a.id];
           const pointsAvailable = pointsMap?.[a.id] ?? 0;
           return (
-            <li key={a.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
+            <li key={a.id} className="content-module-item">
               <div className="flex justify-between items-start gap-4">
                 <div className="flex gap-4 min-w-0 flex-1">
                   {showThumb && a.thumbnail_url && (
@@ -83,22 +83,22 @@ export default async function LessonsPage() {
                         alt=""
                         width={80}
                         height={60}
-                        className="rounded object-cover w-20 h-[60px]"
+                        className="rounded-lg object-cover w-20 h-[60px]"
                       />
                     </Link>
                   )}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Link href={`/lessons/${a.id}`} className="font-semibold text-lg hover:underline">
+                      <Link href={`/lessons/${a.id}`} className="font-semibold text-lg text-gta-text hover:underline">
                         {a.title}
                       </Link>
                       {pointsAvailable > 0 && <PointsBadge points={pointsAvailable} />}
-                      <span className="text-sm text-slate-500 dark:text-slate-400">{a.type}</span>
+                      <span className="text-sm text-gta-textSecondary">{a.type}</span>
                     </div>
-                    {a.description && <p className="mt-2 text-slate-600 dark:text-slate-400 line-clamp-2">{a.description}</p>}
+                    {a.description && <p className="mt-2 text-gta-textSecondary line-clamp-2">{a.description}</p>}
                     {sub && (
-                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                        Submitted {formatDateInToronto(sub.created_at)} · {sub.points_awarded} pts
+                      <p className="mt-1 text-sm text-gta-textSecondary">
+                        Submitted {formatDateInToronto(sub.created_at)} · <span className="font-semibold text-gta-primary">{sub.points_awarded} pts</span>
                       </p>
                     )}
                   </div>
@@ -115,13 +115,13 @@ export default async function LessonsPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Lesson activities</h1>
+        <h1 className="text-2xl font-bold text-gta-text">Lesson activities</h1>
         {isRegional && (
           <>
-            <Link href="/lessons/new" className="px-4 py-2 btn-kid-primary rounded-xl inline-block">
+            <Link href="/lessons/new" className="px-4 py-2 btn-kid-primary rounded-gta inline-block">
               Create lesson
             </Link>
-            <Link href="/lessons/submissions" className="px-4 py-2 border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-colors inline-block">
+            <Link href="/lessons/submissions" className="px-4 py-2 border-2 border-gta-primary text-gta-primary rounded-gta hover:bg-gta-surfaceSecondary transition-colors inline-block font-semibold">
               Grade submissions
             </Link>
           </>
@@ -131,16 +131,16 @@ export default async function LessonsPage() {
       {isTifl ? (
         <>
           <section className="mb-8">
-            <h2 className="text-lg font-semibold mb-3">To complete</h2>
+            <h2 className="text-lg font-bold text-gta-text mb-3">To complete</h2>
             {incompleteActivities.length === 0 ? (
-              <p className="text-slate-500 dark:text-slate-400">No lesson activities to complete. Great work!</p>
+              <p className="text-gta-textSecondary">No lesson activities to complete. Great work!</p>
             ) : (
               <LessonList items={incompleteActivities} showThumb pointsAvailableByActivityId={pointsAvailableByActivityId} />
             )}
           </section>
           {pastActivities.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold mb-3">Past lessons</h2>
+              <h2 className="text-lg font-bold text-gta-text mb-3">Past lessons</h2>
               <LessonList items={pastActivities} showThumb submissionByActivityId={submissionByActivityId} pointsAvailableByActivityId={pointsAvailableByActivityId} />
             </section>
           )}
@@ -148,7 +148,7 @@ export default async function LessonsPage() {
       ) : (
         <>
           {!activities?.length ? (
-            <p className="text-slate-500 dark:text-slate-400">No lesson activities yet.</p>
+            <p className="text-gta-textSecondary">No lesson activities yet.</p>
           ) : (
             <LessonList items={activities} showThumb pointsAvailableByActivityId={pointsAvailableByActivityId} />
           )}

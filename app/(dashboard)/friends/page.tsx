@@ -41,7 +41,7 @@ export default async function FriendsPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">Friends</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gta-text">Friends</h1>
       <FriendsPageClient
         friends={friends ?? []}
         incoming={incoming.map((r) => {

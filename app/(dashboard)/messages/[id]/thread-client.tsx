@@ -57,7 +57,7 @@ export function ThreadClient({
   if (loading) return <p className="text-slate-500">Loading…</p>;
 
   return (
-    <div className="flex flex-col h-[60vh] card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg">
+    <div className="flex flex-col h-[60vh] card-kid">
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.map((m) => (
           <div

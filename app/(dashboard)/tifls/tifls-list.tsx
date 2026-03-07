@@ -142,7 +142,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
       ) : (
         <ul className="space-y-3">
           {tifls.map((t) => (
-            <li key={t.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4 flex justify-between items-center flex-wrap gap-2">
+            <li key={t.id} className="card-kid p-4 flex justify-between items-center flex-wrap gap-2">
               {editingId === t.id ? (
                 <div className="flex-1 space-y-2 min-w-0">
                   <div>

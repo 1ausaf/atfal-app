@@ -39,11 +39,11 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
   return (
     <div className="max-w-2xl mx-auto">
       <Link href="/homework" className="text-green-600 hover:underline mb-4 inline-block">Back to homework</Link>
-      <article className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-6">
+      <article className="card-kid p-6">
         <h1 className="text-2xl font-bold">{hw.title}</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Due: {formatDateTimeInToronto(hw.due_by)}</p>
+        <p className="text-sm text-gta-textSecondary mt-1">Due: {formatDateTimeInToronto(hw.due_by)}</p>
         {(session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin") && hw.release_at != null && new Date(hw.release_at) > new Date() && (
-          <p className="mt-2 text-sm font-medium text-amber-600 dark:text-amber-400">Private until {formatDateTimeInToronto(hw.release_at)}</p>
+          <p className="mt-2 text-sm font-semibold text-gta-secondary">Private until {formatDateTimeInToronto(hw.release_at)}</p>
         )}
         {linkedLessonTitle && (
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">

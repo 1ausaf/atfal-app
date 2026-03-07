@@ -44,20 +44,20 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
         })
       : homework;
 
-  if (!homework.length) return <p className="text-gray-500">No homework.</p>;
+  if (!homework.length) return <p className="text-gta-textSecondary">No homework.</p>;
 
   return (
     <>
       {(role === "regional_nazim" || role === "admin") && (
         <div className="mb-4 flex items-center gap-2">
-          <label htmlFor="majlis-filter" className="text-sm font-medium text-slate-600 dark:text-slate-400">
+          <label htmlFor="majlis-filter" className="text-sm font-semibold text-gta-text">
             Filter by Majlis:
           </label>
           <select
             id="majlis-filter"
             value={majlisFilter}
             onChange={(e) => setMajlisFilter(e.target.value)}
-            className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-1.5 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+            className="rounded-lg border border-gta-border bg-gta-surface px-3 py-1.5 text-sm text-gta-text focus:ring-2 focus:ring-gta-primary/30 focus:outline-none"
           >
             <option value={FILTER_ALL}>All</option>
             <option value={FILTER_REGIONAL}>Regional only</option>
@@ -67,40 +67,40 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
           </select>
         </div>
       )}
-      <ul className="space-y-4">
+      <ul className="flex flex-col gap-3">
       {filteredHomework.map((h) => {
         const canEdit =
           (role === "regional_nazim" || role === "admin") || (role === "local_nazim" && userMajlisId != null && h.majlis_id === userMajlisId);
         const tagLabel = h.majlis_id ? majlisMap.get(h.majlis_id) ?? h.majlis_id : "Regional";
         return (
-          <li key={h.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
+          <li key={h.id} className="content-module-item">
             <div className="flex justify-between items-start gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Link href={`/homework/${h.id}`} className="font-semibold text-lg hover:underline">
+                  <Link href={`/homework/${h.id}`} className="font-semibold text-lg text-gta-text hover:underline">
                     {h.title}
                   </Link>
-                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200 shrink-0">
+                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-gta-secondary text-white shrink-0">
                     {tagLabel}
                   </span>
                   {(role === "local_nazim" || role === "regional_nazim" || role === "admin") && h.release_at != null && new Date(h.release_at) > new Date() && (
-                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200 shrink-0">
+                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-gta-surfaceSecondary text-gta-text shrink-0">
                       Releases at {formatDateTimeInToronto(h.release_at)}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500 mt-1">Due: {formatDateTimeInToronto(h.due_by)}</p>
+                <p className="text-sm text-gta-textSecondary mt-1">Due: {formatDateTimeInToronto(h.due_by)}</p>
                 {h.lesson_activity_id && lessonMap.get(h.lesson_activity_id) && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Lesson: <Link href={`/lessons/${h.lesson_activity_id}`} className="text-emerald-600 hover:underline">{lessonMap.get(h.lesson_activity_id)}</Link>
+                  <p className="text-xs text-gta-textSecondary mt-0.5">
+                    Lesson: <Link href={`/lessons/${h.lesson_activity_id}`} className="link-kid">{lessonMap.get(h.lesson_activity_id)}</Link>
                   </p>
                 )}
-                {h.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{h.description}</p>}
+                {h.description && <p className="mt-2 text-gta-textSecondary">{h.description}</p>}
                 {h.links?.length > 0 && (
                   <ul className="mt-2 flex flex-wrap gap-2">
                     {h.links.map((url, i) => (
                       <li key={i}>
-                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-700 hover:underline text-sm">
+                        <a href={url} target="_blank" rel="noopener noreferrer" className="link-kid text-sm">
                           Link {i + 1}
                         </a>
                       </li>
@@ -111,7 +111,7 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
               <div className="flex flex-col items-end gap-1 shrink-0">
                 <HomeworkItemActions homeworkId={h.id} canEdit={canEdit} />
                 {!canEdit && (role === "local_nazim" || (role === "regional_nazim" || role === "admin")) && (
-                  <Link href={`/homework/${h.id}/submissions`} className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline">
+                  <Link href={`/homework/${h.id}/submissions`} className="link-kid text-sm">
                     View submissions
                   </Link>
                 )}
@@ -122,7 +122,7 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
       })}
     </ul>
     {(role === "regional_nazim" || role === "admin") && filteredHomework.length === 0 && homework.length > 0 && (
-      <p className="text-slate-500 dark:text-slate-400">No homework match the selected filter.</p>
+      <p className="text-gta-textSecondary">No homework match the selected filter.</p>
     )}
     </>
   );

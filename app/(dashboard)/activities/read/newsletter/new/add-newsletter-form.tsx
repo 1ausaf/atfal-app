@@ -58,7 +58,7 @@ export function AddNewsletterForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 p-6"
+      className="space-y-4 card-kid p-6"
     >
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400" role="alert">

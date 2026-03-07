@@ -39,33 +39,33 @@ export function SalatPendingList({ list }: { list: Item[] }) {
   }
 
   if (!list.length) {
-    return <p className="text-slate-500 dark:text-slate-400">No pending test requests.</p>;
+    return <p className="text-gta-textSecondary">No pending test requests.</p>;
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card overflow-hidden">
-      <ul className="divide-y divide-slate-200 dark:divide-slate-700">
+    <div className="card-kid overflow-hidden p-0">
+      <ul className="divide-y divide-gta-border">
         {list.map((item) => (
           <li key={item.id} className="flex flex-wrap items-center justify-between gap-4 px-4 py-3">
             <div>
-              <p className="font-medium text-slate-800 dark:text-slate-200">{item.userName}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">@{item.userMemberCode ?? "—"}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="font-bold text-gta-text">{item.userName}</p>
+              <p className="text-sm text-gta-textSecondary">@{item.userMemberCode ?? "—"}</p>
+              <p className="text-sm text-gta-textSecondary">
                 {item.categoryTitle} · Requested {formatDateInToronto(item.requestedAt)}
               </p>
               {item.passedArabic && (
-                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">Arabic Only: Passed</p>
+                <p className="text-xs text-gta-primary font-semibold mt-1">Arabic Only: Passed</p>
               )}
             </div>
             <div className="flex flex-wrap gap-3">
               {!item.passedArabic && (
                 <div className="flex gap-2 items-center">
-                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Arabic Only:</span>
+                  <span className="text-xs font-semibold text-gta-textSecondary">Arabic Only:</span>
                   <button
                     type="button"
                     onClick={() => handleMark(item.id, { passed_arabic: true })}
                     disabled={loadingKey !== null}
-                    className="px-3 py-1.5 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+                    className="px-3 py-1.5 btn-kid-primary text-sm rounded-gta-sm disabled:opacity-50"
                   >
                     Pass
                   </button>
@@ -73,7 +73,7 @@ export function SalatPendingList({ list }: { list: Item[] }) {
                     type="button"
                     onClick={() => handleMark(item.id, { passed_arabic: false })}
                     disabled={loadingKey !== null}
-                    className="px-3 py-1.5 bg-slate-500 text-white text-sm font-medium rounded-lg hover:bg-slate-600 disabled:opacity-50"
+                    className="px-3 py-1.5 bg-gta-textSecondary text-white text-sm font-semibold rounded-gta-sm hover:opacity-90 disabled:opacity-50"
                   >
                     Fail
                   </button>
@@ -81,12 +81,12 @@ export function SalatPendingList({ list }: { list: Item[] }) {
               )}
               {item.passedArabic && !item.passedTranslation && (
                 <div className="flex gap-2 items-center">
-                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Arabic with Translation:</span>
+                  <span className="text-xs font-semibold text-gta-textSecondary">Arabic with Translation:</span>
                   <button
                     type="button"
                     onClick={() => handleMark(item.id, { passed_translation: true })}
                     disabled={loadingKey !== null}
-                    className="px-3 py-1.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 disabled:opacity-50"
+                    className="px-3 py-1.5 bg-gta-secondary text-white text-sm font-semibold rounded-gta-sm hover:opacity-90 disabled:opacity-50"
                   >
                     Pass
                   </button>
@@ -94,7 +94,7 @@ export function SalatPendingList({ list }: { list: Item[] }) {
                     type="button"
                     onClick={() => handleMark(item.id, { passed_translation: false })}
                     disabled={loadingKey !== null}
-                    className="px-3 py-1.5 bg-slate-500 text-white text-sm font-medium rounded-lg hover:bg-slate-600 disabled:opacity-50"
+                    className="px-3 py-1.5 bg-gta-textSecondary text-white text-sm font-semibold rounded-gta-sm hover:opacity-90 disabled:opacity-50"
                   >
                     Fail
                   </button>

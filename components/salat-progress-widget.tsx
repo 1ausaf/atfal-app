@@ -5,6 +5,24 @@ import Link from "next/link";
 
 const TOTAL = 14;
 
+/** 0% red, 50% yellow, 100% green; interpolates in between so the whole bar is one color by progress. */
+function getProgressBarColor(pct: number): string {
+  if (pct <= 0) return "rgb(239, 68, 68)";
+  if (pct >= 100) return "rgb(34, 197, 94)";
+  if (pct <= 50) {
+    const t = pct / 50;
+    const r = Math.round(239 + (234 - 239) * t);
+    const g = Math.round(68 + (179 - 68) * t);
+    const b = Math.round(68 + (8 - 68) * t);
+    return `rgb(${r},${g},${b})`;
+  }
+  const t = (pct - 50) / 50;
+  const r = Math.round(234 + (34 - 234) * t);
+  const g = Math.round(179 + (197 - 179) * t);
+  const b = Math.round(8 + (94 - 8) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
 export async function SalatProgressWidget() {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "tifl") return null;
@@ -25,30 +43,36 @@ export async function SalatProgressWidget() {
 
   return (
     <div className="space-y-2 flex flex-col">
-      <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400">
+      <div className="flex justify-between text-xs text-gta-textSecondary">
         <span>Arabic: {arabicCount}/{TOTAL}</span>
         <span>Translation: {translationCount}/{TOTAL}</span>
       </div>
-      <div className="space-y-1.5">
-        <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-600 overflow-hidden">
+      <div className="space-y-2">
+        <div className="h-2 rounded-full bg-[#F0F0F0] overflow-hidden">
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all duration-300"
-            style={{ width: `${arabicPct}%` }}
+            className="h-full rounded-full transition-all duration-300"
+            style={{
+              width: `${arabicPct}%`,
+              backgroundColor: getProgressBarColor(arabicPct),
+            }}
           />
         </div>
-        <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-600 overflow-hidden">
+        <div className="h-2 rounded-full bg-[#F0F0F0] overflow-hidden">
           <div
-            className="h-full rounded-full bg-amber-400 transition-all duration-300"
-            style={{ width: `${translationPct}%` }}
+            className="h-full rounded-full transition-all duration-300"
+            style={{
+              width: `${translationPct}%`,
+              backgroundColor: getProgressBarColor(translationPct),
+            }}
           />
         </div>
       </div>
       <div className="flex items-center justify-between gap-2 pt-0.5">
-        <span className="text-xs text-slate-500 dark:text-slate-400">Goals:</span>
+        <span className="text-xs text-gta-textSecondary font-semibold">Goals:</span>
         <div className="flex items-center gap-2">
           <span
             className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              salatStar ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200" : "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
+              salatStar ? "bg-purple-300 text-purple-900" : "bg-gta-surfaceSecondary text-gta-textSecondary"
             }`}
             title="Pass all 14 sections in Arabic only"
           >
@@ -56,7 +80,7 @@ export async function SalatProgressWidget() {
           </span>
           <span
             className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              salatSuperstar ? "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200" : "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
+              salatSuperstar ? "bg-red-500 text-white" : "bg-gta-surfaceSecondary text-gta-textSecondary"
             }`}
             title="Pass all 14 in Arabic and with Translation"
           >
@@ -65,7 +89,7 @@ export async function SalatProgressWidget() {
         </div>
       </div>
       {(salatStar || salatSuperstar) && (
-        <p className="text-xs text-emerald-700 dark:text-emerald-300">
+        <p className="text-xs text-gta-primary font-medium">
           +100 bonus on homework and lessons.
         </p>
       )}

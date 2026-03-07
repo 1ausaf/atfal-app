@@ -33,21 +33,21 @@ export default async function ProfilePage() {
       <Link href="/dashboard" className="link-kid text-sm mb-4 inline-block">
         ← Back to Dashboard
       </Link>
-      <h1 className="text-2xl font-bold mb-2 text-slate-800 dark:text-slate-200">Profile</h1>
+      <h1 className="text-2xl font-bold mb-2 text-gta-text">Profile</h1>
       {salatStar && (
-        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-          <span className="text-emerald-600 dark:text-emerald-400 text-xl" aria-hidden>★</span>
-          <span className="font-medium text-emerald-800 dark:text-emerald-200">Salat Star</span>
+        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-purple-100 border border-purple-300">
+          <span className="text-purple-600 text-xl" aria-hidden>★</span>
+          <span className="font-semibold text-purple-900">Salat Star</span>
         </div>
       )}
       {salatSuperstar && (
-        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
-          <span className="text-amber-600 dark:text-amber-400 text-xl" aria-hidden>★</span>
-          <span className="font-medium text-amber-800 dark:text-amber-200">Salat Superstar</span>
+        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-red-50 border border-red-300">
+          <span className="text-red-500 text-xl" aria-hidden>★</span>
+          <span className="font-semibold text-red-800">Salat Superstar</span>
         </div>
       )}
       {(salatStar || salatSuperstar) && (
-        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+        <p className="text-sm text-gta-textSecondary mb-4">
           You earn +100 bonus points on every homework and lesson you complete.
         </p>
       )}

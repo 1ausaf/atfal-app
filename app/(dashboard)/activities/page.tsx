@@ -16,7 +16,7 @@ export default async function ActivitiesPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href="/activities/read"
-          className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-6 hover:border-emerald-400 dark:hover:border-emerald-600 transition-colors"
+          className="card-kid p-6 transition-colors hover:shadow-gta-hover"
         >
           <h2 className="font-semibold text-lg text-slate-900 dark:text-white">Read</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Newsletter and reading content</p>

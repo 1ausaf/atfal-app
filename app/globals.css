@@ -2,7 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Dark-only theme */
+/* GTACDESIGNv1 design system (ages 7–14) */
+:root {
+  --gta-background: #64c5eb;
+  --gta-background-light: #b8e0f5;
+  --gta-background-lighter: #e5f5fc;
+  --gta-surface: #ffffff;
+  --gta-surface-secondary: #e1f5fe;
+  --gta-primary: #7ed321;
+  --gta-secondary: #f5a623;
+  --gta-text: #2c3e50;
+  --gta-text-secondary: #5d6d7e;
+  --gta-border: #e0e0e0;
+  --gta-radius: 16px;
+  --gta-radius-sm: 8px;
+  --gta-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --gta-shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.08);
+  --gta-card-padding: 20px;
+}
+
+/* Legacy / dark theme (optional) */
 :root {
   --foreground: #ededed;
   --background: #0a0a0a;
@@ -19,52 +38,50 @@
   --salat-accent-dark: #fbbf24;
 }
 
-/* Child-friendly theme for non-Salat app areas */
-:root {
-  --kid-card-radius: 1rem;
-  --kid-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-  --kid-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
-  --kid-accent: #34d399;
-  --kid-accent-hover: #6ee7b7;
-  --kid-border: #334155;
-  --kid-bg-soft: #022c22;
-}
-
 @layer components {
   .card-kid {
-    border-radius: var(--kid-card-radius);
-    border-width: 1px;
-    border-color: var(--kid-border);
-    background: #1e293b;
-    box-shadow: var(--kid-shadow);
+    background: var(--gta-surface);
+    border: 1px solid var(--gta-border);
+    border-radius: var(--gta-radius);
+    box-shadow: var(--gta-shadow);
     transition: box-shadow 0.2s ease;
   }
   .card-kid:hover {
-    box-shadow: var(--kid-shadow-hover);
+    box-shadow: var(--gta-shadow-hover);
   }
   .btn-kid-primary {
-    border-radius: 1rem;
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    color: white;
+    border-radius: var(--gta-radius);
+    background: var(--gta-primary);
+    color: #1a2e0a;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+    box-shadow: var(--gta-shadow);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
   .btn-kid-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+    box-shadow: var(--gta-shadow-hover);
   }
   .link-kid {
-    color: #34d399;
+    color: var(--gta-primary);
     transition: color 0.15s ease;
   }
   .link-kid:hover {
-    color: #6ee7b7;
+    color: #5fa018;
     text-decoration: underline;
+  }
+  .content-module-item {
+    background: var(--gta-surface-secondary);
+    padding: 12px;
+    border-radius: var(--gta-radius-sm);
+    transition: box-shadow 0.2s ease;
+  }
+  .content-module-item:hover {
+    box-shadow: var(--gta-shadow-hover);
   }
 }
 
 body {
-  color: var(--foreground);
-  background: linear-gradient(160deg, var(--background) 0%, #064e3b 50%, #022c22 100%);
+  color: var(--gta-text);
+  background: linear-gradient(160deg, var(--gta-background-lighter) 0%, var(--gta-background-light) 50%, var(--gta-background) 100%);
+  min-height: 100vh;
 }

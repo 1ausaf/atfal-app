@@ -73,7 +73,7 @@ export function NewChatClient({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search friends by name…"
-            className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800"
+            className="flex-1 px-3 py-2 border border-gta-border rounded-gta-sm bg-gta-surface text-gta-text"
           />
           <button type="submit" disabled={loading} className="px-4 py-2 btn-kid-primary rounded-xl disabled:opacity-50 disabled:transform-none">
             Search
@@ -81,45 +81,45 @@ export function NewChatClient({
         </form>
       )}
       {role === "tifl" && users.length > 0 && (
-        <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+        <ul className="card-kid divide-y divide-gta-border overflow-hidden p-0">
           {users.map((u) => (
             <li key={u.id}>
               <button
                 type="button"
                 onClick={() => startChat(u.id)}
                 disabled={creating}
-                className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 disabled:opacity-50"
+                className="w-full text-left px-4 py-3 hover:bg-gta-surfaceSecondary/80 disabled:opacity-50"
               >
                 <span>{u.name ?? "—"}</span>
-                <span className="block text-sm text-slate-500 dark:text-slate-400">@{u.member_code ?? "—"}</span>
+                <span className="block text-sm text-gta-textSecondary">@{u.member_code ?? "—"}</span>
               </button>
             </li>
           ))}
         </ul>
       )}
       {role === "tifl" && query && !loading && users.length === 0 && (
-        <p className="text-slate-500 dark:text-slate-400">No friends found. Add friends first from the Friends page.</p>
+        <p className="text-gta-textSecondary">No friends found. Add friends first from the Friends page.</p>
       )}
       {isNazim && tiflList.length > 0 && (
-        <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
-          <li className="px-4 py-2 text-sm text-slate-500 dark:text-slate-400">Select a Tifl to message</li>
+        <ul className="card-kid divide-y divide-gta-border overflow-hidden p-0">
+          <li className="px-4 py-2 text-sm text-gta-textSecondary">Select a Tifl to message</li>
           {tiflList.map((u) => (
             <li key={u.id}>
               <button
                 type="button"
                 onClick={() => startChat(u.id)}
                 disabled={creating}
-                className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 disabled:opacity-50"
+                className="w-full text-left px-4 py-3 hover:bg-gta-surfaceSecondary/80 disabled:opacity-50"
               >
                 <span>{u.name ?? "—"}</span>
-                <span className="block text-sm text-slate-500 dark:text-slate-400">@{u.member_code ?? "—"}</span>
+                <span className="block text-sm text-gta-textSecondary">@{u.member_code ?? "—"}</span>
               </button>
             </li>
           ))}
         </ul>
       )}
       {isNazim && tiflList.length === 0 && (
-        <p className="text-slate-500 dark:text-slate-400">No Tifls to message yet.</p>
+        <p className="text-gta-textSecondary">No Tifls to message yet.</p>
       )}
     </div>
   );

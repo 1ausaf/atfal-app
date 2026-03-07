@@ -23,8 +23,8 @@ export default async function SalatPendingPage() {
     .or("passed_translation.is.null,passed_translation.eq.false");
   if (errReady || errArabic) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <p className="text-red-600 dark:text-red-400">Failed to load pending tests.</p>
+      <div className="max-w-4xl mx-auto p-4">
+        <p className="text-red-600">Failed to load pending tests.</p>
       </div>
     );
   }
@@ -63,9 +63,9 @@ export default async function SalatPendingPage() {
       : list;
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">Salat test requests</h1>
-      <p className="text-slate-600 dark:text-slate-400 mb-6">
+    <div className="max-w-4xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4 text-gta-text">Salat test requests</h1>
+      <p className="text-gta-textSecondary mb-6">
         Mark each section as Pass or Fail: <strong>Arabic Only</strong> and <strong>Arabic with Translation</strong>.
       </p>
       <SalatPendingList

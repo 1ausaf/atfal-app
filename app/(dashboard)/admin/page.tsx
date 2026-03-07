@@ -10,7 +10,7 @@ export default async function AdminPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-200">Admin</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gta-text">Admin</h1>
       <ul className="space-y-2">
         <li>
           <Link href="/admin/analytics" className="link-kid font-medium">

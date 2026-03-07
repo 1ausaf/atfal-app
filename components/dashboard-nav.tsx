@@ -5,11 +5,11 @@ import Link from "next/link";
 import type { UserRole } from "@/lib/db-types";
 
 const navLinkClass =
-  "text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 inline-flex items-center gap-1 transition-colors py-1 px-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20";
+  "text-gta-textSecondary hover:text-gta-primary inline-flex items-center gap-1 transition-colors py-1 px-2 rounded-lg hover:bg-gta-surfaceSecondary/80";
 const dropdownPanelClass =
-  "absolute top-full left-0 mt-2 min-w-[10rem] rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/50 bg-white dark:bg-slate-800 shadow-xl py-2 z-50";
+  "absolute top-full left-0 mt-2 min-w-[10rem] rounded-gta border border-gta-border bg-gta-surface shadow-gta py-2 z-50";
 const dropdownItemClass =
-  "block w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors rounded-lg mx-1";
+  "block w-full text-left px-4 py-2.5 text-sm text-gta-text hover:bg-gta-surfaceSecondary/80 hover:text-gta-primary transition-colors rounded-lg mx-1 font-semibold";
 
 type NavCounts = { friends: number; messages: number; homework: number; lessons: number };
 

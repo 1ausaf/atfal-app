@@ -34,7 +34,7 @@ export default async function HomeworkSubmissionsPage({ params }: { params: Prom
       ) : (
         <ul className="space-y-4">
           {submissions.map((s) => (
-            <li key={s.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4 flex justify-between items-center">
+            <li key={s.id} className="card-kid p-4 flex justify-between items-center">
               <div>
                 <span className="font-medium">{userInfoMap.get(s.user_id)?.name ?? s.user_id}</span>
                 <span className="block text-sm text-slate-500 dark:text-slate-400">@{userInfoMap.get(s.user_id)?.member_code ?? "—"}</span>

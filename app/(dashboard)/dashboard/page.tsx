@@ -77,9 +77,9 @@ export default async function DashboardPage() {
 
   if (session.user.role === "tifl") {
     return (
-      <div className="max-w-6xl mx-auto min-h-dvh grid grid-rows-[auto_auto_1fr] gap-3 p-3 md:p-4">
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
-          <h1 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">Dashboard</h1>
+      <div className="max-w-6xl mx-auto min-h-dvh grid grid-rows-[auto_auto_1fr] gap-4 p-4 md:p-5">
+        <div className="flex flex-wrap items-center gap-4 shrink-0">
+          <h1 className="text-xl font-bold text-gta-text tracking-tight">Dashboard</h1>
           <LoginRewardBanner
             pointsAwardedToday={loginReward.pointsAwardedToday}
             currentStreak={loginReward.currentStreak}
@@ -88,30 +88,28 @@ export default async function DashboardPage() {
           />
           <LoginStreakDisplay currentStreak={loginReward.currentStreak} />
         </div>
-        <section
-          className="rounded-2xl border border-amber-200/80 dark:border-amber-700/50 bg-amber-50/60 dark:bg-amber-950/30 p-3 md:p-4 shrink-0 shadow-[0_0_24px_rgba(245,158,11,0.25)] dark:shadow-[0_0_24px_rgba(245,158,11,0.15)]"
-        >
-          <h2 className="font-semibold text-sm mb-2 text-slate-800 dark:text-white">Salat course progress</h2>
+        <section className="card-kid p-4 shrink-0 flex flex-col border-l-4 border-l-gta-primary">
+          <h2 className="font-bold text-base mb-2 text-gta-text">Salat course progress</h2>
           <SalatProgressWidget />
         </section>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
           <div className="flex flex-col gap-4 min-h-0">
-            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
-              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Upcoming events</h2>
+            <section className="card-kid p-4 min-h-0 flex flex-col">
+              <h2 className="font-bold text-base mb-2 text-gta-text">Upcoming events</h2>
               <div className="min-h-0">
                 <EventsWidget limit={2} />
               </div>
               <Link href="/events" className="link-kid text-sm mt-1 inline-block">View all events</Link>
             </section>
-            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
-              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Homework due</h2>
+            <section className="card-kid p-4 min-h-0 flex flex-col">
+              <h2 className="font-bold text-base mb-2 text-gta-text">Homework due</h2>
               <div className="min-h-0">
                 <HomeworkDueWidget limit={3} />
               </div>
               <Link href="/homework" className="link-kid text-sm mt-1 inline-block">View all homework</Link>
             </section>
-            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
-              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Lesson activities</h2>
+            <section className="card-kid p-4 min-h-0 flex flex-col">
+              <h2 className="font-bold text-base mb-2 text-gta-text">Lesson activities</h2>
               <div className="min-h-0">
                 <LessonActivitiesWidget limit={3} />
               </div>
@@ -119,8 +117,8 @@ export default async function DashboardPage() {
             </section>
           </div>
           <div className="flex flex-col gap-4 min-h-0">
-            <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-3 min-h-0 flex flex-col">
-              <h2 className="font-semibold text-base mb-2 text-slate-800 dark:text-white">Leaderboard (Top 5)</h2>
+            <section className="card-kid p-4 min-h-0 flex flex-col">
+              <h2 className="font-bold text-base mb-2 text-gta-text">Leaderboard (Top 5)</h2>
               <div className="min-h-0">
                 <LeaderboardWidget limit={5} />
               </div>
@@ -133,30 +131,30 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white tracking-tight">Dashboard</h1>
+    <div className="max-w-6xl mx-auto p-4 md:p-5">
+      <h1 className="text-2xl font-bold mb-6 text-gta-text tracking-tight">Dashboard</h1>
       <div className="grid gap-6 md:grid-cols-2">
-        <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
-          <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Upcoming events</h2>
+        <section className="card-kid p-5">
+          <h2 className="font-bold text-lg mb-3 text-gta-text">Upcoming events</h2>
           <EventsWidget />
           <Link href="/events" className="link-kid text-sm mt-2 inline-block">View all events</Link>
         </section>
-        <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5">
-          <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Leaderboard (Top 25)</h2>
+        <section className="card-kid p-5">
+          <h2 className="font-bold text-lg mb-3 text-gta-text">Leaderboard (Top 25)</h2>
           <LeaderboardWidget />
           <Link href="/leaderboard" className="link-kid text-sm mt-2 inline-block">Full leaderboard</Link>
         </section>
       </div>
       {(session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin") && submissionsToMark.length > 0 && (
-        <section className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-5 mt-6">
-          <h2 className="font-semibold text-lg mb-3 text-slate-800 dark:text-white">Submissions to mark</h2>
+        <section className="card-kid p-5 mt-6">
+          <h2 className="font-bold text-lg mb-3 text-gta-text">Submissions to mark</h2>
           <ul className="space-y-2">
             {submissionsToMark.map((h) => (
               <li key={h.id}>
                 <Link href={`/homework/${h.id}/submissions`} className="link-kid">
                   {h.title}
                 </Link>
-                <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">({h.pendingCount} pending)</span>
+                <span className="ml-2 text-sm text-gta-textSecondary">({h.pendingCount} pending)</span>
               </li>
             ))}
           </ul>

@@ -9,9 +9,30 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+      },
+      colors: {
+        gta: {
+          background: "var(--gta-background)",
+          surface: "var(--gta-surface)",
+          surfaceSecondary: "var(--gta-surface-secondary)",
+          primary: "var(--gta-primary)",
+          secondary: "var(--gta-secondary)",
+          text: "var(--gta-text)",
+          textSecondary: "var(--gta-text-secondary)",
+          border: "var(--gta-border)",
+        },
+      },
+      borderRadius: {
+        gta: "var(--gta-radius)",
+        "gta-sm": "var(--gta-radius-sm)",
+      },
       boxShadow: {
-        card: "0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06)",
-        "card-hover": "0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06)",
+        card: "0 4px 6px rgba(0, 0, 0, 0.05)",
+        "card-hover": "0 6px 12px rgba(0, 0, 0, 0.08)",
+        gta: "0 4px 6px rgba(0, 0, 0, 0.05)",
+        "gta-hover": "0 6px 12px rgba(0, 0, 0, 0.08)",
       },
     },
   },

@@ -92,32 +92,32 @@ export function FriendsPageClient({
   return (
     <div className="space-y-8">
       <section>
-        <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200 mb-2">Add friend</h2>
+        <h2 className="font-bold text-lg text-gta-text mb-2">Add friend</h2>
         <form onSubmit={handleSearch} className="flex gap-2 mb-4">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name…"
-            className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800"
+            className="flex-1 px-3 py-2 border border-gta-border rounded-gta-sm bg-gta-surface text-gta-text"
           />
-          <button type="submit" disabled={loading} className="px-4 py-2 btn-kid-primary rounded-xl disabled:opacity-50 disabled:transform-none">
+          <button type="submit" disabled={loading} className="px-4 py-2 btn-kid-primary rounded-gta disabled:opacity-50 disabled:transform-none">
             Search
           </button>
         </form>
         {searchResults.length > 0 && (
-          <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+          <ul className="card-kid divide-y divide-gta-border overflow-hidden p-0">
             {searchResults.map((u) => (
               <li key={u.id} className="flex items-center justify-between px-4 py-3">
                 <div>
-                  <span>{u.name ?? "—"}</span>
-                  <span className="block text-sm text-slate-500 dark:text-slate-400">@{u.member_code ?? "—"}</span>
+                  <span className="font-semibold text-gta-text">{u.name ?? "—"}</span>
+                  <span className="block text-sm text-gta-textSecondary">@{u.member_code ?? "—"}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => sendRequest(u.id)}
                   disabled={sending === u.id}
-                  className="px-3 py-1.5 btn-kid-primary text-sm rounded-xl disabled:opacity-50 disabled:transform-none"
+                  className="px-3 py-1.5 btn-kid-primary text-sm rounded-gta disabled:opacity-50 disabled:transform-none"
                 >
                   Send request
                 </button>
@@ -129,21 +129,21 @@ export function FriendsPageClient({
 
       {incoming.length > 0 && (
         <section>
-          <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200 mb-2">Incoming requests</h2>
-          <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+          <h2 className="font-bold text-lg text-gta-text mb-2">Incoming requests</h2>
+          <ul className="card-kid divide-y divide-gta-border overflow-hidden p-0">
             {incoming.map((r) => (
               <li key={r.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div>
-                  <p className="font-medium">{r.from_name}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">@{r.from_member_code ?? "—"}</p>
-                  {r.initial_message && <p className="text-sm text-slate-500 dark:text-slate-400">{r.initial_message}</p>}
+                  <p className="font-semibold text-gta-text">{r.from_name}</p>
+                  <p className="text-sm text-gta-textSecondary">@{r.from_member_code ?? "—"}</p>
+                  {r.initial_message && <p className="text-sm text-gta-textSecondary">{r.initial_message}</p>}
                 </div>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => respondToRequest(r.id, "accepted")}
                     disabled={responding === r.id}
-                    className="px-3 py-1.5 btn-kid-primary text-sm rounded-xl disabled:opacity-50 disabled:transform-none"
+                    className="px-3 py-1.5 btn-kid-primary text-sm rounded-gta disabled:opacity-50 disabled:transform-none"
                   >
                     Accept
                   </button>
@@ -151,7 +151,7 @@ export function FriendsPageClient({
                     type="button"
                     onClick={() => respondToRequest(r.id, "rejected")}
                     disabled={responding === r.id}
-                    className="px-3 py-1.5 bg-slate-500 text-white text-sm rounded-lg hover:bg-slate-600 disabled:opacity-50"
+                    className="px-3 py-1.5 bg-gta-textSecondary text-white text-sm rounded-gta-sm hover:bg-gta-text disabled:opacity-50 font-medium"
                   >
                     Reject
                   </button>
@@ -164,15 +164,15 @@ export function FriendsPageClient({
 
       {outgoing.length > 0 && (
         <section>
-          <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200 mb-2">Outgoing requests</h2>
-          <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+          <h2 className="font-bold text-lg text-gta-text mb-2">Outgoing requests</h2>
+          <ul className="card-kid divide-y divide-gta-border overflow-hidden p-0">
             {outgoing.map((r) => (
               <li key={r.id} className="flex items-center justify-between px-4 py-3">
                 <div>
-                  <span>{r.to_name}</span>
-                  <span className="block text-sm text-slate-500 dark:text-slate-400">@{r.to_member_code ?? "—"}</span>
+                  <span className="font-semibold text-gta-text">{r.to_name}</span>
+                  <span className="block text-sm text-gta-textSecondary">@{r.to_member_code ?? "—"}</span>
                 </div>
-                <span className="text-sm text-slate-500 dark:text-slate-400">Pending</span>
+                <span className="text-sm text-gta-textSecondary">Pending</span>
               </li>
             ))}
           </ul>
@@ -180,22 +180,22 @@ export function FriendsPageClient({
       )}
 
       <section>
-        <h2 className="font-semibold text-lg text-slate-800 dark:text-slate-200 mb-2">Friends ({friends.length})</h2>
+        <h2 className="font-bold text-lg text-gta-text mb-2">Friends ({friends.length})</h2>
         {friends.length === 0 ? (
-          <p className="text-slate-500 dark:text-slate-400">No friends yet. Search and send a request.</p>
+          <p className="text-gta-textSecondary">No friends yet. Search and send a request.</p>
         ) : (
-          <ul className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+          <ul className="card-kid divide-y divide-gta-border overflow-hidden p-0">
             {friends.map((u) => (
-              <li key={u.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+              <li key={u.id} className="flex items-center justify-between px-4 py-3 hover:bg-gta-surfaceSecondary/80">
                 <div>
-                  <span className="font-medium">{u.name ?? "—"}</span>
-                  <span className="block text-sm text-slate-500 dark:text-slate-400">@{u.member_code ?? "—"}</span>
+                  <span className="font-semibold text-gta-text">{u.name ?? "—"}</span>
+                  <span className="block text-sm text-gta-textSecondary">@{u.member_code ?? "—"}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => openChat(u.id)}
                   disabled={openingChat === u.id}
-                  className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline disabled:opacity-50"
+                  className="link-kid text-sm disabled:opacity-50"
                 >
                   Message
                 </button>

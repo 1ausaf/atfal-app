@@ -46,7 +46,7 @@ export default async function EventsPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Upcoming events</h1>
+        <h1 className="text-2xl font-bold text-gta-text">Upcoming events</h1>
         {canCreate && (
           <Link href="/events/new" className="px-4 py-2 btn-kid-primary rounded-xl inline-block">
             Create event
@@ -55,29 +55,29 @@ export default async function EventsPage() {
       </div>
       {canCreate && (
         <details className="mb-6">
-          <summary className="cursor-pointer font-medium text-emerald-600 hover:text-emerald-700">Create new event</summary>
+          <summary className="cursor-pointer font-semibold text-gta-primary hover:underline">Create new event</summary>
           <div className="mt-3">
             <CreateEventForm majlisList={majlis ?? []} role={session.user.role} defaultMajlisId={session.user.majlisId} />
           </div>
         </details>
       )}
       {!events?.length ? (
-        <p className="text-slate-500 dark:text-slate-400">No upcoming events.</p>
+        <p className="text-gta-textSecondary">No upcoming events.</p>
       ) : (
-        <ul className="space-y-4">
+        <ul className="flex flex-col gap-3">
           {events.map((e) => (
-            <li key={e.id} className="card-kid rounded-2xl border-2 border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-slate-800 shadow-lg p-4">
+            <li key={e.id} className="content-module-item">
               <div className="flex justify-between items-start gap-4">
                 <div className="min-w-0">
-                  <span className="font-semibold text-lg">{e.title}</span>
-                  <span className="ml-2 px-2 py-0.5 rounded text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+                  <span className="font-semibold text-lg text-gta-text">{e.title}</span>
+                  <span className="ml-2 px-2 py-0.5 rounded text-sm bg-gta-secondary text-white font-medium">
                     {EVENT_TYPE_LABEL[e.event_type] ?? e.event_type}
                   </span>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{formatDateTimeInToronto(e.event_date)}</p>
-                  {e.location && <p className="text-sm text-slate-600 dark:text-slate-400">Location: {e.location}</p>}
-                  {e.description && <p className="mt-2 text-slate-600 dark:text-slate-400">{e.description}</p>}
+                  <p className="text-sm text-gta-textSecondary mt-1">{formatDateTimeInToronto(e.event_date)}</p>
+                  {e.location && <p className="text-sm text-gta-textSecondary">Location: {e.location}</p>}
+                  {e.description && <p className="mt-2 text-gta-textSecondary">{e.description}</p>}
                   {e.link && (
-                    <a href={e.link} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-700 hover:underline transition-colors text-sm mt-2 inline-block">
+                    <a href={e.link} target="_blank" rel="noopener noreferrer" className="link-kid text-sm mt-2 inline-block">
                       Link
                     </a>
                   )}
