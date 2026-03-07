@@ -46,7 +46,7 @@ export function LoginRewardBanner({
     {
       role: "alert",
       className:
-        "mb-6 rounded-gta border-2 border-amber-400 bg-[rgba(255,215,0,0.25)] p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3",
+        "mb-6 rounded-gta border-2 border-amber-400 bg-[rgba(255,215,0,0.25)] p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 dark:border-amber-600 dark:bg-amber-900/30",
     },
     React.createElement(
       "div",
@@ -79,7 +79,7 @@ export function LoginRewardBanner({
         type: "button",
         onClick: handleDismiss,
         className:
-          "shrink-0 px-3 py-1.5 text-sm font-semibold text-green-800 hover:bg-amber-200/50 rounded-gta-sm transition-colors",
+          "shrink-0 px-3 py-1.5 text-sm font-semibold text-green-800 hover:bg-amber-200/50 rounded-gta-sm transition-colors dark:text-emerald-200 dark:hover:bg-amber-800/50",
         "aria-label": "Dismiss",
       },
       "Dismiss"
@@ -97,14 +97,14 @@ export function LoginStreakDisplay({
     "div",
     {
       className:
-        "rounded-gta-sm border border-amber-400 bg-[rgba(255,215,0,0.25)] px-4 py-2.5 inline-flex items-center gap-2",
+        "rounded-gta-sm border border-amber-400 bg-[rgba(255,215,0,0.25)] px-4 py-2.5 inline-flex items-center gap-2 dark:border-amber-600 dark:bg-amber-900/30",
     },
     React.createElement("span", {
       className: "text-sm font-semibold text-gta-text",
     }, `Login streak: ${currentStreak}/7 days`),
     currentStreak < 7 &&
       React.createElement("span", {
-        className: "text-xs text-green-800 font-medium",
+        className: "text-xs text-green-800 font-medium dark:text-emerald-200",
       }, `${remaining} more for 1000 pts`)
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Amiri, Nunito } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const amiri = Amiri({
   weight: ["400", "700"],
@@ -28,9 +29,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${amiri.variable} ${nunito.variable}`}>
+    <html lang="en" className={`${amiri.variable} ${nunito.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('gta-theme');if(t==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');})();`,
+          }}
+        />
+      </head>
       <body className="antialiased font-sans">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <ThemeToggle />
+        </Providers>
       </body>
     </html>
   );

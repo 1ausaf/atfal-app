@@ -48,7 +48,7 @@ export async function SalatProgressWidget() {
         <span>Translation: {translationCount}/{TOTAL}</span>
       </div>
       <div className="space-y-2">
-        <div className="h-2 rounded-full bg-[#F0F0F0] overflow-hidden">
+        <div className="h-2 rounded-full bg-[#F0F0F0] dark:bg-slate-600 overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-300"
             style={{
@@ -57,7 +57,7 @@ export async function SalatProgressWidget() {
             }}
           />
         </div>
-        <div className="h-2 rounded-full bg-[#F0F0F0] overflow-hidden">
+        <div className="h-2 rounded-full bg-[#F0F0F0] dark:bg-slate-600 overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-300"
             style={{
@@ -72,7 +72,7 @@ export async function SalatProgressWidget() {
         <div className="flex items-center gap-2">
           <span
             className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              salatStar ? "bg-purple-300 text-purple-900" : "bg-gta-surfaceSecondary text-gta-textSecondary"
+              salatStar ? "bg-purple-300 text-purple-900 dark:bg-purple-600 dark:text-white" : "bg-gta-surfaceSecondary text-gta-textSecondary"
             }`}
             title="Pass all 14 sections in Arabic only"
           >
@@ -80,7 +80,7 @@ export async function SalatProgressWidget() {
           </span>
           <span
             className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              salatSuperstar ? "bg-red-500 text-white" : "bg-gta-surfaceSecondary text-gta-textSecondary"
+              salatSuperstar ? "bg-red-500 text-white dark:bg-red-600" : "bg-gta-surfaceSecondary text-gta-textSecondary"
             }`}
             title="Pass all 14 in Arabic and with Translation"
           >

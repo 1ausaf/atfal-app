@@ -16,7 +16,7 @@ export default async function NewHomeworkPage() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <Link href="/homework" className="text-green-600 hover:underline mb-4 inline-block">Back to homework</Link>
+      <Link href="/homework" className="text-green-600 hover:underline dark:text-emerald-400 mb-4 inline-block">Back to homework</Link>
       <h1 className="text-2xl font-bold mb-6">Create homework</h1>
       <CreateHomeworkForm majlisList={majlisList ?? []} lessonList={lessonList ?? []} defaultMajlisId={defaultMajlisId} isRegional={session.user.role === "regional_nazim" || session.user.role === "admin"} />
     </div>

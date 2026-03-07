@@ -144,7 +144,7 @@ export function EditLessonForm({ activity }: EditLessonFormProps) {
             <button
               type="button"
               onClick={() => setThumbnailUrl(null)}
-              className="absolute top-0 right-0 mt-1 mr-1 px-1.5 py-0.5 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+              className="absolute top-0 right-0 mt-1 mr-1 px-1.5 py-0.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
             >
               Remove
             </button>
@@ -159,7 +159,7 @@ export function EditLessonForm({ activity }: EditLessonFormProps) {
         />
         {thumbnailUploading && <p className="text-sm text-slate-500 mt-1">Uploading…</p>}
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       <button type="submit" disabled={loading} className="px-4 py-2 btn-kid-primary rounded-xl disabled:opacity-50 disabled:transform-none focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none">
         {loading ? "Saving…" : "Save changes"}
       </button>

@@ -11,7 +11,7 @@ export default async function NewLessonPage() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <Link href="/lessons" className="text-green-600 hover:underline mb-4 inline-block">Back to lessons</Link>
+      <Link href="/lessons" className="text-green-600 hover:underline dark:text-emerald-400 mb-4 inline-block">Back to lessons</Link>
       <h1 className="text-2xl font-bold mb-6">Create lesson activity</h1>
       <CreateLessonForm />
     </div>

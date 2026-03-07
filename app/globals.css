@@ -21,6 +21,22 @@
   --gta-card-padding: 20px;
 }
 
+/* Dark theme: dark emerald to black gradient + emerald accents */
+html.dark {
+  --gta-background: #000000;
+  --gta-background-light: #022c22;
+  --gta-background-lighter: #064e3b;
+  --gta-surface: #1e293b;
+  --gta-surface-secondary: #334155;
+  --gta-border: #475569;
+  --gta-primary: #34d399;
+  --gta-secondary: #fbbf24;
+  --gta-text: #ededed;
+  --gta-text-secondary: #94a3b8;
+  --gta-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  --gta-shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
 /* Legacy / dark theme (optional) */
 :root {
   --foreground: #ededed;

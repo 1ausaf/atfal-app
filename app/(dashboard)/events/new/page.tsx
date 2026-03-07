@@ -19,7 +19,7 @@ export default async function NewEventPage() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <Link href="/events" className="text-green-600 hover:underline mb-4 inline-block">Back to events</Link>
+      <Link href="/events" className="text-green-600 hover:underline dark:text-emerald-400 mb-4 inline-block">Back to events</Link>
       <h1 className="text-2xl font-bold mb-6">Create event</h1>
       <CreateEventForm majlisList={majlisList ?? []} role={session.user.role} defaultMajlisId={session.user.majlisId} majlisName={majlisName} />
     </div>

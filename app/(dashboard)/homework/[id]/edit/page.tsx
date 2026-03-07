@@ -22,7 +22,7 @@ export default async function EditHomeworkPage({ params }: { params: Promise<{ i
 
   return (
     <div className="max-w-xl mx-auto">
-      <Link href={`/homework/${id}`} className="text-green-600 hover:underline mb-4 inline-block">Back to homework</Link>
+      <Link href={`/homework/${id}`} className="text-green-600 hover:underline dark:text-emerald-400 mb-4 inline-block">Back to homework</Link>
       <h1 className="text-2xl font-bold mb-6">Edit homework</h1>
       <EditHomeworkForm
         homework={homework}

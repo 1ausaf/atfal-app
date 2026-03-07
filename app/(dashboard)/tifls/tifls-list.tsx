@@ -212,7 +212,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                       <button
                         type="button"
                         onClick={() => openPoints(t)}
-                        className="px-3 py-1.5 bg-amber-500/80 text-white text-sm rounded-lg hover:bg-amber-600"
+                        className="px-3 py-1.5 bg-amber-500/80 text-white text-sm rounded-lg hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700"
                       >
                         Points
                       </button>
@@ -232,7 +232,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                         <button
                           type="button"
                           onClick={() => handleDelete(t.id)}
-                          className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                          className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
                         >
                           Delete
                         </button>

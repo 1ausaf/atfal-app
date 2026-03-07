@@ -102,7 +102,7 @@ export function SalatCategoryContent({
         <div className="card-kid p-4">
           <p className="text-gta-textSecondary">You can request to be tested again when you are ready.</p>
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
         <button type="button" onClick={handleRequestAgain} disabled={loading} className={buttonClass}>
           {loading ? "Requesting…" : "Request test again"}
         </button>
@@ -112,7 +112,7 @@ export function SalatCategoryContent({
 
   return (
     <div className="space-y-3">
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       <button type="button" onClick={handleRequestTest} disabled={loading} className={buttonClass}>
         {loading ? "Submitting…" : "I have successfully memorized and I am ready to be tested"}
       </button>

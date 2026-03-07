@@ -27,7 +27,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="max-w-xl mx-auto">
-      <Link href="/events" className="text-green-600 hover:underline mb-4 inline-block">Back to events</Link>
+      <Link href="/events" className="text-green-600 hover:underline dark:text-emerald-400 mb-4 inline-block">Back to events</Link>
       <h1 className="text-2xl font-bold mb-6">Edit event</h1>
       <EditEventForm
         event={event}

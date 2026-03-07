@@ -38,7 +38,7 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Link href="/homework" className="text-green-600 hover:underline mb-4 inline-block">Back to homework</Link>
+      <Link href="/homework" className="text-green-600 hover:underline dark:text-emerald-400 mb-4 inline-block">Back to homework</Link>
       <article className="card-kid p-6">
         <h1 className="text-2xl font-bold">{hw.title}</h1>
         <p className="text-sm text-gta-textSecondary mt-1">Due: {formatDateTimeInToronto(hw.due_by)}</p>
@@ -47,7 +47,7 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
         )}
         {linkedLessonTitle && (
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            Linked lesson: <Link href={`/lessons/${hw.lesson_activity_id}`} className="text-green-600 hover:underline">{linkedLessonTitle}</Link>
+            Linked lesson: <Link href={`/lessons/${hw.lesson_activity_id}`} className="text-green-600 hover:underline dark:text-emerald-400">{linkedLessonTitle}</Link>
           </p>
         )}
         {hw.description && <p className="mt-4 text-slate-600 dark:text-slate-400">{hw.description}</p>}
@@ -55,7 +55,7 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
           <ul className="mt-4 space-y-1">
             {hw.links.map((url: string, i: number) => (
               <li key={i}>
-                <a href={url} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">
+                <a href={url} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline dark:text-emerald-400">
                   {url}
                 </a>
               </li>
@@ -74,11 +74,11 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
         {(session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin") && (
           <div className="mt-6 flex flex-wrap gap-4">
             {((session.user.role === "regional_nazim" || session.user.role === "admin") || (session.user.role === "local_nazim" && hw.majlis_id === session.user.majlisId)) && (
-              <Link href={`/homework/${id}/edit`} className="text-green-600 hover:underline">
+              <Link href={`/homework/${id}/edit`} className="text-green-600 hover:underline dark:text-emerald-400">
                 Edit
               </Link>
             )}
-            <Link href={`/homework/${id}/submissions`} className="text-green-600 hover:underline">
+            <Link href={`/homework/${id}/submissions`} className="text-green-600 hover:underline dark:text-emerald-400">
               View submissions
             </Link>
           </div>

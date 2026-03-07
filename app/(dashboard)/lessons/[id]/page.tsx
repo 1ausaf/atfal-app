@@ -46,7 +46,7 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
 
   return (
     <div className="max-w-3xl mx-auto">
-      <Link href="/lessons" className="text-green-600 hover:underline mb-4 inline-block">Back to lessons</Link>
+      <Link href="/lessons" className="text-green-600 hover:underline dark:text-emerald-400 mb-4 inline-block">Back to lessons</Link>
       {activity.thumbnail_url && (
         <div className="mb-4 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
           <Image

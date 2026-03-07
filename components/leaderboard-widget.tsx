@@ -27,12 +27,12 @@ export async function LeaderboardWidget({ limit = 10 }: { limit?: number }) {
               <span className="font-bold text-gta-text">
                 {i + 1}. {r.name ?? "—"}
                 {showSuperstar && (
-                  <span className="ml-1.5 text-xs font-semibold px-1.5 py-0.5 rounded-full bg-red-500 text-white">
+                  <span className="ml-1.5 text-xs font-semibold px-1.5 py-0.5 rounded-full bg-red-500 text-white dark:bg-red-600">
                     Salat Superstar
                   </span>
                 )}
                 {showStar && (
-                  <span className="ml-1.5 text-xs font-semibold px-1.5 py-0.5 rounded-full bg-purple-300 text-purple-900">
+                  <span className="ml-1.5 text-xs font-semibold px-1.5 py-0.5 rounded-full bg-purple-300 text-purple-900 dark:bg-purple-600 dark:text-white">
                     Salat Star
                   </span>
                 )}

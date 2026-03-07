@@ -32,7 +32,7 @@ export default async function LessonSubmissionsPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <Link href="/lessons" className="text-green-600 hover:underline mb-4 inline-block">Back to lessons</Link>
+      <Link href="/lessons" className="text-green-600 hover:underline dark:text-emerald-400 mb-4 inline-block">Back to lessons</Link>
       <h1 className="text-2xl font-bold mb-6">Grade lesson submissions (pending)</h1>
       {!submissions?.length ? (
         <p className="text-slate-500 dark:text-slate-400">No pending submissions.</p>

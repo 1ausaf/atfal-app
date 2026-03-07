@@ -72,7 +72,7 @@ function LoginForm() {
               className="w-full px-3 py-2.5 border-2 border-gta-border rounded-gta bg-gta-surface text-gta-text focus:ring-2 focus:ring-gta-primary focus:border-gta-primary transition-colors"
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <button
             type="submit"
             disabled={loading}

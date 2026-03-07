@@ -45,7 +45,7 @@ export function HomeworkItemActions({ homeworkId, canEdit }: HomeworkItemActions
           type="button"
           onClick={handleDelete}
           disabled={deleting}
-          className="text-sm text-red-600 hover:text-red-700 hover:underline disabled:opacity-50"
+          className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:underline disabled:opacity-50"
         >
           {deleting ? "Deleting…" : "Delete"}
         </button>

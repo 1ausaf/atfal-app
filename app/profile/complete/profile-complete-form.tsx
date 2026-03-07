@@ -57,7 +57,7 @@ export function ProfileCompleteForm({ majlisList }: { majlisList: Majlis[] }) {
       </div>
       <div>
         <label htmlFor="date_of_birth" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-          Date of birth <span className="text-red-500">*</span>
+          Date of birth <span className="text-red-500 dark:text-red-400">*</span>
         </label>
         <input
           id="date_of_birth"

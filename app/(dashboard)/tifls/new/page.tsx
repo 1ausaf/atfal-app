@@ -14,7 +14,7 @@ export default async function NewUserPage() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <Link href="/tifls" className="text-green-600 hover:underline mb-4 inline-block">Back to Tifls</Link>
+      <Link href="/tifls" className="text-green-600 hover:underline dark:text-emerald-400 mb-4 inline-block">Back to Tifls</Link>
       <h1 className="text-2xl font-bold mb-6">Create user</h1>
       <p className="text-slate-600 dark:text-slate-400 mb-4">Create a Tifl (youth), Local Nazim, or Admin account. Give the member code and password to the user.</p>
       <CreateUserForm majlisList={majlisList ?? []} />

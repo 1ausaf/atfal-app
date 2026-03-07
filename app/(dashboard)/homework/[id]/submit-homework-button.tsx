@@ -40,7 +40,7 @@ export function SubmitHomeworkButton({ homeworkId }: { homeworkId: string }) {
       >
         {loading ? "Submitting…" : "Mark as submitted"}
       </button>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
     </div>
   );
 }

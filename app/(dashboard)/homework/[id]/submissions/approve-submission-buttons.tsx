@@ -57,7 +57,7 @@ export function ApproveSubmissionButtons({ submissionId }: { submissionId: strin
         type="button"
         onClick={handleReject}
         disabled={loading}
-        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:opacity-50"
+        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 disabled:opacity-50"
       >
         Reject
       </button>

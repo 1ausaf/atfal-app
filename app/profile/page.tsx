@@ -35,15 +35,15 @@ export default async function ProfilePage() {
       </Link>
       <h1 className="text-2xl font-bold mb-2 text-gta-text">Profile</h1>
       {salatStar && (
-        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-purple-100 border border-purple-300">
-          <span className="text-purple-600 text-xl" aria-hidden>★</span>
-          <span className="font-semibold text-purple-900">Salat Star</span>
+        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-purple-100 border border-purple-300 dark:bg-purple-900/40 dark:border-purple-600">
+          <span className="text-purple-600 text-xl dark:text-purple-300" aria-hidden>★</span>
+          <span className="font-semibold text-purple-900 dark:text-purple-200">Salat Star</span>
         </div>
       )}
       {salatSuperstar && (
-        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-red-50 border border-red-300">
-          <span className="text-red-500 text-xl" aria-hidden>★</span>
-          <span className="font-semibold text-red-800">Salat Superstar</span>
+        <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-red-50 border border-red-300 dark:bg-red-900/40 dark:border-red-600">
+          <span className="text-red-500 text-xl dark:text-red-400" aria-hidden>★</span>
+          <span className="font-semibold text-red-800 dark:text-red-200">Salat Superstar</span>
         </div>
       )}
       {(salatStar || salatSuperstar) && (
