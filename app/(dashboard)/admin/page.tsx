@@ -18,6 +18,11 @@ export default async function AdminPage() {
           </Link>
         </li>
         <li>
+          <Link href="/admin/analytics/lesson-completion" className="link-kid font-medium">
+            Analytics — Lesson completion (Atfal)
+          </Link>
+        </li>
+        <li>
           <Link href="/admin/chats" className="link-kid font-medium">
             All Chats — View all conversations
           </Link>

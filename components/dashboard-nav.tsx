@@ -210,6 +210,7 @@ export function DashboardNav({
         >
           <DropdownItem href="/admin" label="Overview" onNavigate={closeDropdown} />
           <DropdownItem href="/admin/analytics" label="Analytics" onNavigate={closeDropdown} />
+          <DropdownItem href="/admin/analytics/lesson-completion" label="Lesson completion" onNavigate={closeDropdown} />
           <DropdownItem href="/admin/chats" label="All Chats" onNavigate={closeDropdown} />
         </Dropdown>
       )}

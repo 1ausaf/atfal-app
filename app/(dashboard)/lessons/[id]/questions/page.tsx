@@ -34,6 +34,7 @@ export default async function LessonQuestionsPage({ params }: { params: Promise<
               questionText={q.question_text}
               questionType={q.question_type}
               pointsValue={"points_value" in q && typeof (q as { points_value: number }).points_value === "number" ? (q as { points_value: number }).points_value : 1}
+              options={(q as { options?: { correct?: string; options?: string[] } }).options ?? undefined}
             />
           </li>
         ))}
