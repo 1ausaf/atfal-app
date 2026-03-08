@@ -118,10 +118,12 @@ export function WordleGame() {
         return;
       }
       if (e.key === "Backspace") {
+        e.preventDefault();
         setCurrentGuess((g) => g.slice(0, -1));
         return;
       }
       if (e.key.length === 1 && /^[A-Za-z]$/.test(e.key)) {
+        e.preventDefault();
         setCurrentGuess((g) => (g.length < wordLength ? g + e.key.toUpperCase() : g));
       }
     };
