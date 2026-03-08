@@ -94,6 +94,9 @@ html.dark {
   .content-module-item:hover {
     box-shadow: var(--gta-shadow-hover);
   }
+  .rounded-adventure {
+    border-radius: var(--gta-radius);
+  }
 }
 
 body {

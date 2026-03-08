@@ -27,6 +27,11 @@ export default async function AdminPage() {
             All Chats — View all conversations
           </Link>
         </li>
+        <li>
+          <Link href="/admin/wordle" className="link-kid font-medium">
+            Wordle — Manage daily words
+          </Link>
+        </li>
       </ul>
     </div>
   );
