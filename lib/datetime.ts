@@ -41,6 +41,19 @@ export function getTodayToronto(): string {
   return `${y}-${m}-${d}`;
 }
 
+/**
+ * Wordle "day" in Toronto (YYYY-MM-DD). Resets at 9:00 AM Toronto time.
+ * Before 9 AM we are still in the previous calendar day's Wordle day.
+ */
+export function getWordleDayToronto(): string {
+  const now = new Date();
+  const hour = parseInt(
+    new Intl.DateTimeFormat("en-CA", { timeZone: TORONTO_TZ, hour: "2-digit", hour12: false }).format(now),
+    10
+  );
+  return hour >= 9 ? getTodayToronto() : getYesterdayToronto();
+}
+
 /** Yesterday's date in Toronto (YYYY-MM-DD) for streak comparison */
 export function getYesterdayToronto(): string {
   const formatter = new Intl.DateTimeFormat("en-CA", {

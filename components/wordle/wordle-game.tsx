@@ -31,6 +31,7 @@ export function WordleGame() {
   const [submitting, setSubmitting] = useState(false);
   const [howToPlayImageError, setHowToPlayImageError] = useState(false);
   const [seed, setSeed] = useState<string | null>(null);
+  const [pointsAwarded, setPointsAwarded] = useState<number | null>(null);
 
   const loadNewWord = useCallback((newSeed: string) => {
     setSeed(newSeed);
@@ -93,11 +94,13 @@ export function WordleGame() {
       if (data.solved || data.answer) {
         setGameOver(true);
         setAnswer(data.answer ?? guess);
+        setPointsAwarded(typeof data.pointsAwarded === "number" ? data.pointsAwarded : null);
         await fetchDefinition(data.answer ?? guess);
         setShowLearnModal(true);
       } else if (currentRow + 1 >= ROWS) {
         setGameOver(true);
         setAnswer(data.answer ?? null);
+        setPointsAwarded(null);
         if (data.answer) {
           await fetchDefinition(data.answer);
           setShowLearnModal(true);
@@ -239,6 +242,7 @@ export function WordleGame() {
             setGameOver(false);
             setAnswer(null);
             setShowLearnModal(false);
+            setPointsAwarded(null);
             setError(null);
             setLoading(true);
             loadNewWord(newSeed);
@@ -322,6 +326,14 @@ export function WordleGame() {
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
               {answer ? `"${answer}"` : "The word"}
             </h2>
+            {pointsAwarded !== null && pointsAwarded > 0 && (
+              <p className="text-emerald-600 dark:text-emerald-400 font-semibold mb-2">You earned 50 points!</p>
+            )}
+            {pointsAwarded !== null && pointsAwarded === 0 && (
+              <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">
+                No points this time — you already earned today&apos;s 50 pts. Next wordle day starts at 9:00 AM.
+              </p>
+            )}
             <p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{definitionUsage}</p>
           </div>
         </div>

@@ -2,8 +2,11 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { getWordleDayToronto } from "@/lib/datetime";
 import { getWordIndexFromSeed, getFeedback } from "@/lib/wordle";
 import { WORDLE_FALLBACK_WORDS } from "@/lib/wordle-fallback-words";
+
+const WORDLE_POINTS = 50;
 
 async function getCombinedWords(supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>): Promise<string[]> {
   const { data: rows, error } = await supabase
@@ -51,11 +54,37 @@ export async function POST(request: Request) {
   const solved = guess === target;
   const gameOver = solved || guessNumber >= 6;
 
-  const res: { feedback: string[]; solved: boolean; answer?: string } = {
+  let pointsAwarded = 0;
+  if (gameOver && solved && session.user.role === "tifl") {
+    const wordleDay = getWordleDayToronto();
+    const { data: existing } = await supabase
+      .from("activity_log")
+      .select("id, points_awarded")
+      .eq("user_id", session.user.id)
+      .eq("activity_date", wordleDay)
+      .eq("activity_type", "wordle")
+      .maybeSingle();
+
+    if (!existing || (existing.points_awarded ?? 0) === 0) {
+      await supabase.from("activity_log").upsert(
+        {
+          user_id: session.user.id,
+          activity_date: wordleDay,
+          activity_type: "wordle",
+          points_awarded: WORDLE_POINTS,
+        },
+        { onConflict: "user_id,activity_date,activity_type" }
+      );
+      pointsAwarded = WORDLE_POINTS;
+    }
+  }
+
+  const res: { feedback: string[]; solved: boolean; answer?: string; pointsAwarded?: number } = {
     feedback,
     solved,
   };
   if (gameOver) res.answer = target;
+  if (gameOver && solved) res.pointsAwarded = pointsAwarded;
 
   return NextResponse.json(res);
 }
