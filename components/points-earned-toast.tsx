@@ -49,13 +49,13 @@ function ToastCard({
           : "animate-toast-pop"
       }
     >
-      <div className="flex items-center gap-3 rounded-gta border-2 border-amber-400 bg-black/75 backdrop-blur-md px-4 py-3 shadow-lg dark:border-amber-500 dark:bg-slate-900/90">
+      <div className="flex items-center gap-3 rounded-gta border-2 border-amber-500 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-md dark:border-amber-500 dark:bg-slate-900/90 dark:shadow-none">
         <span className="text-2xl" aria-hidden="true">
           🏆
         </span>
-        <p className="text-gta-text font-semibold tracking-wide">
+        <p className="font-semibold tracking-wide text-gta-text">
           YOU EARNED{" "}
-          <span className="font-black text-amber-400 animate-points-glow dark:text-amber-300">
+          <span className="font-black text-amber-600 animate-points-glow dark:text-amber-300">
             {points}
           </span>{" "}
           POINTS
