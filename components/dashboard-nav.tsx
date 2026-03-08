@@ -134,6 +134,8 @@ export function DashboardNav({
         onToggle={() => setOpenDropdown((v) => (v === "activities" ? null : "activities"))}
         panelRef={activitiesRef}
       >
+        <DropdownItem href="/activities" label="Overview" onNavigate={closeDropdown} />
+        <DropdownItem href="/activities/wordle" label="WORDLE" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/read/newsletter" label="Newsletter" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/read/read" label="Read" onNavigate={closeDropdown} />
       </Dropdown>
@@ -212,6 +214,7 @@ export function DashboardNav({
           <DropdownItem href="/admin/analytics" label="Analytics" onNavigate={closeDropdown} />
           <DropdownItem href="/admin/analytics/lesson-completion" label="Lesson completion" onNavigate={closeDropdown} />
           <DropdownItem href="/admin/chats" label="All Chats" onNavigate={closeDropdown} />
+          <DropdownItem href="/admin/wordle" label="Wordle" onNavigate={closeDropdown} />
         </Dropdown>
       )}
 
