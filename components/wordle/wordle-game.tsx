@@ -30,20 +30,27 @@ export function WordleGame() {
   const [definitionUsage, setDefinitionUsage] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [howToPlayImageError, setHowToPlayImageError] = useState(false);
+  const [seed, setSeed] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch("/api/wordle/daily")
+  const loadNewWord = useCallback((newSeed: string) => {
+    setSeed(newSeed);
+    setError(null);
+    fetch(`/api/wordle/next?seed=${encodeURIComponent(newSeed)}`)
       .then((res) => {
-        if (!res.ok) throw new Error(res.status === 503 ? "No words configured yet." : "Failed to load.");
+        if (!res.ok) throw new Error(res.status === 503 ? "No words available." : "Failed to load.");
         return res.json();
       })
       .then((data) => {
         setWordLength(data.wordLength ?? 5);
-        setError(null);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const newSeed = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    loadNewWord(newSeed);
+  }, [loadNewWord]);
 
   const fetchDefinition = useCallback(async (word: string) => {
     try {
@@ -57,14 +64,14 @@ export function WordleGame() {
 
   const submitGuess = useCallback(async () => {
     const guess = currentGuess.trim().toUpperCase();
-    if (guess.length !== wordLength || submitting || gameOver) return;
+    if (guess.length !== wordLength || submitting || gameOver || !seed) return;
 
     setSubmitting(true);
     try {
       const res = await fetch("/api/wordle/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ guess, guessNumber: currentRow + 1 }),
+        body: JSON.stringify({ guess, seed, guessNumber: currentRow + 1 }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -101,7 +108,7 @@ export function WordleGame() {
     } finally {
       setSubmitting(false);
     }
-  }, [currentGuess, currentRow, wordLength, submitting, gameOver, fetchDefinition]);
+  }, [currentGuess, currentRow, wordLength, submitting, gameOver, fetchDefinition, seed]);
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
@@ -214,13 +221,34 @@ export function WordleGame() {
         {error && <p className="mt-2 text-center text-sm text-red-600 dark:text-red-400">{error}</p>}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setShowHowToPlay(true)}
-        className="shrink-0 px-4 py-2 rounded-gta border-2 border-gta-primary text-gta-primary hover:bg-gta-surfaceSecondary transition-colors font-semibold"
-      >
-        How to play
-      </button>
+      <div className="shrink-0 flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={() => setShowHowToPlay(true)}
+          className="px-4 py-2 rounded-gta border-2 border-gta-primary text-gta-primary hover:bg-gta-surfaceSecondary transition-colors font-semibold"
+        >
+          How to play
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const newSeed = Date.now().toString(36) + Math.random().toString(36).slice(2);
+            setRows(Array(ROWS).fill(null).map(() => ({ letters: "", statuses: [] })));
+            setCurrentRow(0);
+            setCurrentGuess("");
+            setGameOver(false);
+            setAnswer(null);
+            setShowLearnModal(false);
+            setError(null);
+            setLoading(true);
+            loadNewWord(newSeed);
+          }}
+          disabled={loading}
+          className="px-4 py-2 rounded-gta border-2 border-gta-border text-gta-text hover:bg-gta-surfaceSecondary transition-colors font-semibold disabled:opacity-50"
+        >
+          New word
+        </button>
+      </div>
 
       {showHowToPlay && (
         <div
@@ -257,7 +285,7 @@ export function WordleGame() {
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white">How To Play</h3>
                   <p>Guess the Wordle in 6 tries.</p>
                   <ul className="list-disc list-inside space-y-1 text-sm">
-                    <li>Each guess must be a valid 5- or 6-letter word (depending on the day).</li>
+                    <li>Each guess must be a valid 5- or 6-letter word (depending on the puzzle).</li>
                     <li>The color of the tiles will change to show how close your guess was to the word.</li>
                   </ul>
                   <p className="font-semibold mt-2">Examples</p>
@@ -292,7 +320,7 @@ export function WordleGame() {
               ×
             </button>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-              {answer ? `"${answer}"` : "Today's word"}
+              {answer ? `"${answer}"` : "The word"}
             </h2>
             <p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{definitionUsage}</p>
           </div>

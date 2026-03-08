@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { getWordIndexFromSeed, getFeedback } from "@/lib/wordle";
+import { getWordIndexFromSeed } from "@/lib/wordle";
 import { WORDLE_FALLBACK_WORDS } from "@/lib/wordle-fallback-words";
 
 async function getCombinedWords(supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>): Promise<string[]> {
@@ -16,16 +16,12 @@ async function getCombinedWords(supabase: Awaited<ReturnType<typeof createSupaba
   return WORDLE_FALLBACK_WORDS;
 }
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
-  const guess = typeof body.guess === "string" ? body.guess.trim().toUpperCase() : "";
-  const seed = typeof body.seed === "string" ? body.seed.trim() : "";
-  const guessNumber = typeof body.guessNumber === "number" ? body.guessNumber : 1;
-
-  if (!guess) return NextResponse.json({ error: "Guess required" }, { status: 400 });
+  const { searchParams } = new URL(request.url);
+  const seed = searchParams.get("seed")?.trim();
   if (!seed) return NextResponse.json({ error: "Seed required" }, { status: 400 });
 
   const supabase = createSupabaseServerClient();
@@ -35,27 +31,10 @@ export async function POST(request: Request) {
   } catch (e) {
     return NextResponse.json({ error: "Failed to load words" }, { status: 500 });
   }
+
   if (!combined.length) return NextResponse.json({ error: "No words available" }, { status: 503 });
 
   const index = getWordIndexFromSeed(seed, combined.length);
-  const target = combined[index] ?? combined[0];
-
-  if (guess.length !== target.length) {
-    return NextResponse.json(
-      { error: `Guess must be ${target.length} letters` },
-      { status: 400 }
-    );
-  }
-
-  const feedback = getFeedback(guess, target);
-  const solved = guess === target;
-  const gameOver = solved || guessNumber >= 6;
-
-  const res: { feedback: string[]; solved: boolean; answer?: string } = {
-    feedback,
-    solved,
-  };
-  if (gameOver) res.answer = target;
-
-  return NextResponse.json(res);
+  const word = combined[index] ?? combined[0];
+  return NextResponse.json({ wordLength: word.length });
 }

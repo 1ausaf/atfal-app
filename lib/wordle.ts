@@ -11,6 +11,19 @@ export function getDailyWordIndex(dateKey: string, wordCount: number): number {
   return Math.abs(hash) % wordCount;
 }
 
+/**
+ * Deterministic word index from a seed string (e.g. client-generated). Used for unlimited play.
+ */
+export function getWordIndexFromSeed(seed: string, wordCount: number): number {
+  if (wordCount <= 0) return 0;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash) % wordCount;
+}
+
 export type LetterStatus = "correct" | "misplaced" | "absent";
 
 /**
