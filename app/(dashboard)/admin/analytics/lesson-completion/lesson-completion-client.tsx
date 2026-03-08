@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 type Row = {
   activity_id: string;
@@ -38,10 +39,15 @@ export function LessonCompletionClient() {
         </thead>
         <tbody>
           {data.activities.map((r) => (
-            <tr key={r.activity_id} className="border-b border-gta-border">
+            <tr key={r.activity_id} className="border-b border-gta-border hover:bg-gta-surfaceSecondary/50">
               <td className="px-4 py-3 text-gta-text">{r.title}</td>
-              <td className="px-4 py-3 text-right font-semibold text-gta-primary">
-                {r.completion_count}
+              <td className="px-4 py-3 text-right font-semibold">
+                <Link
+                  href={`/admin/analytics/lesson-completion/${r.activity_id}`}
+                  className="text-gta-primary hover:underline"
+                >
+                  {r.completion_count}
+                </Link>
               </td>
             </tr>
           ))}

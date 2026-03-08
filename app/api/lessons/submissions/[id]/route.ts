@@ -13,10 +13,27 @@ export async function PATCH(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const body = await request.json();
-  const { manual_points } = body;
+  const { manual_points, points_awarded: pointsAwardedOverride } = body;
   const supabase = createSupabaseServerClient();
+  const isRegionalOrAdmin = session.user.role === "regional_nazim" || session.user.role === "admin";
   const { data: sub } = await supabase.from("lesson_submissions").select("id, status, auto_points, user_id").eq("id", id).single();
   if (!sub) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  if (typeof pointsAwardedOverride === "number" && isRegionalOrAdmin) {
+    const points = Math.max(0, Math.floor(pointsAwardedOverride));
+    const { error } = await supabase
+      .from("lesson_submissions")
+      .update({
+        points_awarded: points,
+        status: "graded",
+        graded_by: session.user.id,
+        graded_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
   if (sub.status === "graded") return NextResponse.json({ error: "Already graded" }, { status: 400 });
   const autoPoints = typeof (sub as { auto_points?: number }).auto_points === "number" ? (sub as { auto_points: number }).auto_points : 0;
   const manualPts = Math.max(0, Number(manual_points) ?? 0);
