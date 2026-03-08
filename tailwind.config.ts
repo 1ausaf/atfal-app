@@ -34,6 +34,26 @@ const config: Config = {
         gta: "0 4px 6px rgba(0, 0, 0, 0.05)",
         "gta-hover": "0 6px 12px rgba(0, 0, 0, 0.08)",
       },
+      keyframes: {
+        "toast-pop": {
+          "0%": { transform: "scale(0)", opacity: "0" },
+          "70%": { transform: "scale(1.05)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "toast-unpop": {
+          "0%": { transform: "scale(1)", opacity: "1" },
+          "100%": { transform: "scale(0.8)", opacity: "0" },
+        },
+        "points-glow": {
+          "0%, 100%": { textShadow: "0 0 12px rgba(251, 191, 36, 0.6)" },
+          "50%": { textShadow: "0 0 20px rgba(251, 191, 36, 0.9)" },
+        },
+      },
+      animation: {
+        "toast-pop": "toast-pop 0.3s ease-out forwards",
+        "toast-unpop": "toast-unpop 0.25s ease-in forwards",
+        "points-glow": "points-glow 1.5s ease-in-out infinite",
+      },
     },
   },
   plugins: [],

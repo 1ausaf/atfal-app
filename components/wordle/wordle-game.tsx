@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { usePointsEarnedToast } from "@/components/points-earned-toast";
 
 const ROWS = 6;
 const CORRECT = "#7ED321";
@@ -15,6 +16,7 @@ interface RowState {
 }
 
 export function WordleGame() {
+  const { showPointsEarned } = usePointsEarnedToast();
   const [wordLength, setWordLength] = useState<number>(5);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +96,11 @@ export function WordleGame() {
       if (data.solved || data.answer) {
         setGameOver(true);
         setAnswer(data.answer ?? guess);
-        setPointsAwarded(typeof data.pointsAwarded === "number" ? data.pointsAwarded : null);
+        const pts = typeof data.pointsAwarded === "number" ? data.pointsAwarded : null;
+        setPointsAwarded(pts);
+        if (pts != null && pts > 0) {
+          showPointsEarned(pts);
+        }
         await fetchDefinition(data.answer ?? guess);
         setShowLearnModal(true);
       } else if (currentRow + 1 >= ROWS) {
@@ -111,7 +117,7 @@ export function WordleGame() {
     } finally {
       setSubmitting(false);
     }
-  }, [currentGuess, currentRow, wordLength, submitting, gameOver, fetchDefinition, seed]);
+  }, [currentGuess, currentRow, wordLength, submitting, gameOver, fetchDefinition, seed, showPointsEarned]);
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
@@ -327,7 +333,7 @@ export function WordleGame() {
               {answer ? `"${answer}"` : "The word"}
             </h2>
             {pointsAwarded !== null && pointsAwarded > 0 && (
-              <p className="text-emerald-600 dark:text-emerald-400 font-semibold mb-2">You earned 50 points!</p>
+              <p className="text-emerald-600 dark:text-emerald-400 font-semibold mb-2">You earned {pointsAwarded} points!</p>
             )}
             {pointsAwarded !== null && pointsAwarded === 0 && (
               <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">

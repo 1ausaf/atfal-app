@@ -66,5 +66,9 @@ export async function POST(
     if (error.code === "23505") return NextResponse.json({ error: "Already submitted" }, { status: 400 });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json(data ?? { ok: true });
+  const payload = data ?? { ok: true };
+  if (status === "graded" && typeof pointsAwarded === "number") {
+    return NextResponse.json({ ...payload, points_awarded: pointsAwarded });
+  }
+  return NextResponse.json(payload);
 }

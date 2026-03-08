@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { usePointsEarnedToast } from "@/components/points-earned-toast";
 
 interface Question {
   id: string;
@@ -28,6 +29,7 @@ interface LessonContentProps {
 
 export function LessonContent({ activity, questions, existingSubmission, isTifl }: LessonContentProps) {
   const router = useRouter();
+  const { showPointsEarned } = usePointsEarnedToast();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -50,6 +52,10 @@ export function LessonContent({ activity, questions, existingSubmission, isTifl 
         setError(data.error ?? "Failed to submit");
         setLoading(false);
         return;
+      }
+      const points = data.points_awarded;
+      if (typeof points === "number" && points > 0) {
+        showPointsEarned(points);
       }
       router.refresh();
     } catch {
