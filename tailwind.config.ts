@@ -48,11 +48,16 @@ const config: Config = {
           "0%, 100%": { textShadow: "0 0 12px rgba(251, 191, 36, 0.6)" },
           "50%": { textShadow: "0 0 20px rgba(251, 191, 36, 0.9)" },
         },
+        "my-life-glow": {
+          "0%, 100%": { boxShadow: "0 0 12px rgba(126, 211, 33, 0.4)" },
+          "50%": { boxShadow: "0 0 20px rgba(126, 211, 33, 0.6)" },
+        },
       },
       animation: {
         "toast-pop": "toast-pop 0.3s ease-out forwards",
         "toast-unpop": "toast-unpop 0.25s ease-in forwards",
         "points-glow": "points-glow 1.5s ease-in-out infinite",
+        "my-life-glow": "my-life-glow 2.5s ease-in-out infinite",
       },
     },
   },

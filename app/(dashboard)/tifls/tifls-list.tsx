@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface TiflRow {
   id: string;
@@ -217,6 +218,12 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                         Points
                       </button>
                     )}
+                    <Link
+                      href={`/tifls/${t.id}/my-life`}
+                      className="px-3 py-1.5 text-gta-primary dark:text-emerald-400 border border-gta-primary dark:border-emerald-400 text-sm rounded-lg hover:bg-gta-primary/10 dark:hover:bg-emerald-500/10"
+                    >
+                      My Life
+                    </Link>
                     {isRegional ? (
                       <>
                         <select

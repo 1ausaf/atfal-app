@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import Link from "next/link";
 import type { UserRole } from "@/lib/db-types";
 import { DashboardNav } from "@/components/dashboard-nav";
+import { MyLifeStar } from "@/components/my-life-star";
 
 async function getNavCounts(
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
@@ -89,6 +90,7 @@ export default async function DashboardLayout({
         </div>
       </header>
       <main className="flex-1 p-4 md:p-8 bg-gradient-to-b from-transparent to-gta-surfaceSecondary/50">{children}</main>
+      {isTifl && <MyLifeStar />}
     </div>
   );
 }

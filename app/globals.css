@@ -104,3 +104,17 @@ body {
   background: linear-gradient(160deg, var(--gta-background-lighter) 0%, var(--gta-background-light) 50%, var(--gta-background) 100%);
   min-height: 100vh;
 }
+
+/* My Life: hide nav and floating buttons when printing */
+@media print {
+  header,
+  .no-print,
+  .print\\:hidden {
+    display: none !important;
+  }
+  .schedule-print,
+  .print-planner {
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+  }
+}
