@@ -175,7 +175,7 @@ export function LessonsTiflView({
     <>
       <section className="mb-6">
         <h2 className="text-lg font-bold text-gta-text mb-3">Sections</h2>
-        <div className="flex gap-4 overflow-x-auto pb-1">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {sectionStats.map(({ section, total, incomplete }) => {
             const isSelected = selectedSectionId === section.id;
             return (
@@ -190,7 +190,7 @@ export function LessonsTiflView({
                     setSelectedSectionId(section.id);
                   }
                 }}
-                className={`group relative flex-shrink-0 w-[260px] rounded-2xl border bg-gta-surface dark:bg-slate-800 p-4 flex flex-col gap-3 cursor-pointer transition-shadow transition-colors ${
+                className={`group relative w-full rounded-2xl border bg-gta-surface dark:bg-slate-800 p-4 flex flex-col gap-3 cursor-pointer transition-shadow transition-colors ${
                   isSelected
                     ? "border-gta-primary shadow-md"
                     : "border-gta-border hover:border-gta-primary/60 hover:shadow-md"
