@@ -2,12 +2,12 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { formatDateInToronto } from "@/lib/datetime";
 import Link from "next/link";
 import Image from "next/image";
 import { LessonItemActions } from "./lesson-item-actions";
 import { PointsBadge } from "@/components/points-badge";
 import { LessonSectionsManager } from "./lesson-sections-manager";
+import { LessonsTiflView } from "./lessons-tifl-view";
 
 export default async function LessonsPage() {
   const session = await getServerSession(authOptions);
@@ -61,23 +61,18 @@ export default async function LessonsPage() {
     pointsAvailableByActivityId = map;
   }
 
-  function LessonList({
+  function LessonListAll({
     items,
     showThumb,
-    submissionByActivityId: subMap,
-    pointsAvailableByActivityId: pointsMap,
   }: {
     items: typeof activities;
     showThumb?: boolean;
-    submissionByActivityId?: Record<string, { points_awarded: number; created_at: string }>;
-    pointsAvailableByActivityId?: Record<string, number>;
   }) {
     if (!items?.length) return null;
     return (
       <ul className="flex flex-col gap-3">
         {items.map((a) => {
-          const sub = subMap?.[a.id];
-          const pointsAvailable = pointsMap?.[a.id] ?? 0;
+          const pointsAvailable = pointsAvailableByActivityId[a.id] ?? 0;
           return (
             <li key={a.id} className="content-module-item">
               <div className="flex justify-between items-start gap-4">
@@ -92,14 +87,6 @@ export default async function LessonsPage() {
                           height={60}
                           className="rounded-lg object-cover w-20 h-[60px]"
                         />
-                        {sub && (
-                          <>
-                            <div className="absolute inset-0 bg-black/50 rounded-lg" />
-                            <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs">
-                              ✓
-                            </div>
-                          </>
-                        )}
                       </div>
                     </Link>
                   )}
@@ -108,20 +95,10 @@ export default async function LessonsPage() {
                       <Link href={`/lessons/${a.id}`} className="font-semibold text-lg text-gta-text hover:underline">
                         {a.title}
                       </Link>
-                      {pointsAvailable > 0 && !sub && <PointsBadge points={pointsAvailable} />}
-                      {sub && pointsAvailable > 0 && (
-                        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                          ✓ {sub.points_awarded} / {pointsAvailable} pts
-                        </span>
-                      )}
+                      {pointsAvailable > 0 && <PointsBadge points={pointsAvailable} />}
                       <span className="text-sm text-gta-textSecondary">{a.type}</span>
                     </div>
                     {a.description && <p className="mt-2 text-gta-textSecondary line-clamp-2">{a.description}</p>}
-                    {sub && (
-                      <p className="mt-1 text-sm text-gta-textSecondary">
-                        Submitted {formatDateInToronto(sub.created_at)} · <span className="font-semibold text-gta-primary">{sub.points_awarded} pts</span>
-                      </p>
-                    )}
                   </div>
                 </div>
                 <LessonItemActions activityId={a.id} canEdit={isRegional} />
@@ -132,23 +109,6 @@ export default async function LessonsPage() {
       </ul>
     );
   }
-
-  // Build per-section stats for tifls
-  const sectionsList = sections ?? [];
-  const sectionStats =
-    isTifl && activities
-      ? sectionsList.map((s) => {
-          const lessonsInSection = activities.filter((a) => a.section_id === s.id);
-          const incompleteInSection = lessonsInSection.filter((a) =>
-            incompleteActivities.some((ia) => ia.id === a.id)
-          ).length;
-          return {
-            section: s,
-            total: lessonsInSection.length,
-            incomplete: incompleteInSection,
-          };
-        })
-      : [];
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -174,65 +134,20 @@ export default async function LessonsPage() {
       {isRegional && <LessonSectionsManager />}
 
       {isTifl ? (
-        <>
-          {sectionStats.length > 0 && (
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-gta-text mb-3">Sections</h2>
-              <div className="flex gap-3 overflow-x-auto pb-1">
-                {sectionStats.map(({ section, total, incomplete }) => (
-                  <div
-                    key={section.id}
-                    className="relative min-w-[160px] rounded-xl border border-gta-border bg-gta-surface dark:bg-slate-800 p-3 flex flex-col gap-2"
-                  >
-                    {section.thumbnail_url ? (
-                      <div className="relative w-full h-24 mb-1 overflow-hidden rounded-lg">
-                        <Image
-                          src={section.thumbnail_url}
-                          alt={section.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ) : null}
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-sm text-gta-text dark:text-slate-100 line-clamp-2">
-                        {section.title}
-                      </p>
-                      {incomplete > 0 && (
-                        <span className="ml-auto inline-flex items-center justify-center min-w-[1.5rem] h-6 rounded-full bg-red-500 text-white text-xs font-bold px-1">
-                          {incomplete}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gta-textSecondary dark:text-slate-400">
-                      {total} lesson{total === 1 ? "" : "s"}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-          <section className="mb-8">
-            <h2 className="text-lg font-bold text-gta-text mb-3">To complete</h2>
-            {incompleteActivities.length === 0 ? (
-              <p className="text-gta-textSecondary">No lesson activities to complete. Great work!</p>
-            ) : (
-              <LessonList items={incompleteActivities} showThumb pointsAvailableByActivityId={pointsAvailableByActivityId} />
-            )}
-          </section>
-          {pastActivities.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold text-gta-text mb-3">Past lessons</h2>
-              <LessonList items={pastActivities} showThumb submissionByActivityId={submissionByActivityId} pointsAvailableByActivityId={pointsAvailableByActivityId} />
-            </section>
-          )}
-        </>
+        <LessonsTiflView
+          activities={activities ?? []}
+          sections={sections ?? []}
+          incompleteActivities={incompleteActivities}
+          pastActivities={pastActivities}
+          submissionByActivityId={submissionByActivityId}
+          pointsAvailableByActivityId={pointsAvailableByActivityId}
+        />
       ) : (
         <>
           {!activities?.length ? (
             <p className="text-gta-textSecondary">No lesson activities yet.</p>
           ) : (
-            <LessonList items={activities} showThumb pointsAvailableByActivityId={pointsAvailableByActivityId} />
+            <LessonListAll items={activities} showThumb />
           )}
         </>
       )}
