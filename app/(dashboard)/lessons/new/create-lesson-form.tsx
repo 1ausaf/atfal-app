@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -15,6 +15,19 @@ export function CreateLessonForm() {
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sections, setSections] = useState<{ id: string; title: string }[]>([]);
+  const [sectionId, setSectionId] = useState<string>("");
+
+  useEffect(() => {
+    fetch("/api/lessons/sections")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setSections(data.map((s: { id: string; title: string }) => ({ id: s.id, title: s.title })));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   async function handleThumbnailChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -58,6 +71,7 @@ export function CreateLessonForm() {
           link: link.trim() || null,
           type,
           thumbnail_url: thumbnailUrl || null,
+          section_id: sectionId || null,
         }),
       });
       if (!res.ok) {
@@ -117,6 +131,23 @@ export function CreateLessonForm() {
           <option value="article">Article</option>
         </select>
       </div>
+      {sections.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium mb-1">Section (optional)</label>
+          <select
+            value={sectionId}
+            onChange={(e) => setSectionId(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:ring-offset-2 focus-visible:outline-none transition-colors"
+          >
+            <option value="">Uncategorized</option>
+            {sections.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div>
         <label className="block text-sm font-medium mb-1">Thumbnail (PNG, max 2MB)</label>
         <input

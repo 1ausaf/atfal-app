@@ -35,7 +35,7 @@ export async function PATCH(
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await request.json();
-  const { title, description, link, type, thumbnail_url } = body;
+  const { title, description, link, type, thumbnail_url, section_id } = body;
   if (!title) return NextResponse.json({ error: "Title required" }, { status: 400 });
   const activityType = type === "article" ? "article" : "video";
 
@@ -47,6 +47,21 @@ export async function PATCH(
   };
   if (thumbnail_url !== undefined)
     updates.thumbnail_url = thumbnail_url != null && thumbnail_url !== "" ? String(thumbnail_url).trim() : null;
+  if (section_id !== undefined) {
+    if (section_id == null || section_id === "") {
+      updates.section_id = null;
+    } else {
+      const { data: sectionRow } = await supabase
+        .from("lesson_sections")
+        .select("id")
+        .eq("id", String(section_id))
+        .single();
+      if (!sectionRow) {
+        return NextResponse.json({ error: "Invalid section_id" }, { status: 400 });
+      }
+      updates.section_id = sectionRow.id;
+    }
+  }
 
   const { error: updateError } = await supabase
     .from("lesson_activities")
