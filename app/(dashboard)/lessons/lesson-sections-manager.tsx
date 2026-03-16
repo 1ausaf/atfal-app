@@ -24,6 +24,13 @@ export function LessonSectionsManager() {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editThumbnailUrl, setEditThumbnailUrl] = useState<string | null>(null);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editThumbnailUploading, setEditThumbnailUploading] = useState(false);
+
   function load() {
     setLoading(true);
     fetch("/api/lessons/sections")
@@ -64,6 +71,34 @@ export function LessonSectionsManager() {
       setThumbnailUrl(data.url);
     } finally {
       setThumbnailUploading(false);
+    }
+  }
+
+  async function handleEditThumbnailChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== "image/png") {
+      setError("Only PNG images allowed");
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      setError("File too large (max 2MB)");
+      return;
+    }
+    setError(null);
+    setEditThumbnailUploading(true);
+    try {
+      const form = new FormData();
+      form.set("thumbnail", file);
+      const res = await fetch("/api/lessons/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Thumbnail upload failed");
+        return;
+      }
+      setEditThumbnailUrl(data.url);
+    } finally {
+      setEditThumbnailUploading(false);
     }
   }
 
@@ -114,6 +149,56 @@ export function LessonSectionsManager() {
     } catch {
       setError("Something went wrong while deleting section");
     }
+  }
+
+  async function handleEditSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingId) return;
+    if (!editTitle.trim()) {
+      setError("Title required");
+      return;
+    }
+    setEditSaving(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/lessons/sections/${editingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: editTitle.trim(),
+          description: editDescription.trim() || null,
+          thumbnail_url: editThumbnailUrl,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Failed to update section");
+        return;
+      }
+      setSections((prev) => prev.map((s) => (s.id === data.id ? { ...s, ...data } : s)));
+      setEditingId(null);
+      setEditTitle("");
+      setEditDescription("");
+      setEditThumbnailUrl(null);
+    } catch {
+      setError("Something went wrong while updating section");
+    } finally {
+      setEditSaving(false);
+    }
+  }
+
+  function startEditing(section: Section) {
+    setEditingId(section.id);
+    setEditTitle(section.title);
+    setEditDescription(section.description ?? "");
+    setEditThumbnailUrl(section.thumbnail_url ?? null);
+  }
+
+  function cancelEditing() {
+    setEditingId(null);
+    setEditTitle("");
+    setEditDescription("");
+    setEditThumbnailUrl(null);
   }
 
   return (
@@ -194,35 +279,106 @@ export function LessonSectionsManager() {
               No sections yet. Create one on the left to start organizing lessons.
             </p>
           ) : (
-            sections.map((s) => (
-              <div
-                key={s.id}
-                className="flex items-center gap-3 border border-gta-border/70 dark:border-slate-700 rounded-lg px-3 py-2 bg-gta-surfaceSecondary dark:bg-slate-800"
-              >
-                {s.thumbnail_url && (
-                  <div className="relative w-12 h-10 overflow-hidden rounded-md shrink-0">
-                    <Image src={s.thumbnail_url} alt={s.title} fill className="object-cover" />
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gta-text dark:text-slate-100 truncate">
-                    {s.title}
-                  </p>
-                  {s.description && (
-                    <p className="text-xs text-gta-textSecondary dark:text-slate-400 truncate">
-                      {s.description}
-                    </p>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(s.id)}
-                  className="text-xs text-red-600 dark:text-red-400 hover:underline"
+            sections.map((s) => {
+              const isEditing = editingId === s.id;
+              if (isEditing) {
+                return (
+                  <form
+                    key={s.id}
+                    onSubmit={handleEditSave}
+                    className="space-y-2 border border-gta-border/70 dark:border-slate-700 rounded-lg px-3 py-2 bg-gta-surfaceSecondary dark:bg-slate-800"
+                  >
+                    <div className="flex items-center gap-3">
+                      {editThumbnailUrl && (
+                        <div className="relative w-12 h-10 overflow-hidden rounded-md shrink-0">
+                          <Image src={editThumbnailUrl} alt={editTitle || s.title} fill className="object-cover" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <input
+                          type="text"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          className="w-full px-2 py-1 rounded-md border border-gta-border dark:border-slate-700 bg-gta-surface dark:bg-slate-900 text-sm text-gta-text dark:text-slate-100"
+                        />
+                        <textarea
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          rows={2}
+                          className="w-full px-2 py-1 rounded-md border border-gta-border dark:border-slate-700 bg-gta-surface dark:bg-slate-900 text-xs text-gta-text dark:text-slate-100"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          accept="image/png"
+                          onChange={handleEditThumbnailChange}
+                          disabled={editThumbnailUploading}
+                          className="text-xs"
+                        />
+                        {editThumbnailUploading && (
+                          <span className="text-xs text-gta-textSecondary dark:text-slate-400">Uploading…</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={cancelEditing}
+                          className="text-xs text-gta-textSecondary dark:text-slate-400 hover:underline"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={editSaving}
+                          className="text-xs px-3 py-1 rounded-md bg-gta-primary text-white disabled:opacity-60"
+                        >
+                          {editSaving ? "Saving…" : "Save"}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                );
+              }
+              return (
+                <div
+                  key={s.id}
+                  className="flex items-center gap-3 border border-gta-border/70 dark:border-slate-700 rounded-lg px-3 py-2 bg-gta-surfaceSecondary dark:bg-slate-800"
                 >
-                  Delete
-                </button>
-              </div>
-            ))
+                  {s.thumbnail_url && (
+                    <div className="relative w-12 h-10 overflow-hidden rounded-md shrink-0">
+                      <Image src={s.thumbnail_url} alt={s.title} fill className="object-cover" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gta-text dark:text-slate-100 truncate">
+                      {s.title}
+                    </p>
+                    {s.description && (
+                      <p className="text-xs text-gta-textSecondary dark:text-slate-400 truncate">
+                        {s.description}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => startEditing(s)}
+                    className="text-xs text-gta-primary dark:text-emerald-400 hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(s.id)}
+                    className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
+              );
+            })
           )}
         </div>
       </div>
