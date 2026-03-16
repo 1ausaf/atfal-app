@@ -261,6 +261,7 @@ export function LessonSectionsManager() {
                   width={120}
                   height={80}
                   className="rounded-lg object-cover w-30 h-20"
+                  unoptimized
                 />
               </div>
             )}
@@ -291,7 +292,13 @@ export function LessonSectionsManager() {
                     <div className="flex items-center gap-3">
                       {editThumbnailUrl && (
                         <div className="relative w-12 h-10 overflow-hidden rounded-md shrink-0">
-                          <Image src={editThumbnailUrl} alt={editTitle || s.title} fill className="object-cover" />
+                          <Image
+                            src={editThumbnailUrl}
+                            alt={editTitle || s.title}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
                         </div>
                       )}
                       <div className="min-w-0 flex-1 space-y-1">
@@ -349,7 +356,7 @@ export function LessonSectionsManager() {
                 >
                   {s.thumbnail_url && (
                     <div className="relative w-12 h-10 overflow-hidden rounded-md shrink-0">
-                      <Image src={s.thumbnail_url} alt={s.title} fill className="object-cover" />
+                      <Image src={s.thumbnail_url} alt={s.title} fill className="object-cover" unoptimized />
                     </div>
                   )}
                   <div className="min-w-0 flex-1">

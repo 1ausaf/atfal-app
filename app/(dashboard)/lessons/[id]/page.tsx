@@ -55,6 +55,7 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
             width={640}
             height={360}
             className="w-full h-auto object-cover"
+            unoptimized
           />
         </div>
       )}

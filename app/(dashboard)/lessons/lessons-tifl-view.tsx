@@ -203,6 +203,7 @@ export function LessonsTiflView({
                       alt={section.title}
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                   ) : null}
                   {incomplete > 0 && (
