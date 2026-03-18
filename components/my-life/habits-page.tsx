@@ -27,6 +27,7 @@ function getWeekDates(refDate: string): string[] {
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const GOALS_CHANGED_EVENT = "my-life-goals-changed";
+const HABITS_CHANGED_EVENT = "my-life-habits-changed";
 
 export function HabitsPage() {
   const [weekStart, setWeekStart] = useState(() => getTodayToronto());
@@ -77,6 +78,7 @@ export function HabitsPage() {
           next.delete(key);
           return next;
         });
+        window.dispatchEvent(new Event(HABITS_CHANGED_EVENT));
       });
     } else {
       fetch(url, {
@@ -85,6 +87,7 @@ export function HabitsPage() {
         body: JSON.stringify({ habit_id: habitId, date }),
       }).then(() => {
         setCompletions((prev) => new Set(prev).add(key));
+        window.dispatchEvent(new Event(HABITS_CHANGED_EVENT));
       });
     }
   }

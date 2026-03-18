@@ -17,11 +17,26 @@ export function StreaksWidget() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/my-life/progress")
-      .then((r) => r.json())
-      .then(setData)
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
+    let alive = true;
+    async function load() {
+      try {
+        const r = await fetch("/api/my-life/progress", { cache: "no-store" });
+        const j = await r.json();
+        if (alive) setData(j);
+      } catch {
+        if (alive) setData(null);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+    load();
+
+    const handler = () => load();
+    window.addEventListener("my-life-habits-changed", handler);
+    return () => {
+      alive = false;
+      window.removeEventListener("my-life-habits-changed", handler);
+    };
   }, []);
 
   if (loading) return <p className="text-gta-textSecondary dark:text-slate-400 text-sm">Loading…</p>;

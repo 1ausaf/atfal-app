@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { getTodayToronto } from "@/lib/datetime";
 
 function parseDate(s: string): Date {
   return new Date(s + "T12:00:00");
@@ -10,7 +11,7 @@ function parseDate(s: string): Date {
 function getStreakForHabit(completions: { date: string }[]): number {
   if (completions.length === 0) return 0;
   const sorted = [...completions].map((c) => c.date).sort().reverse();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getTodayToronto();
   let streak = 0;
   let expect = today;
   for (const d of sorted) {

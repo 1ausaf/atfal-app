@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { getTodayToronto } from "@/lib/datetime";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -38,7 +39,7 @@ export async function GET(request: Request) {
   const defs = await supabase.from("habit_definitions").select("id, slug, label").order("sort_order");
   const defMap = new Map((defs.data ?? []).map((d) => [d.id, d]));
   const streaks: { label: string; streak: number }[] = [];
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getTodayToronto();
   byHabit.forEach((dates, habitId) => {
     const sorted = [...dates].sort().reverse();
     let streak = 0;
