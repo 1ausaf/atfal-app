@@ -17,7 +17,9 @@ const OBJECT_KEY_BY_DOC: Record<IjtimaDocKey, string> = {
 const ALLOWED_DOC_BY_AGE_GROUP: Record<string, IjtimaDocKey> = {
   "7-9": "sagheer-g1",
   "10-11": "sagheer-g2",
+  "10-12": "sagheer-g2",
   "12-14": "kabeer",
+  "13-15": "kabeer",
 };
 
 function textError(status: number, message: string) {

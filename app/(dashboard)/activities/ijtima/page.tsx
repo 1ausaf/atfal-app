@@ -17,7 +17,19 @@ const DOC_BY_AGE_GROUP: Record<string, { key: IjtimaDocKey; title: string; subti
     title: "Mayar-e-Sagheer (Group 2)",
     subtitle: "Ijtima syllabus PDF",
   },
+  // Back-compat (older label used in some parts of the app/docs)
+  "10-12": {
+    key: "sagheer-g2",
+    title: "Mayar-e-Sagheer (Group 2)",
+    subtitle: "Ijtima syllabus PDF",
+  },
   "12-14": {
+    key: "kabeer",
+    title: "Mayar-e-Kabeer",
+    subtitle: "Ijtima syllabus PDF",
+  },
+  // Back-compat with the older "13-15" wording
+  "13-15": {
     key: "kabeer",
     title: "Mayar-e-Kabeer",
     subtitle: "Ijtima syllabus PDF",
