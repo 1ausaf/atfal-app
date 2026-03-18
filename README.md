@@ -53,3 +53,14 @@ Ahmadiyya Abode of Peace, Rexdale, Weston North West, Weston North East, Weston 
 - **Leaderboard**: Global top 25 by total points (homework + lessons), with name, points, age and Majlis as subscript.
 - **Events**: Regional, local, national. Dashboard widget shows upcoming events with labels.
 - **Tifl management**: Regional Nazim can move Tifls between Majlis and soft-delete (disable) accounts.
+
+## IJTIMA PDFs (Supabase Storage)
+
+The IJTIMA PDF viewer uses **Supabase Storage signed URLs** (server-side) so the bucket can be private.
+
+- **Bucket name**: `ijtima`
+- **Required object keys** (upload your PDFs with these exact names):
+  - `mayar-e-sagheer-group-1.pdf` (shown to age group `7-9`)
+  - `mayar-e-sagheer-group-2.pdf` (shown to age group `10-11`)
+  - `mayar-e-kabeer.pdf` (shown to age group `12-14`)
+
