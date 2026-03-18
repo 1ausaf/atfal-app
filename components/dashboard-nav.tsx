@@ -135,6 +135,7 @@ export function DashboardNav({
         panelRef={activitiesRef}
       >
         <DropdownItem href="/activities" label="Overview" onNavigate={closeDropdown} />
+        <DropdownItem href="/activities/ijtima" label="IJTIMA" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/wordle" label="WORDLE" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/read/newsletter" label="Newsletter" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/read/read" label="Read" onNavigate={closeDropdown} />
