@@ -11,17 +11,36 @@ export function CompetitionCountdown() {
   // NOTE: This is a NEXT_PUBLIC var so it is inlined at build time for the client.
   const endLocal = process.env.NEXT_PUBLIC_COMPETITION_END_TORONTO_LOCAL as string | undefined;
 
-  const endDate = useMemo(() => {
+  const parsedEndDate = useMemo(() => {
     if (!endLocal || typeof endLocal !== "string") return null;
-    try {
-      // Env is expected to be a datetime-local string in Toronto time (YYYY-MM-DDTHH:mm).
-      const iso = parseDateTimeLocalAsToronto(endLocal);
+    const raw = endLocal.trim();
+    if (!raw) return null;
+
+    // If Vercel wraps the value in quotes, strip them.
+    const unquoted =
+      (raw.startsWith('"') && raw.endsWith('"')) || (raw.startsWith("'") && raw.endsWith("'")) ? raw.slice(1, -1) : raw;
+
+    const withoutSeconds = unquoted.replace(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}):\d{2}$/, "$1");
+
+    // Strict format: YYYY-MM-DDTHH:mm (Toronto local)
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(withoutSeconds)) {
+      const iso = parseDateTimeLocalAsToronto(withoutSeconds);
       const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return null;
-      return d;
-    } catch {
-      return null;
+      return Number.isNaN(d.getTime()) ? null : d;
     }
+
+    // Common alternative: YYYY-MM-DDTHH:mm:ss (Toronto local)
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(unquoted)) {
+      const hhmm = unquoted.slice(0, 16); // keep YYYY-MM-DDTHH:mm
+      const iso = parseDateTimeLocalAsToronto(hhmm);
+      const d = new Date(iso);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    // ISO w/ timezone offset or Z -> let Date parse it.
+    // Examples: 2026-03-19T18:00:00Z, 2026-03-19T18:00:00-04:00
+    const d = new Date(unquoted);
+    return Number.isNaN(d.getTime()) ? null : d;
   }, [endLocal]);
 
   const [nowMs, setNowMs] = useState(() => Date.now());
@@ -30,7 +49,7 @@ export function CompetitionCountdown() {
     return () => window.clearInterval(id);
   }, []);
 
-  if (!endDate) {
+  if (!parsedEndDate) {
     return (
       <section className="card-kid p-6 md:p-7">
         <h2 className="text-lg font-bold text-gta-text tracking-tight">Winner countdown unavailable</h2>
@@ -41,7 +60,7 @@ export function CompetitionCountdown() {
     );
   }
 
-  const diffMs = endDate.getTime() - nowMs;
+  const diffMs = parsedEndDate.getTime() - nowMs;
   if (diffMs <= 0) {
     return (
       <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
