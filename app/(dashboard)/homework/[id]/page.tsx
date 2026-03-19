@@ -25,11 +25,11 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
     linkedLessonTitle = lesson?.title ?? null;
   }
 
-  let existingSubmission: { id: string; status: string } | null = null;
+  let existingSubmission: { id: string; status: string; points_awarded: number | null } | null = null;
   if (session.user.role === "tifl") {
     const { data: sub } = await supabase
       .from("homework_submissions")
-      .select("id, status")
+      .select("id, status, points_awarded")
       .eq("homework_id", id)
       .eq("user_id", session.user.id)
       .single();
@@ -65,7 +65,16 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
         {session.user.role === "tifl" && (
           <div className="mt-6">
             {existingSubmission ? (
-              <p className="text-slate-600 dark:text-slate-400">Status: <span className="font-medium">{existingSubmission.status}</span></p>
+              existingSubmission.status === "approved" ? (
+                <p className="text-slate-600 dark:text-slate-400">
+                  POINTS AWARDED:{" "}
+                  <span className="font-medium">{existingSubmission.points_awarded ?? 0} pts</span>
+                </p>
+              ) : (
+                <p className="text-slate-600 dark:text-slate-400">
+                  Status: <span className="font-medium">{existingSubmission.status}</span>
+                </p>
+              )
             ) : (
               <SubmitHomeworkButton homeworkId={id} />
             )}

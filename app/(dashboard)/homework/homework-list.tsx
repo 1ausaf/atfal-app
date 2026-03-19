@@ -17,6 +17,15 @@ interface HomeworkItem {
   created_at: string;
 }
 
+interface PastHomeworkItem {
+  id: string;
+  title: string;
+  due_by: string;
+  links: string[];
+  submitted_at: string | null;
+  points_awarded: number | null;
+}
+
 interface HomeworkListProps {
   initialHomework: HomeworkItem[];
   role: string;
@@ -24,12 +33,21 @@ interface HomeworkListProps {
   userMajlisId: string | null;
   majlisList: { id: string; name: string }[];
   lessonList?: { id: string; title: string }[];
+  pastAssignments?: PastHomeworkItem[];
 }
 
 const FILTER_ALL = "all";
 const FILTER_REGIONAL = "regional";
 
-export function HomeworkList({ initialHomework, role, userId, userMajlisId, majlisList, lessonList = [] }: HomeworkListProps) {
+export function HomeworkList({
+  initialHomework,
+  role,
+  userId,
+  userMajlisId,
+  majlisList,
+  lessonList = [],
+  pastAssignments = [],
+}: HomeworkListProps) {
   const [homework, setHomework] = useState(initialHomework);
   const [majlisFilter, setMajlisFilter] = useState<string>(FILTER_ALL);
   const majlisMap = useMemo(() => new Map(majlisList.map((m) => [m.id, m.name])), [majlisList]);
@@ -44,10 +62,54 @@ export function HomeworkList({ initialHomework, role, userId, userMajlisId, majl
         })
       : homework;
 
-  if (!homework.length) return <p className="text-gta-textSecondary">No homework.</p>;
+  if (role !== "tifl" && !homework.length) return <p className="text-gta-textSecondary">No homework.</p>;
+
+  const hasPast = pastAssignments.length > 0;
 
   return (
     <>
+      {role === "tifl" && (
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-gta-text tracking-tight mb-3">Past Homework Assignments</h2>
+          {!hasPast ? (
+            <p className="text-gta-textSecondary">No past approved homework yet.</p>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {pastAssignments.map((p) => {
+                const pointsValue = p.points_awarded ?? 0;
+                const points =
+                  pointsValue > 0 ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                      {pointsValue} pts
+                    </span>
+                  ) : (
+                    <span className="text-gta-textSecondary text-sm">
+                      {pointsValue} pts
+                    </span>
+                  );
+
+                return (
+                  <li key={p.id} className="card-kid p-4 flex justify-between items-start gap-4">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Link href={`/homework/${p.id}`} className="font-semibold text-lg text-gta-text hover:underline">
+                          {p.title}
+                        </Link>
+                      </div>
+                      <p className="text-sm text-gta-textSecondary mt-1">Due: {formatDateTimeInToronto(p.due_by)}</p>
+                    </div>
+                    <div className="shrink-0">
+                      <span className="text-sm text-gta-textSecondary dark:text-slate-400 font-medium">Awarded:</span>{" "}
+                      {points}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      )}
+
       {(role === "regional_nazim" || role === "admin") && (
         <div className="mb-4 flex items-center gap-2">
           <label htmlFor="majlis-filter" className="text-sm font-semibold text-gta-text">

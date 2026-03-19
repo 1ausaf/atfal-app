@@ -12,6 +12,14 @@ export default async function HomeworkPage() {
   if (!session) redirect("/login");
   const supabase = createSupabaseServerClient();
   let query = supabase.from("homework").select("id, majlis_id, title, description, due_by, links, release_at, lesson_activity_id, created_at").order("due_by", { ascending: true });
+  let pastAssignments: Array<{
+    id: string;
+    title: string;
+    due_by: string;
+    links: string[];
+    submitted_at: string | null;
+    points_awarded: number | null;
+  }> = [];
   if (session.user.role === "tifl") {
     if (!session.user.majlisId) return <p>Complete your profile to see homework.</p>;
     const nowIso = new Date().toISOString();
@@ -22,7 +30,43 @@ export default async function HomeworkPage() {
     if (!session.user.majlisId) return <p>No Majlis assigned.</p>;
     query = query.eq("majlis_id", session.user.majlisId);
   }
+
+  if (session.user.role === "tifl") {
+    // Past-only: show homework where this tifl has an approved submission, including historical items.
+    const { data: approvedSubmissions } = await supabase
+      .from("homework_submissions")
+      .select("homework_id, points_awarded, submitted_at")
+      .eq("user_id", session.user.id)
+      .eq("status", "approved");
+
+    const approvedHomeworkIds = new Set((approvedSubmissions ?? []).map((s) => s.homework_id));
+    if (approvedHomeworkIds.size > 0) {
+      const { data: approvedHomework } = await supabase
+        .from("homework")
+        .select("id, title, due_by, links, created_at")
+        .in("id", [...approvedHomeworkIds]);
+
+      const pointsByHomeworkId = new Map(
+        (approvedSubmissions ?? []).map((s) => [s.homework_id, { points_awarded: s.points_awarded as number | null, submitted_at: (s as { submitted_at?: string | null }).submitted_at ?? null }])
+      );
+
+      pastAssignments = (approvedHomework ?? []).map((h) => ({
+        id: h.id,
+        title: h.title,
+        due_by: h.due_by,
+        links: (h.links as string[]) ?? [],
+        points_awarded: pointsByHomeworkId.get(h.id)?.points_awarded ?? null,
+        submitted_at: pointsByHomeworkId.get(h.id)?.submitted_at ?? null,
+      }));
+    }
+  }
+
   const { data: homeworkList } = await query;
+  // Filter client-safe even if we didn't modify query above (the RPC dummy above is a placeholder guard we avoid).
+  const approvedHomeworkIdSet = new Set(pastAssignments.map((p) => p.id));
+  const filteredHomeworkList =
+    session.user.role === "tifl" ? (homeworkList ?? []).filter((h) => !approvedHomeworkIdSet.has(h.id)) : homeworkList ?? [];
+
   const { data: majlisList } = await supabase.from("majlis").select("id, name").order("name");
   const { data: lessonList } = await supabase.from("lesson_activities").select("id, title").order("created_at", { ascending: false });
   const canCreate = session.user.role === "local_nazim" || session.user.role === "regional_nazim" || session.user.role === "admin";
@@ -37,7 +81,15 @@ export default async function HomeworkPage() {
           </Link>
         )}
       </div>
-      <HomeworkList initialHomework={homeworkList ?? []} role={session.user.role} userId={session.user.id} userMajlisId={session.user.majlisId ?? null} majlisList={majlisList ?? []} lessonList={lessonList ?? []} />
+      <HomeworkList
+        initialHomework={filteredHomeworkList}
+        role={session.user.role}
+        userId={session.user.id}
+        userMajlisId={session.user.majlisId ?? null}
+        majlisList={majlisList ?? []}
+        lessonList={lessonList ?? []}
+        pastAssignments={pastAssignments}
+      />
     </div>
   );
 }
