@@ -7,6 +7,8 @@ export default async function ActivitiesPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
+  const isTifl = session.user.role === "tifl";
+
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">Activities</h1>
@@ -14,6 +16,17 @@ export default async function ActivitiesPage() {
         Play WORDLE or explore Read for newsletters and other content.
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
+        {isTifl && (
+          <Link
+            href="/activities/letter-to-huzoor"
+            className="card-kid p-6 transition-all hover:shadow-gta-hover ring-1 ring-amber-400/20 hover:ring-amber-400/40"
+          >
+            <h2 className="font-semibold text-lg text-slate-900 dark:text-white">Letter to Huzoor</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Type your letter to Huzoor and submit it.
+            </p>
+          </Link>
+        )}
         <Link
           href="/activities/wordle"
           className="card-kid p-6 transition-colors hover:shadow-gta-hover"

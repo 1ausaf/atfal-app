@@ -135,6 +135,16 @@ export function DashboardNav({
         panelRef={activitiesRef}
       >
         <DropdownItem href="/activities" label="Overview" onNavigate={closeDropdown} />
+        {isTifl && (
+          <DropdownItem href="/activities/letter-to-huzoor" label="Letter to Huzoor" onNavigate={closeDropdown} />
+        )}
+        {isNazim && (
+          <DropdownItem
+            href="/activities/letter-to-huzoor/submissions"
+            label="Submitted Letters"
+            onNavigate={closeDropdown}
+          />
+        )}
         <DropdownItem href="/activities/ijtima" label="IJTIMA" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/wordle" label="WORDLE" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/read/newsletter" label="Newsletter" onNavigate={closeDropdown} />
