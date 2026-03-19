@@ -7,6 +7,21 @@ function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
 
+type WinnerPayload = {
+  id: string;
+  name: string | null;
+  age: number | null;
+  majlis: string | null;
+  points: number;
+  lessonsCompletedPct: number;
+  averageMarksPct: number;
+};
+
+function formatPercent(value: number) {
+  if (!Number.isFinite(value)) return "0%";
+  return `${value.toFixed(1)}%`;
+}
+
 export function CompetitionCountdown() {
   // NOTE: This is a NEXT_PUBLIC var so it is inlined at build time for the client.
   const endLocal = process.env.NEXT_PUBLIC_COMPETITION_END_TORONTO_LOCAL as string | undefined;
@@ -44,6 +59,8 @@ export function CompetitionCountdown() {
   }, [endLocal]);
 
   const [nowMs, setNowMs] = useState(() => Date.now());
+  const [winner, setWinner] = useState<WinnerPayload | null>(null);
+  const [winnerStatus, setWinnerStatus] = useState<"idle" | "loading" | "success" | "empty" | "error">("idle");
   useEffect(() => {
     const id = window.setInterval(() => setNowMs(Date.now()), 1000);
     return () => window.clearInterval(id);
@@ -61,12 +78,99 @@ export function CompetitionCountdown() {
   }
 
   const diffMs = parsedEndDate.getTime() - nowMs;
+  const hasEnded = diffMs <= 0;
+
+  useEffect(() => {
+    if (!hasEnded || winnerStatus !== "idle") return;
+
+    let active = true;
+    const loadWinner = async () => {
+      setWinnerStatus("loading");
+      try {
+        const res = await fetch("/api/leaderboard/winner", { method: "GET", credentials: "include" });
+        if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
+        const json = (await res.json()) as { winner?: WinnerPayload | null };
+        if (!active) return;
+        if (!json.winner) {
+          setWinner(null);
+          setWinnerStatus("empty");
+          return;
+        }
+        setWinner(json.winner);
+        setWinnerStatus("success");
+      } catch {
+        if (!active) return;
+        setWinner(null);
+        setWinnerStatus("error");
+      }
+    };
+
+    void loadWinner();
+    return () => {
+      active = false;
+    };
+  }, [hasEnded, winnerStatus]);
+
   if (diffMs <= 0) {
+    if (winnerStatus === "loading" || winnerStatus === "idle") {
+      return (
+        <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 tracking-tight text-center">
+            Winner is being finalized...
+          </h2>
+        </section>
+      );
+    }
+
+    if (winnerStatus === "empty") {
+      return (
+        <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 tracking-tight text-center">
+            Winner is decided
+          </h2>
+          <p className="mt-2 text-sm text-gta-textSecondary text-center">No leaderboard winner found yet.</p>
+        </section>
+      );
+    }
+
+    if (winnerStatus === "error" || !winner) {
+      return (
+        <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 tracking-tight text-center">
+            Winner is decided
+          </h2>
+          <p className="mt-2 text-sm text-gta-textSecondary text-center">
+            Winner details are temporarily unavailable.
+          </p>
+        </section>
+      );
+    }
+
     return (
       <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 animate-points-glow tracking-tight">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 animate-points-glow tracking-tight text-center">
           Winner is decided
         </h2>
+        <div className="mt-4 rounded-gta border border-gta-border bg-gta-surfaceSecondary/60 p-4">
+          <p className="text-lg font-bold text-gta-text text-center">{winner.name ?? "Unnamed Tifl"}</p>
+          <p className="text-sm text-gta-textSecondary mt-1 text-center">
+            Age {winner.age ?? "—"} · {winner.majlis ?? "—"}
+          </p>
+          <p className="text-center mt-3">
+            <span className="text-2xl font-extrabold text-gta-primary">{winner.points}</span>
+            <span className="ml-1 text-sm font-semibold text-gta-textSecondary">pts</span>
+          </p>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            <div className="rounded-gta-sm border border-gta-border p-2">
+              <p className="text-gta-textSecondary">Lessons completed</p>
+              <p className="font-bold text-gta-text">{formatPercent(winner.lessonsCompletedPct)}</p>
+            </div>
+            <div className="rounded-gta-sm border border-gta-border p-2">
+              <p className="text-gta-textSecondary">Average marks</p>
+              <p className="font-bold text-gta-text">{formatPercent(winner.averageMarksPct)}</p>
+            </div>
+          </div>
+        </div>
       </section>
     );
   }
