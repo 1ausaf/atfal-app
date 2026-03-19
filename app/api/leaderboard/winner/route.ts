@@ -28,9 +28,9 @@ export async function GET() {
       .eq("user_id", winnerRow.id),
   ]);
 
-  if (submissionsRes.error) return NextResponse.json({ error: submissionsRes.error.message }, { status: 500 });
-
-  const submissions = submissionsRes.data ?? [];
+  // Keep winner display resilient: stats can gracefully degrade to 0%,
+  // but winner identity/points should still be returned.
+  const submissions = submissionsRes.error ? [] : (submissionsRes.data ?? []);
   const submittedActivityIds = Array.from(new Set(submissions.map((s) => s.activity_id)));
   const completedLessonsCount = submittedActivityIds.length;
 
@@ -44,13 +44,22 @@ export async function GET() {
       .select("activity_id, points_value")
       .in("activity_id", submittedActivityIds);
 
-    if (questionsError) return NextResponse.json({ error: questionsError.message }, { status: 500 });
-
     const possibleByActivity = new Map<string, number>();
-    (questions ?? []).forEach((q) => {
-      const points = q.points_value ?? 1;
-      possibleByActivity.set(q.activity_id, (possibleByActivity.get(q.activity_id) ?? 0) + points);
-    });
+    // Older databases may not have points_value; fallback to 1 point/question.
+    if (!questionsError) {
+      (questions ?? []).forEach((q) => {
+        const points = q.points_value ?? 1;
+        possibleByActivity.set(q.activity_id, (possibleByActivity.get(q.activity_id) ?? 0) + points);
+      });
+    } else {
+      const { data: fallbackQuestions } = await supabase
+        .from("lesson_questions")
+        .select("activity_id")
+        .in("activity_id", submittedActivityIds);
+      (fallbackQuestions ?? []).forEach((q) => {
+        possibleByActivity.set(q.activity_id, (possibleByActivity.get(q.activity_id) ?? 0) + 1);
+      });
+    }
 
     submittedActivityIds.forEach((activityId) => {
       totalPossibleOnSubmitted += possibleByActivity.get(activityId) ?? 0;
@@ -68,8 +77,7 @@ export async function GET() {
       .select("name")
       .eq("id", winnerRow.majlis_id)
       .maybeSingle();
-    if (majlisError) return NextResponse.json({ error: majlisError.message }, { status: 500 });
-    majlisName = majlis?.name ?? null;
+    majlisName = majlisError ? null : (majlis?.name ?? null);
   }
 
   return NextResponse.json({
