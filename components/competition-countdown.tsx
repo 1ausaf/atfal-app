@@ -23,8 +23,10 @@ function formatPercent(value: number) {
 }
 
 export function CompetitionCountdown() {
-  // NOTE: This is a NEXT_PUBLIC var so it is inlined at build time for the client.
+  // NOTE: NEXT_PUBLIC_* vars are inlined at build time for the client.
   const endLocal = process.env.NEXT_PUBLIC_COMPETITION_END_TORONTO_LOCAL as string | undefined;
+  const seasonHeadline =
+    (process.env.NEXT_PUBLIC_SEASON_COUNTDOWN_HEADLINE as string | undefined)?.trim() || "SEASON 2 STARTING MONDAY";
 
   const parsedEndDate = useMemo(() => {
     if (!endLocal || typeof endLocal !== "string") return null;
@@ -69,9 +71,9 @@ export function CompetitionCountdown() {
   if (!parsedEndDate) {
     return (
       <section className="card-kid p-6 md:p-7">
-        <h2 className="text-lg font-bold text-gta-text tracking-tight">Winner countdown unavailable</h2>
+        <h2 className="text-lg font-bold text-gta-text tracking-tight">Season countdown unavailable</h2>
         <p className="text-sm text-gta-textSecondary mt-1">
-          Set `NEXT_PUBLIC_COMPETITION_END_TORONTO_LOCAL` to enable the timer.
+          Set `NEXT_PUBLIC_COMPETITION_END_TORONTO_LOCAL` (e.g. 2026-03-23T15:00 for Monday Mar 23, 2026 3:00 PM Toronto).
         </p>
       </section>
     );
@@ -116,8 +118,9 @@ export function CompetitionCountdown() {
       return (
         <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
           <h2 className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 tracking-tight text-center">
-            Winner is being finalized...
+            Season 2 has started
           </h2>
+          <p className="mt-2 text-sm text-gta-textSecondary text-center">Loading…</p>
         </section>
       );
     }
@@ -126,7 +129,7 @@ export function CompetitionCountdown() {
       return (
         <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
           <h2 className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 tracking-tight text-center">
-            Winner is decided
+            Season 2 has started
           </h2>
           <p className="mt-2 text-sm text-gta-textSecondary text-center">No leaderboard winner found yet.</p>
         </section>
@@ -137,7 +140,7 @@ export function CompetitionCountdown() {
       return (
         <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
           <h2 className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 tracking-tight text-center">
-            Winner is decided
+            Season 2 has started
           </h2>
           <p className="mt-2 text-sm text-gta-textSecondary text-center">
             Winner details are temporarily unavailable.
@@ -149,7 +152,7 @@ export function CompetitionCountdown() {
     return (
       <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
         <h2 className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 animate-points-glow tracking-tight text-center">
-          Winner is decided
+          Season winner
         </h2>
         <div className="mt-4 rounded-gta border border-gta-border bg-gta-surfaceSecondary/60 p-4">
           <p className="text-lg font-bold text-gta-text text-center">{winner.name ?? "Unnamed Tifl"}</p>
@@ -180,24 +183,26 @@ export function CompetitionCountdown() {
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
-  // Very specific required copy:
-  // "_ Hours _ Minutes _ Seconds left!"
   const countdownText = `${hours} Hours ${pad2(minutes)} Minutes ${pad2(seconds)} Seconds left!`;
 
-  // getTodayToronto is kept referenced to ensure timezone helper stays in bundle and for potential future reuse.
-  // (Unused but safe for tree-shaking due to useMemo above; this is only for bundler stability.)
   getTodayToronto();
 
   return (
     <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
       <h2
-        className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 animate-points-glow tracking-tight text-center"
+        className="text-2xl md:text-3xl font-extrabold text-amber-500 dark:text-amber-400 animate-points-glow tracking-tight text-center uppercase"
+        aria-live="polite"
+      >
+        {seasonHeadline}
+      </h2>
+      <p
+        className="mt-3 text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 tracking-tight text-center tabular-nums"
         aria-live="polite"
       >
         {countdownText}
-      </h2>
+      </p>
       <p className="mt-2 text-xs md:text-sm text-gta-textSecondary dark:text-slate-400 text-center">
-        Until the winner of the $100 is decided! Winner will be announced on whatsapp.
+        Countdown to Season 2 start (Toronto local time).
       </p>
     </section>
   );

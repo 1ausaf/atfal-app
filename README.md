@@ -64,11 +64,11 @@ The IJTIMA PDF viewer uses **Supabase Storage signed URLs** (server-side) so the
   - `mayar-e-sagheer-group-2.pdf` (shown to age group `10-11`)
   - `mayar-e-kabeer.pdf` (shown to age group `12-14`)
 
-## Competition countdown (Dashboard)
+## Season countdown (Dashboard)
 
-The dashboard shows a live countdown to when the competition winner is decided.
+The dashboard shows a live countdown to Season 2 start (headline: **SEASON 2 STARTING MONDAY** by default).
 
-- **Env var**: `NEXT_PUBLIC_COMPETITION_END_TORONTO_LOCAL=2026-03-19T18:00`
+- **End time (Toronto)**: `NEXT_PUBLIC_COMPETITION_END_TORONTO_LOCAL=2026-03-23T15:00` (Mon Mar 23, 2026 3:00 PM)
+- **Optional headline**: `NEXT_PUBLIC_SEASON_COUNTDOWN_HEADLINE=SEASON 2 STARTING MONDAY`
 - **Format**: `YYYY-MM-DDTHH:mm` (interpreted as Toronto local time)
-- **Example (placeholder)**: `2026-03-31T23:59`
 
