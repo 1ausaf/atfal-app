@@ -63,26 +63,17 @@ export function CompetitionCountdown() {
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [winner, setWinner] = useState<WinnerPayload | null>(null);
   const [winnerStatus, setWinnerStatus] = useState<"idle" | "loading" | "success" | "empty" | "error">("idle");
+
+  const diffMs = parsedEndDate ? parsedEndDate.getTime() - nowMs : 0;
+  const hasEnded = parsedEndDate ? diffMs <= 0 : false;
+
   useEffect(() => {
     const id = window.setInterval(() => setNowMs(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, []);
 
-  if (!parsedEndDate) {
-    return (
-      <section className="card-kid p-6 md:p-7">
-        <h2 className="text-lg font-bold text-gta-text tracking-tight">Season countdown unavailable</h2>
-        <p className="text-sm text-gta-textSecondary mt-1">
-          Set `NEXT_PUBLIC_COMPETITION_END_TORONTO_LOCAL` (e.g. 2026-03-23T15:00 for Monday Mar 23, 2026 3:00 PM Toronto).
-        </p>
-      </section>
-    );
-  }
-
-  const diffMs = parsedEndDate.getTime() - nowMs;
-  const hasEnded = diffMs <= 0;
-
   useEffect(() => {
+    if (!parsedEndDate) return;
     if (!hasEnded || winnerStatus !== "idle") return;
 
     let active = true;
@@ -111,7 +102,28 @@ export function CompetitionCountdown() {
     return () => {
       active = false;
     };
-  }, [hasEnded, winnerStatus]);
+  }, [parsedEndDate, hasEnded, winnerStatus]);
+
+  if (!parsedEndDate) {
+    return (
+      <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
+        <h2
+          className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 animate-points-glow tracking-tight text-center uppercase"
+          aria-live="polite"
+        >
+          {seasonHeadline}
+        </h2>
+        <p className="mt-3 text-sm font-semibold text-gta-text text-center">Timer unavailable — set end date to show countdown</p>
+        <p className="mt-2 text-xs md:text-sm text-gta-textSecondary text-center max-w-lg mx-auto">
+          Add <code className="text-xs bg-gta-surfaceSecondary px-1 py-0.5 rounded">NEXT_PUBLIC_COMPETITION_END_TORONTO_LOCAL</code>{" "}
+          to <code className="text-xs bg-gta-surfaceSecondary px-1 py-0.5 rounded">.env.local</code> (e.g.{" "}
+          <code className="text-xs bg-gta-surfaceSecondary px-1 py-0.5 rounded">2026-03-23T15:00</code> for Mon Mar 23, 2026 3:00 PM
+          Toronto), then <strong>restart</strong> <code className="text-xs">next dev</code> or redeploy —{" "}
+          <code className="text-xs">NEXT_PUBLIC_*</code> is inlined at build time.
+        </p>
+      </section>
+    );
+  }
 
   if (diffMs <= 0) {
     if (winnerStatus === "loading" || winnerStatus === "idle") {
@@ -190,7 +202,7 @@ export function CompetitionCountdown() {
   return (
     <section className="card-kid p-6 md:p-7 border border-amber-400/25 shadow-[0_0_28px_rgba(251,191,36,0.18)]">
       <h2
-        className="text-2xl md:text-3xl font-extrabold text-amber-500 dark:text-amber-400 animate-points-glow tracking-tight text-center uppercase"
+        className="text-3xl md:text-4xl font-extrabold text-amber-500 dark:text-amber-400 animate-points-glow tracking-tight text-center uppercase"
         aria-live="polite"
       >
         {seasonHeadline}
