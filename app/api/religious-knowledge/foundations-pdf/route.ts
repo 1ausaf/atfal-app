@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 const BUCKET = "religious-knowledge-pdfs";
 const MAX_SIZE = 20 * 1024 * 1024; // 20MB
 const CHECKPOINT_ID = "cp-1";
+const STABLE_FILE_PATH = `${CHECKPOINT_ID}/latest.pdf`;
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -18,8 +19,19 @@ export async function GET() {
     .select("file_url, updated_at")
     .eq("checkpoint_id", CHECKPOINT_ID)
     .maybeSingle();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ file_url: data?.file_url ?? null, updated_at: data?.updated_at ?? null });
+  if (!error && data?.file_url) {
+    return NextResponse.json({ file_url: data.file_url, updated_at: data.updated_at ?? null });
+  }
+
+  const { data: listData } = await supabase.storage.from(BUCKET).list(CHECKPOINT_ID, {
+    search: "latest.pdf",
+    limit: 10,
+  });
+  const hasStableFile = (listData ?? []).some((item) => item.name === "latest.pdf");
+  if (!hasStableFile) return NextResponse.json({ file_url: null, updated_at: null });
+
+  const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(STABLE_FILE_PATH);
+  return NextResponse.json({ file_url: urlData.publicUrl, updated_at: null });
 }
 
 export async function POST(request: Request) {
@@ -41,11 +53,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: bucketError.message }, { status: 500 });
   }
 
-  const path = `${CHECKPOINT_ID}/${randomUUID()}.pdf`;
+  const path = STABLE_FILE_PATH;
   const ab = await file.arrayBuffer();
   const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, ab, {
     contentType: "application/pdf",
-    upsert: false,
+    upsert: true,
   });
   if (uploadError) return NextResponse.json({ error: uploadError.message }, { status: 500 });
 
@@ -61,7 +73,10 @@ export async function POST(request: Request) {
     },
     { onConflict: "checkpoint_id" }
   );
-  if (saveError) return NextResponse.json({ error: saveError.message }, { status: 500 });
+  // Keep upload functional even if migration table is missing.
+  if (saveError) {
+    return NextResponse.json({ file_url: url, warning: saveError.message });
+  }
 
   return NextResponse.json({ file_url: url });
 }
