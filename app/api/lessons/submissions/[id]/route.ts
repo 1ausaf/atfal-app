@@ -4,6 +4,13 @@ import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
 
+function getSalatLessonMultiplier(user: { salat_star?: boolean; salat_superstar?: boolean } | null): number {
+  if (!user) return 0;
+  if (user.salat_superstar === true) return 0.25;
+  if (user.salat_star === true) return 0.1;
+  return 0;
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -21,7 +28,16 @@ export async function PATCH(
   if (!sub) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   if (typeof pointsAwardedOverride === "number" && isRegionalOrAdmin) {
-    const points = Math.max(0, Math.floor(pointsAwardedOverride));
+    const basePoints = Math.max(0, Math.floor(pointsAwardedOverride));
+    const { data: userBadgeRow } = await supabase
+      .from("users")
+      .select("salat_star, salat_superstar, majlis_id")
+      .eq("id", (sub as { user_id: string }).user_id)
+      .maybeSingle();
+    const multiplier = getSalatLessonMultiplier(
+      userBadgeRow as { salat_star?: boolean; salat_superstar?: boolean } | null
+    );
+    const points = basePoints + Math.round(basePoints * multiplier);
     const { data: userRow } = await supabase.from("users").select("majlis_id").eq("id", (sub as { user_id: string }).user_id).maybeSingle();
     const { error } = await supabase
       .from("lesson_submissions")
@@ -48,10 +64,14 @@ export async function PATCH(
   if (sub.status === "graded") return NextResponse.json({ error: "Already graded" }, { status: 400 });
   const autoPoints = typeof (sub as { auto_points?: number }).auto_points === "number" ? (sub as { auto_points: number }).auto_points : 0;
   const manualPts = Math.max(0, Number(manual_points) ?? 0);
-  let totalPoints = autoPoints + manualPts;
-  const { data: u } = await supabase.from("users").select("salat_star, salat_superstar").eq("id", (sub as { user_id: string }).user_id).single();
-  const hasBadge = (u as { salat_star?: boolean; salat_superstar?: boolean } | null)?.salat_star === true || (u as { salat_superstar?: boolean } | null)?.salat_superstar === true;
-  if (hasBadge) totalPoints += 100;
+  const basePoints = autoPoints + manualPts;
+  const { data: u } = await supabase
+    .from("users")
+    .select("salat_star, salat_superstar")
+    .eq("id", (sub as { user_id: string }).user_id)
+    .single();
+  const multiplier = getSalatLessonMultiplier(u as { salat_star?: boolean; salat_superstar?: boolean } | null);
+  const totalPoints = basePoints + Math.round(basePoints * multiplier);
   const { data: userRow } = await supabase.from("users").select("majlis_id").eq("id", (sub as { user_id: string }).user_id).maybeSingle();
   const { error } = await supabase
     .from("lesson_submissions")

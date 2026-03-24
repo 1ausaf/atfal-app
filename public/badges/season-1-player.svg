@@ -1,0 +1,14 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldA" x1="10" y1="10" x2="118" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFE8A3"/>
+      <stop offset="0.5" stop-color="#D8AA42"/>
+      <stop offset="1" stop-color="#B8841D"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="58" fill="url(#goldA)" stroke="#8B5E17" stroke-width="4"/>
+  <circle cx="64" cy="64" r="44" fill="none" stroke="#9D6F1D" stroke-width="3"/>
+  <path d="M64 34L83 43V57C83 71 74 83 64 88C54 83 45 71 45 57V43L64 34Z" fill="#C4902E" stroke="#8B5E17" stroke-width="2"/>
+  <text x="64" y="55" text-anchor="middle" fill="#5C3D0E" font-size="7" font-family="Arial, sans-serif" font-weight="700">SEASON 1</text>
+  <text x="64" y="66" text-anchor="middle" fill="#5C3D0E" font-size="7" font-family="Arial, sans-serif" font-weight="700">PLAYER</text>
+</svg>

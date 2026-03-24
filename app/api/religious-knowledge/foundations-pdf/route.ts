@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { randomUUID } from "crypto";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
@@ -47,37 +46,44 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Only Regional Nazim can upload Foundations PDF" }, { status: 403 });
   }
 
-  const formData = await request.formData();
-  const file = formData.get("pdf");
-  if (!file || !(file instanceof File)) return NextResponse.json({ error: "No PDF file" }, { status: 400 });
-  if (!isPdfFile(file)) {
-    return NextResponse.json(
-      { error: `Only PDF files allowed. Received type="${file.type || "unknown"}" name="${file.name}"` },
-      { status: 400 }
-    );
-  }
-  if (file.size > MAX_SIZE) return NextResponse.json({ error: "File too large (max 20MB)" }, { status: 400 });
-
   const supabase = createSupabaseServerClient();
   const { error: bucketError } = await supabase.storage.createBucket(BUCKET, { public: true });
   if (bucketError && !bucketError.message?.toLowerCase?.().includes("already exists")) {
     return NextResponse.json({ error: bucketError.message }, { status: 500 });
   }
 
-  const path = STABLE_FILE_PATH;
-  const ab = await file.arrayBuffer();
-  const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, ab, {
-    contentType: "application/pdf",
-    upsert: true,
-  });
-  if (uploadError) {
-    return NextResponse.json(
-      { error: `Storage upload failed: ${uploadError.message}` },
-      { status: 500 }
-    );
+  let payload: { action?: string; fileName?: string; fileType?: string; fileSize?: number } = {};
+  try {
+    payload = (await request.json()) as typeof payload;
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  if (payload.action === "create_upload_url") {
+    const fileName = payload.fileName ?? "latest.pdf";
+    const fileType = payload.fileType ?? "";
+    const fileSize = payload.fileSize ?? 0;
+    const fakeFile = { name: fileName, type: fileType } as File;
+    if (!isPdfFile(fakeFile)) {
+      return NextResponse.json(
+        { error: `Only PDF files allowed. Received type="${fileType || "unknown"}" name="${fileName}"` },
+        { status: 400 }
+      );
+    }
+    if (fileSize > MAX_SIZE) return NextResponse.json({ error: "File too large (max 20MB)" }, { status: 400 });
+
+    const { data, error } = await supabase.storage.from(BUCKET).createSignedUploadUrl(STABLE_FILE_PATH);
+    if (error || !data?.token) {
+      return NextResponse.json({ error: `Failed to create upload URL: ${error?.message ?? "Unknown error"}` }, { status: 500 });
+    }
+    return NextResponse.json({ path: STABLE_FILE_PATH, token: data.token });
+  }
+
+  if (payload.action !== "finalize_upload") {
+    return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+  }
+
+  const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(STABLE_FILE_PATH);
   const url = urlData.publicUrl;
 
   const { error: saveError } = await supabase.from("religious_knowledge_checkpoint_files").upsert(

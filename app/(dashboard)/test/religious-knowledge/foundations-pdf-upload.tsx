@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { createSupabaseClient } from "@/lib/supabase";
+
+const MAX_SIZE = 20 * 1024 * 1024; // 20MB
 
 export function FoundationsPdfUpload({ initialUrl }: { initialUrl: string | null }) {
   const [url, setUrl] = useState(initialUrl);
@@ -21,25 +24,61 @@ export function FoundationsPdfUpload({ initialUrl }: { initialUrl: string | null
       setError(`Selected file is not recognized as PDF (name: ${file.name}, type: ${file.type || "unknown"}).`);
       return;
     }
+    if (file.size > MAX_SIZE) {
+      setError("File too large (max 20MB).");
+      return;
+    }
     setError(null);
     setWarning(null);
     setLoading(true);
     try {
-      const form = new FormData();
-      form.set("pdf", file);
-      const res = await fetch("/api/religious-knowledge/foundations-pdf", { method: "POST", body: form });
-      let data: Record<string, unknown> = {};
-      try {
-        data = await res.json();
-      } catch {
-        // non-json response
-      }
-      if (!res.ok) {
-        setError(`${res.status} ${res.statusText}${data.error ? ` - ${String(data.error)}` : ""}`);
+      const prepareRes = await fetch("/api/religious-knowledge/foundations-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "create_upload_url",
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+        }),
+      });
+      const prepareData = (await prepareRes.json().catch(() => ({}))) as Record<string, unknown>;
+      if (!prepareRes.ok) {
+        setError(
+          `${prepareRes.status} ${prepareRes.statusText}${prepareData.error ? ` - ${String(prepareData.error)}` : ""}`
+        );
         return;
       }
-      if (data.warning) setWarning(String(data.warning));
-      setUrl((data.file_url as string | null) ?? null);
+
+      const path = String(prepareData.path ?? "");
+      const token = String(prepareData.token ?? "");
+      if (!path || !token) {
+        setError("Upload setup failed: missing signed upload data.");
+        return;
+      }
+
+      const supabase = createSupabaseClient();
+      const { error: uploadError } = await supabase.storage.from("religious-knowledge-pdfs").uploadToSignedUrl(path, token, file);
+      if (uploadError) {
+        setError(`Storage upload failed: ${uploadError.message}`);
+        return;
+      }
+
+      const finalizeRes = await fetch("/api/religious-knowledge/foundations-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "finalize_upload" }),
+      });
+      const finalizeData = (await finalizeRes.json().catch(() => ({}))) as Record<string, unknown>;
+      if (!finalizeRes.ok) {
+        setError(
+          `${finalizeRes.status} ${finalizeRes.statusText}${finalizeData.error ? ` - ${String(finalizeData.error)}` : ""}`
+        );
+        return;
+      }
+
+      if (finalizeData.warning) setWarning(String(finalizeData.warning));
+      setUrl((finalizeData.file_url as string | null) ?? null);
       setFile(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");

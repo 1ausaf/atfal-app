@@ -90,7 +90,7 @@ export async function SalatProgressWidget() {
       </div>
       {(salatStar || salatSuperstar) && (
         <p className="text-xs text-gta-primary font-medium">
-          +100 bonus on homework and lessons.
+          Lesson bonus only: Star +10%, Superstar +25%.
         </p>
       )}
       <Link href="/learn/salat" className="link-kid text-sm inline-block">

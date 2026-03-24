@@ -25,6 +25,16 @@ export async function PATCH(request: Request) {
 
   const body = await request.json();
   const { date_of_birth, name, majlis_id } = body;
+  if (session.user.role === "tifl") {
+    const attemptsLockedFieldEdit =
+      name !== undefined || date_of_birth !== undefined || majlis_id !== undefined;
+    if (attemptsLockedFieldEdit) {
+      return NextResponse.json(
+        { error: "Tifl profile fields are locked for Season 2. Contact your Nazim for changes." },
+        { status: 403 }
+      );
+    }
+  }
 
   let age: number | null = null;
   let age_group: string | null = null;

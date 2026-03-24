@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { ProfileForm } from "@/components/profile-form";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -12,19 +13,16 @@ export default async function ProfilePage() {
   const supabase = createSupabaseServerClient();
   const { data: user } = await supabase
     .from("users")
-    .select("id, name, age, age_group, majlis_id, date_of_birth")
+    .select("id, name, age, age_group, majlis_id, date_of_birth, salat_star, salat_superstar, season1_points, season1_player_badge")
     .eq("id", session.user.id)
     .single();
 
   if (!user) redirect("/dashboard");
 
-  let salatStar = false;
-  let salatSuperstar = false;
-  const { data: u, error: _e } = await supabase.from("users").select("salat_star, salat_superstar").eq("id", session.user.id).single();
-  if (!_e && u) {
-    salatStar = (u as { salat_star?: boolean }).salat_star === true;
-    salatSuperstar = (u as { salat_superstar?: boolean }).salat_superstar === true;
-  }
+  const salatStar = (user as { salat_star?: boolean }).salat_star === true;
+  const salatSuperstar = (user as { salat_superstar?: boolean }).salat_superstar === true;
+  const season1PlayerBadge = (user as { season1_player_badge?: boolean }).season1_player_badge === true;
+  const season1Points = (user as { season1_points?: number | null }).season1_points ?? 0;
 
   const { data: majlisList } = await supabase.from("majlis").select("id, name").order("name");
 
@@ -46,9 +44,27 @@ export default async function ProfilePage() {
           <span className="font-semibold text-red-800 dark:text-red-200">Salat Superstar</span>
         </div>
       )}
+      {season1PlayerBadge && (
+        <div className="flex items-center gap-3 mb-3 p-3 rounded-lg bg-amber-50 border border-amber-300 dark:bg-amber-900/40 dark:border-amber-600">
+          <Image
+            src="/badges/season-1-player.svg"
+            alt="Season 1 Player badge"
+            width={48}
+            height={48}
+            className="shrink-0"
+          />
+          <span className="font-semibold text-amber-900 dark:text-amber-200">Season 1 Player</span>
+        </div>
+      )}
+      <div className="mb-4 p-3 rounded-lg bg-sky-50 border border-sky-300 dark:bg-sky-900/40 dark:border-sky-600">
+        <p className="text-xs font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-200">
+          Season 1 points (locked)
+        </p>
+        <p className="text-2xl font-bold text-sky-900 dark:text-sky-100">{season1Points}</p>
+      </div>
       {(salatStar || salatSuperstar) && (
         <p className="text-sm text-gta-textSecondary mb-4">
-          You earn +100 bonus points on every homework and lesson you complete.
+          Salat Star gives +10% lesson points. Salat Superstar gives +25% lesson points.
         </p>
       )}
       <ProfileForm
@@ -61,6 +77,7 @@ export default async function ProfilePage() {
         }}
         majlisList={majlisList ?? []}
         canEditMajlis={session.user.role === "regional_nazim" || session.user.role === "admin"}
+        readOnly={session.user.role === "tifl"}
       />
     </div>
   );

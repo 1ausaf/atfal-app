@@ -4,6 +4,13 @@ import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
 
+function getSalatLessonMultiplier(user: { salat_star?: boolean; salat_superstar?: boolean } | null): number {
+  if (!user) return 0;
+  if (user.salat_superstar === true) return 0.25;
+  if (user.salat_star === true) return 0.1;
+  return 0;
+}
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -46,9 +53,16 @@ export async function POST(
   }
 
   const status = hasLongAnswer ? "pending" : "graded";
-  const { data: userRow } = await supabase.from("users").select("salat_star, salat_superstar").eq("id", session.user.id).single();
-  const hasBadge = (userRow as { salat_star?: boolean; salat_superstar?: boolean } | null)?.salat_star === true || (userRow as { salat_superstar?: boolean } | null)?.salat_superstar === true;
-  const pointsAwarded = autoPoints + (hasBadge ? 100 : 0);
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("salat_star, salat_superstar")
+    .eq("id", session.user.id)
+    .single();
+  const multiplier = getSalatLessonMultiplier(
+    userRow as { salat_star?: boolean; salat_superstar?: boolean } | null
+  );
+  const bonusPoints = Math.round(autoPoints * multiplier);
+  const pointsAwarded = autoPoints + bonusPoints;
 
   const { data, error } = await supabase
     .from("lesson_submissions")
