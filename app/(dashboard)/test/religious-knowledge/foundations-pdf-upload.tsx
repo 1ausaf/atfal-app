@@ -6,6 +6,7 @@ export function FoundationsPdfUpload({ initialUrl }: { initialUrl: string | null
   const [url, setUrl] = useState(initialUrl);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleUpload(e: React.FormEvent) {
@@ -14,21 +15,34 @@ export function FoundationsPdfUpload({ initialUrl }: { initialUrl: string | null
       setError("Please choose a PDF file first.");
       return;
     }
+    const nameLooksPdf = file.name.toLowerCase().endsWith(".pdf");
+    const typeLooksPdf = file.type === "application/pdf";
+    if (!nameLooksPdf && !typeLooksPdf) {
+      setError(`Selected file is not recognized as PDF (name: ${file.name}, type: ${file.type || "unknown"}).`);
+      return;
+    }
     setError(null);
+    setWarning(null);
     setLoading(true);
     try {
       const form = new FormData();
       form.set("pdf", file);
       const res = await fetch("/api/religious-knowledge/foundations-pdf", { method: "POST", body: form });
-      const data = await res.json();
+      let data: Record<string, unknown> = {};
+      try {
+        data = await res.json();
+      } catch {
+        // non-json response
+      }
       if (!res.ok) {
-        setError(data.error ?? "Upload failed");
+        setError(`${res.status} ${res.statusText}${data.error ? ` - ${String(data.error)}` : ""}`);
         return;
       }
-      setUrl(data.file_url ?? null);
+      if (data.warning) setWarning(String(data.warning));
+      setUrl((data.file_url as string | null) ?? null);
       setFile(null);
-    } catch {
-      setError("Upload failed");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed");
     } finally {
       setLoading(false);
     }
@@ -52,6 +66,7 @@ export function FoundationsPdfUpload({ initialUrl }: { initialUrl: string | null
         </button>
       </div>
       {error && <p className="text-sm text-red-600 dark:text-red-400 mt-2">{error}</p>}
+      {warning && <p className="text-sm text-amber-700 dark:text-amber-400 mt-2">{warning}</p>}
       {url && (
         <p className="text-sm text-gta-textSecondary mt-2">
           Current file:{" "}
