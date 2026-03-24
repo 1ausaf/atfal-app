@@ -13,6 +13,11 @@ export default async function AdminPage() {
       <h1 className="text-2xl font-bold mb-4 text-gta-text">Admin</h1>
       <ul className="space-y-2">
         <li>
+          <Link href="/admin/majlis-competition" className="link-kid font-medium">
+            Majlis Competition — Goal, prize, and fairness settings
+          </Link>
+        </li>
+        <li>
           <Link href="/admin/analytics" className="link-kid font-medium">
             Analytics — Active Tifls by Majlis
           </Link>

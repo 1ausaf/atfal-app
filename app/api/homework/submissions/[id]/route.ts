@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
 
 export async function GET(
   _request: Request,
@@ -38,11 +39,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const { data: hw } = await supabase.from("homework").select("majlis_id").eq("id", sub.homework_id).single();
   if (session.user.role === "local_nazim" && hw?.majlis_id !== session.user.majlisId)
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  let points = Math.max(0, Number(points_awarded) || 0);
+  let points = Math.min(100, Math.max(0, Number(points_awarded) || 0));
   if (status === "approved") {
     const { data: u } = await supabase.from("users").select("salat_star, salat_superstar").eq("id", (sub as { user_id: string }).user_id).single();
     const hasBadge = (u as { salat_star?: boolean; salat_superstar?: boolean } | null)?.salat_star === true || (u as { salat_superstar?: boolean } | null)?.salat_superstar === true;
     if (hasBadge) points += 100;
+    points = Math.min(100, points);
   }
   const updates: Record<string, unknown> = {
     status,
@@ -52,5 +54,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (status === "approved") updates.points_awarded = points;
   const { error } = await supabase.from("homework_submissions").update(updates).eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (status === "approved" && points > 0) {
+    await recordMajlisCompetitionContribution({
+      userId: (sub as { user_id: string }).user_id,
+      majlisId: hw?.majlis_id ?? null,
+      rawPoints: points,
+      homeworkPoints: points,
+      eventType: "homework",
+    });
+  }
   return NextResponse.json({ ok: true });
 }

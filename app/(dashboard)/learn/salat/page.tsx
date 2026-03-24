@@ -30,6 +30,9 @@ export default async function SalatHubPage() {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <section>
+        <Link href="/learn/courses" className="link-kid text-sm inline-block mb-3">
+          ← Back to Courses
+        </Link>
         <h1 className="text-3xl font-bold mb-2 text-gta-text">Salat Course</h1>
         <p className="text-gta-textSecondary mb-6">
           Arabic: <strong className="text-gta-primary">{arabicCount}/{TOTAL}</strong>

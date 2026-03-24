@@ -2,6 +2,7 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { getTodayToronto, getYesterdayToronto } from "@/lib/datetime";
+import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
 import bcrypt from "bcryptjs";
 
 declare module "next-auth" {
@@ -104,6 +105,13 @@ export const authOptions: NextAuthOptions = {
               },
               { onConflict: "user_id" }
             );
+            await recordMajlisCompetitionContribution({
+              userId: user.id,
+              majlisId: (user as { majlis_id?: string | null }).majlis_id ?? null,
+              rawPoints: points,
+              homeworkPoints: 0,
+              eventType: "login",
+            });
           }
         }
       } catch {

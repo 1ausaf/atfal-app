@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { SalatPendingList } from "./salat-pending-list";
+import Link from "next/link";
 
 export default async function SalatPendingPage() {
   const session = await getServerSession(authOptions);
@@ -64,6 +65,9 @@ export default async function SalatPendingPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
+      <Link href="/test" className="link-kid text-sm inline-flex items-center gap-1 mb-4">
+        <span aria-hidden>←</span> Back to TEST
+      </Link>
       <h1 className="text-2xl font-bold mb-4 text-gta-text">Salat test requests</h1>
       <p className="text-gta-textSecondary mb-6">
         Mark each section as Pass or Fail: <strong>Arabic Only</strong> and <strong>Arabic with Translation</strong>.

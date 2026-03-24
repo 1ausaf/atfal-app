@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
 
 export async function PATCH(
   request: Request,
@@ -21,6 +22,7 @@ export async function PATCH(
 
   if (typeof pointsAwardedOverride === "number" && isRegionalOrAdmin) {
     const points = Math.max(0, Math.floor(pointsAwardedOverride));
+    const { data: userRow } = await supabase.from("users").select("majlis_id").eq("id", (sub as { user_id: string }).user_id).maybeSingle();
     const { error } = await supabase
       .from("lesson_submissions")
       .update({
@@ -31,6 +33,15 @@ export async function PATCH(
       })
       .eq("id", id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (points > 0) {
+      await recordMajlisCompetitionContribution({
+        userId: (sub as { user_id: string }).user_id,
+        majlisId: userRow?.majlis_id ?? null,
+        rawPoints: points,
+        homeworkPoints: 0,
+        eventType: "lesson",
+      });
+    }
     return NextResponse.json({ ok: true });
   }
 
@@ -41,6 +52,7 @@ export async function PATCH(
   const { data: u } = await supabase.from("users").select("salat_star, salat_superstar").eq("id", (sub as { user_id: string }).user_id).single();
   const hasBadge = (u as { salat_star?: boolean; salat_superstar?: boolean } | null)?.salat_star === true || (u as { salat_superstar?: boolean } | null)?.salat_superstar === true;
   if (hasBadge) totalPoints += 100;
+  const { data: userRow } = await supabase.from("users").select("majlis_id").eq("id", (sub as { user_id: string }).user_id).maybeSingle();
   const { error } = await supabase
     .from("lesson_submissions")
     .update({
@@ -51,5 +63,14 @@ export async function PATCH(
     })
     .eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (totalPoints > 0) {
+    await recordMajlisCompetitionContribution({
+      userId: (sub as { user_id: string }).user_id,
+      majlisId: userRow?.majlis_id ?? null,
+      rawPoints: totalPoints,
+      homeworkPoints: 0,
+      eventType: "lesson",
+    });
+  }
   return NextResponse.json({ ok: true });
 }

@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import { getWordleDayToronto } from "@/lib/datetime";
 import { getWordIndexFromSeed, getFeedback } from "@/lib/wordle";
 import { WORDLE_FALLBACK_WORDS } from "@/lib/wordle-fallback-words";
+import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
 
 const WORDLE_POINTS = 50;
 
@@ -76,6 +77,13 @@ export async function POST(request: Request) {
         { onConflict: "user_id,activity_date,activity_type" }
       );
       pointsAwarded = WORDLE_POINTS;
+      await recordMajlisCompetitionContribution({
+        userId: session.user.id,
+        majlisId: session.user.majlisId,
+        rawPoints: WORDLE_POINTS,
+        homeworkPoints: 0,
+        eventType: "wordle",
+      });
     }
   }
 

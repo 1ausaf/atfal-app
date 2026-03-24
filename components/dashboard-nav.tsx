@@ -192,7 +192,7 @@ export function DashboardNav({
             count={navCounts.lessons}
             onNavigate={closeDropdown}
           />
-          <DropdownItem href="/learn/salat" label="Salat" onNavigate={closeDropdown} />
+          <DropdownItem href="/learn/courses" label="Courses" onNavigate={closeDropdown} />
         </Dropdown>
       )}
 
@@ -208,7 +208,7 @@ export function DashboardNav({
           <DropdownItem href="/homework" label="Homework" onNavigate={closeDropdown} />
           <DropdownItem href="/events" label="Events" onNavigate={closeDropdown} />
           {(isRegionalNazim || isLocalNazim) && (
-            <DropdownItem href="/learn/salat/pending" label="Salat tests" onNavigate={closeDropdown} />
+            <DropdownItem href="/test" label="TEST" onNavigate={closeDropdown} />
           )}
           <DropdownItem href="/lessons" label="Lessons" onNavigate={closeDropdown} />
         </Dropdown>
@@ -222,6 +222,7 @@ export function DashboardNav({
           panelRef={adminRef}
         >
           <DropdownItem href="/admin" label="Overview" onNavigate={closeDropdown} />
+          <DropdownItem href="/admin/majlis-competition" label="Majlis competition" onNavigate={closeDropdown} />
           <DropdownItem href="/admin/analytics" label="Analytics" onNavigate={closeDropdown} />
           <DropdownItem href="/admin/analytics/lesson-completion" label="Lesson completion" onNavigate={closeDropdown} />
           <DropdownItem href="/admin/chats" label="All Chats" onNavigate={closeDropdown} />

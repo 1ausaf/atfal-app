@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
 
 export async function POST(
   request: Request,
@@ -68,6 +69,15 @@ export async function POST(
   }
   const payload = data ?? { ok: true };
   if (status === "graded" && typeof pointsAwarded === "number") {
+    if (pointsAwarded > 0) {
+      await recordMajlisCompetitionContribution({
+        userId: session.user.id,
+        majlisId: session.user.majlisId,
+        rawPoints: pointsAwarded,
+        homeworkPoints: 0,
+        eventType: "lesson",
+      });
+    }
     return NextResponse.json({ ...payload, points_awarded: pointsAwarded });
   }
   return NextResponse.json(payload);

@@ -1,0 +1,67 @@
+import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { createSupabaseServerClient } from "@/lib/supabase";
+
+const BUCKET = "religious-knowledge-pdfs";
+const MAX_SIZE = 20 * 1024 * 1024; // 20MB
+const CHECKPOINT_ID = "cp-1";
+
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("religious_knowledge_checkpoint_files")
+    .select("file_url, updated_at")
+    .eq("checkpoint_id", CHECKPOINT_ID)
+    .maybeSingle();
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ file_url: data?.file_url ?? null, updated_at: data?.updated_at ?? null });
+}
+
+export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (session.user.role !== "regional_nazim" && session.user.role !== "admin") {
+    return NextResponse.json({ error: "Only Regional Nazim can upload Foundations PDF" }, { status: 403 });
+  }
+
+  const formData = await request.formData();
+  const file = formData.get("pdf");
+  if (!file || !(file instanceof File)) return NextResponse.json({ error: "No PDF file" }, { status: 400 });
+  if (file.type !== "application/pdf") return NextResponse.json({ error: "Only PDF files allowed" }, { status: 400 });
+  if (file.size > MAX_SIZE) return NextResponse.json({ error: "File too large (max 20MB)" }, { status: 400 });
+
+  const supabase = createSupabaseServerClient();
+  const { error: bucketError } = await supabase.storage.createBucket(BUCKET, { public: true });
+  if (bucketError && !bucketError.message?.toLowerCase?.().includes("already exists")) {
+    return NextResponse.json({ error: bucketError.message }, { status: 500 });
+  }
+
+  const path = `${CHECKPOINT_ID}/${randomUUID()}.pdf`;
+  const ab = await file.arrayBuffer();
+  const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, ab, {
+    contentType: "application/pdf",
+    upsert: false,
+  });
+  if (uploadError) return NextResponse.json({ error: uploadError.message }, { status: 500 });
+
+  const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  const url = urlData.publicUrl;
+
+  const { error: saveError } = await supabase.from("religious_knowledge_checkpoint_files").upsert(
+    {
+      checkpoint_id: CHECKPOINT_ID,
+      file_url: url,
+      uploaded_by: session.user.id,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "checkpoint_id" }
+  );
+  if (saveError) return NextResponse.json({ error: saveError.message }, { status: 500 });
+
+  return NextResponse.json({ file_url: url });
+}

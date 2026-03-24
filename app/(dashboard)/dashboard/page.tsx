@@ -9,7 +9,6 @@ import { HomeworkDueWidget } from "@/components/homework-due-widget";
 import { LessonActivitiesWidget } from "@/components/lesson-activities-widget";
 import { LoginRewardBanner, LoginStreakDisplay } from "@/components/login-reward-banner";
 import { SalatProgressWidget } from "@/components/salat-progress-widget";
-import { CompetitionCountdown } from "@/components/competition-countdown";
 import Link from "next/link";
 
 async function getSubmissionsToMark(role: string, majlisId: string | null) {
@@ -78,7 +77,7 @@ export default async function DashboardPage() {
 
   if (session.user.role === "tifl") {
     return (
-      <div className="max-w-6xl mx-auto min-h-dvh grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 md:p-5">
+      <div className="max-w-6xl mx-auto min-h-dvh grid grid-rows-[auto_auto_1fr] gap-4 p-4 md:p-5">
         <div className="flex flex-wrap items-center gap-4 shrink-0">
           <h1 className="text-xl font-bold text-gta-text tracking-tight">Dashboard</h1>
           <LoginRewardBanner
@@ -89,7 +88,6 @@ export default async function DashboardPage() {
           />
           <LoginStreakDisplay currentStreak={loginReward.currentStreak} />
         </div>
-        <CompetitionCountdown />
         <section className="card-kid p-4 shrink-0 flex flex-col border-l-4 border-l-gta-primary">
           <h2 className="font-bold text-base mb-2 text-gta-text">Salat course progress</h2>
           <SalatProgressWidget />
@@ -135,9 +133,6 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-5">
       <h1 className="text-2xl font-bold mb-6 text-gta-text tracking-tight">Dashboard</h1>
-      <div className="mb-6">
-        <CompetitionCountdown />
-      </div>
       <div className="grid gap-6 md:grid-cols-2">
         <section className="card-kid p-5">
           <h2 className="font-bold text-lg mb-3 text-gta-text">Upcoming events</h2>

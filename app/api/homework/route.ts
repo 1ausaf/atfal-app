@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { getStartOfTodayTorontoISO } from "@/lib/datetime";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -43,6 +44,18 @@ export async function POST(request: Request) {
     if (!majlisId) return NextResponse.json({ error: "Majlis required" }, { status: 400 });
   }
   const supabase = createSupabaseServerClient();
+  if (session.user.role === "local_nazim") {
+    const todayStartIso = getStartOfTodayTorontoISO();
+    const { count, error: dayCountError } = await supabase
+      .from("homework")
+      .select("*", { count: "exact", head: true })
+      .eq("created_by", session.user.id)
+      .gte("created_at", todayStartIso);
+    if (dayCountError) return NextResponse.json({ error: dayCountError.message }, { status: 500 });
+    if ((count ?? 0) >= 5) {
+      return NextResponse.json({ error: "Daily homework assignment limit reached (max 5)." }, { status: 400 });
+    }
+  }
   if (lesson_activity_id) {
     const { data: lesson } = await supabase.from("lesson_activities").select("id").eq("id", lesson_activity_id).single();
     if (!lesson) return NextResponse.json({ error: "Lesson not found" }, { status: 400 });
