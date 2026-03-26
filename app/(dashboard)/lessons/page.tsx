@@ -35,13 +35,8 @@ export default async function LessonsPage() {
   const isRegional = session.user.role === "regional_nazim" || session.user.role === "admin";
   const canCreateLesson = session.user.role === "local_nazim" || isRegional;
   const canGradeLessons = session.user.role === "local_nazim" || isRegional;
-  const visibleActivities =
-    isTifl && tiflAgeGroup != null
-      ? (activities ?? []).filter((activity) => {
-          const groups = Array.isArray(activity.target_age_groups) ? (activity.target_age_groups as string[]) : ["all"];
-          return groups.includes("all") || groups.includes(tiflAgeGroup!);
-        })
-      : activities ?? [];
+  const allActivities = activities ?? [];
+  const visibleActivities = allActivities;
 
   let incompleteActivities = visibleActivities;
   let pastActivities: typeof activities = [];
@@ -161,6 +156,7 @@ export default async function LessonsPage() {
           pastActivities={pastActivities}
           submissionByActivityId={submissionByActivityId}
           pointsAvailableByActivityId={pointsAvailableByActivityId}
+          tiflAgeGroup={tiflAgeGroup}
         />
       ) : (
         <>

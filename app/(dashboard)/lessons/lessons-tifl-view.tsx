@@ -15,6 +15,7 @@ interface Activity {
   type: string;
   thumbnail_url?: string | null;
   section_id?: string | null;
+  target_age_groups?: string[] | null;
   created_at: string;
 }
 
@@ -38,6 +39,7 @@ interface LessonsTiflViewProps {
   pastActivities: Activity[];
   submissionByActivityId: Record<string, SubmissionInfo>;
   pointsAvailableByActivityId: Record<string, number>;
+  tiflAgeGroup: string | null;
 }
 
 export function LessonsTiflView({
@@ -47,6 +49,7 @@ export function LessonsTiflView({
   pastActivities,
   submissionByActivityId,
   pointsAvailableByActivityId,
+  tiflAgeGroup,
 }: LessonsTiflViewProps) {
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
 
@@ -75,6 +78,20 @@ export function LessonsTiflView({
   const visiblePast =
     selectedSectionId != null ? pastActivities.filter((a) => a.section_id === selectedSectionId) : pastActivities;
 
+  function getAllowedAgeText(groups: string[]): string {
+    if (groups.includes("all")) return "all ages";
+    return groups.map((group) => `ages ${group}`).join(", ");
+  }
+
+  function canAccess(activity: Activity): boolean {
+    const groups = Array.isArray(activity.target_age_groups) && activity.target_age_groups.length > 0
+      ? activity.target_age_groups
+      : ["all"];
+    if (groups.includes("all")) return true;
+    if (!tiflAgeGroup) return false;
+    return groups.includes(tiflAgeGroup);
+  }
+
   function LessonList({
     items,
   }: {
@@ -86,11 +103,16 @@ export function LessonsTiflView({
         {items.map((a) => {
           const sub = submissionByActivityId[a.id];
           const pointsAvailable = pointsAvailableByActivityId[a.id] ?? 0;
+          const accessible = canAccess(a);
+          const groups = Array.isArray(a.target_age_groups) && a.target_age_groups.length > 0
+            ? a.target_age_groups
+            : ["all"];
           return (
-            <li key={a.id} className="content-module-item">
+            <li key={a.id} className={`content-module-item ${accessible ? "" : "opacity-60"}`}>
               <div className="flex justify-between items-start gap-4">
                 <div className="flex gap-4 min-w-0 flex-1">
                   {a.thumbnail_url && (
+                    accessible ? (
                     <Link href={`/lessons/${a.id}`} className="shrink-0 block">
                       <div className="relative w-20 h-[60px]">
                         <Image
@@ -110,12 +132,31 @@ export function LessonsTiflView({
                         )}
                       </div>
                     </Link>
+                    ) : (
+                      <div className="shrink-0 block cursor-not-allowed" aria-disabled>
+                        <div className="relative w-20 h-[60px]">
+                          <Image
+                            src={a.thumbnail_url}
+                            alt=""
+                            width={80}
+                            height={60}
+                            className="rounded-lg object-cover w-20 h-[60px] grayscale"
+                          />
+                        </div>
+                      </div>
+                    )
                   )}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Link href={`/lessons/${a.id}`} className="font-semibold text-lg text-gta-text hover:underline">
-                        {a.title}
-                      </Link>
+                      {accessible ? (
+                        <Link href={`/lessons/${a.id}`} className="font-semibold text-lg text-gta-text hover:underline">
+                          {a.title}
+                        </Link>
+                      ) : (
+                        <span className="font-semibold text-lg text-gta-text">
+                          {a.title}
+                        </span>
+                      )}
                       {pointsAvailable > 0 && !sub && <PointsBadge points={pointsAvailable} />}
                       {sub && pointsAvailable > 0 && (
                         <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -126,6 +167,11 @@ export function LessonsTiflView({
                     </div>
                     {a.description && (
                       <p className="mt-2 text-gta-textSecondary line-clamp-2">{a.description}</p>
+                    )}
+                    {!accessible && (
+                      <p className="mt-1 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                        Content only for {getAllowedAgeText(groups)}.
+                      </p>
                     )}
                     {sub && (
                       <p className="mt-1 text-sm text-gta-textSecondary">
