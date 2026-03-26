@@ -14,6 +14,18 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
   const supabase = createSupabaseServerClient();
   const { data: activity } = await supabase.from("lesson_activities").select("*").eq("id", id).single();
   if (!activity) notFound();
+  if (session.user.role === "tifl") {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("age_group")
+      .eq("id", session.user.id)
+      .maybeSingle();
+    const tiflAgeGroup = profile?.age_group;
+    const targetAgeGroups = Array.isArray(activity.target_age_groups) ? (activity.target_age_groups as string[]) : ["all"];
+    if (!(targetAgeGroups.includes("all") || (tiflAgeGroup != null && targetAgeGroups.includes(tiflAgeGroup)))) {
+      notFound();
+    }
+  }
   const { data: questions } = await supabase
     .from("lesson_questions")
     .select("*")

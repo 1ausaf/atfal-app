@@ -14,8 +14,16 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
   const { data: hw } = await supabase.from("homework").select("*").eq("id", id).single();
   if (!hw) notFound();
   if (session.user.role === "tifl") {
+    const { data: tiflProfile } = await supabase
+      .from("users")
+      .select("age_group")
+      .eq("id", session.user.id)
+      .maybeSingle();
+    const tiflAgeGroup = tiflProfile?.age_group;
     if (hw.majlis_id != null && hw.majlis_id !== session.user.majlisId) notFound();
     if (hw.release_at != null && new Date(hw.release_at) > new Date()) notFound();
+    const targetAgeGroups = Array.isArray(hw.target_age_groups) ? (hw.target_age_groups as string[]) : ["all"];
+    if (!(targetAgeGroups.includes("all") || (tiflAgeGroup != null && targetAgeGroups.includes(tiflAgeGroup)))) notFound();
   }
   if (session.user.role === "local_nazim" && hw.majlis_id !== session.user.majlisId) notFound();
 

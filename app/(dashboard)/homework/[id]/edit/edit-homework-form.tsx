@@ -12,9 +12,16 @@ interface HomeworkData {
   links: string[];
   release_at?: string | null;
   lesson_activity_id?: string | null;
+  target_age_groups?: string[] | null;
 }
 
 type Scope = "region" | "majlis";
+const AGE_GROUP_OPTIONS = [
+  { value: "all", label: "All age groups" },
+  { value: "7-9", label: "Ages 7-9" },
+  { value: "10-11", label: "Ages 10-11" },
+  { value: "12-14", label: "Ages 12-14" },
+] as const;
 
 interface EditHomeworkFormProps {
   homework: HomeworkData;
@@ -44,8 +51,25 @@ export function EditHomeworkForm({ homework, majlisList, lessonList, isRegional,
   const [lessonActivityId, setLessonActivityId] = useState(homework.lesson_activity_id ?? "");
   const [scope, setScope] = useState<Scope>(homework.majlis_id == null ? "region" : "majlis");
   const [majlisId, setMajlisId] = useState(homework.majlis_id ?? defaultMajlisId ?? "");
+  const [targetAgeGroups, setTargetAgeGroups] = useState<string[]>(
+    Array.isArray(homework.target_age_groups) && homework.target_age_groups.length > 0
+      ? homework.target_age_groups
+      : ["all"]
+  );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  function toggleAgeGroup(value: string) {
+    setTargetAgeGroups((current) => {
+      if (value === "all") return ["all"];
+      const withoutAll = current.filter((item) => item !== "all");
+      if (withoutAll.includes(value)) {
+        const next = withoutAll.filter((item) => item !== value);
+        return next.length > 0 ? next : ["all"];
+      }
+      return [...withoutAll, value];
+    });
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -68,6 +92,7 @@ export function EditHomeworkForm({ homework, majlisList, lessonList, isRegional,
           ...(payloadMajlisId !== undefined && { majlis_id: payloadMajlisId }),
           release_at: releaseAt.trim() ? releaseAt.trim() : null,
           lesson_activity_id: lessonActivityId || null,
+          target_age_groups: targetAgeGroups,
         }),
       });
       if (!res.ok) {
@@ -136,6 +161,22 @@ export function EditHomeworkForm({ homework, majlisList, lessonList, isRegional,
             <option key={l.id} value={l.id}>{l.title}</option>
           ))}
         </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Age-group visibility</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {AGE_GROUP_OPTIONS.map((option) => (
+            <label key={option.value} className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={targetAgeGroups.includes(option.value)}
+                onChange={() => toggleAgeGroup(option.value)}
+                className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
       </div>
       <div>
         <label className="block text-sm font-medium mb-1">Links (one per line or comma-separated)</label>

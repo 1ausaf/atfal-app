@@ -14,12 +14,26 @@ export async function POST(request: Request) {
   if (!homework_id) return NextResponse.json({ error: "homework_id required" }, { status: 400 });
 
   const supabase = createSupabaseServerClient();
-  const { data: hw } = await supabase.from("homework").select("id, majlis_id, release_at").eq("id", homework_id).single();
+  const { data: hw } = await supabase
+    .from("homework")
+    .select("id, majlis_id, release_at, target_age_groups")
+    .eq("id", homework_id)
+    .single();
   if (!hw) return NextResponse.json({ error: "Homework not found" }, { status: 404 });
+  const { data: tiflProfile } = await supabase
+    .from("users")
+    .select("age_group")
+    .eq("id", session.user.id)
+    .maybeSingle();
+  const tiflAgeGroup = tiflProfile?.age_group;
   if (hw.majlis_id != null && hw.majlis_id !== session.user.majlisId)
     return NextResponse.json({ error: "You can only submit homework for your Majlis or region-wide homework" }, { status: 403 });
   if (hw.release_at != null && new Date(hw.release_at) > new Date())
     return NextResponse.json({ error: "Homework is not yet released" }, { status: 403 });
+  const targetAgeGroups = Array.isArray(hw.target_age_groups) ? (hw.target_age_groups as string[]) : ["all"];
+  if (!(targetAgeGroups.includes("all") || (tiflAgeGroup != null && targetAgeGroups.includes(tiflAgeGroup)))) {
+    return NextResponse.json({ error: "This homework is not assigned to your age group" }, { status: 403 });
+  }
 
   const { data, error } = await supabase
     .from("homework_submissions")

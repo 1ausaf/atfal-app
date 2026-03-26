@@ -11,7 +11,17 @@ export default async function HomeworkPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
   const supabase = createSupabaseServerClient();
-  let query = supabase.from("homework").select("id, majlis_id, title, description, due_by, links, release_at, lesson_activity_id, created_at").order("due_by", { ascending: true });
+  let tiflAgeGroup: string | null = null;
+  if (session.user.role === "tifl") {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("age_group")
+      .eq("id", session.user.id)
+      .maybeSingle();
+    tiflAgeGroup = profile?.age_group ?? null;
+    if (!tiflAgeGroup) return <p>Complete your profile to see homework.</p>;
+  }
+  let query = supabase.from("homework").select("id, majlis_id, title, description, due_by, links, release_at, lesson_activity_id, target_age_groups, created_at").order("due_by", { ascending: true });
   let pastAssignments: Array<{
     id: string;
     title: string;
@@ -25,7 +35,8 @@ export default async function HomeworkPage() {
     const nowIso = new Date().toISOString();
     query = query
       .or(`majlis_id.eq.${session.user.majlisId},majlis_id.is.null`)
-      .or(`release_at.is.null,release_at.lte.${nowIso}`);
+      .or(`release_at.is.null,release_at.lte.${nowIso}`)
+      .or(`target_age_groups.cs.{"all"},target_age_groups.cs.{"${tiflAgeGroup}"}`);
   } else if (session.user.role === "local_nazim") {
     if (!session.user.majlisId) return <p>No Majlis assigned.</p>;
     query = query.eq("majlis_id", session.user.majlisId);
@@ -43,21 +54,28 @@ export default async function HomeworkPage() {
     if (approvedHomeworkIds.size > 0) {
       const { data: approvedHomework } = await supabase
         .from("homework")
-        .select("id, title, due_by, links, created_at")
+        .select("id, title, due_by, links, created_at, target_age_groups")
         .in("id", [...approvedHomeworkIds]);
 
       const pointsByHomeworkId = new Map(
         (approvedSubmissions ?? []).map((s) => [s.homework_id, { points_awarded: s.points_awarded as number | null, submitted_at: (s as { submitted_at?: string | null }).submitted_at ?? null }])
       );
 
-      pastAssignments = (approvedHomework ?? []).map((h) => ({
+      pastAssignments = (approvedHomework ?? [])
+        .filter((h) => {
+          const groups = Array.isArray((h as { target_age_groups?: unknown }).target_age_groups)
+            ? ((h as { target_age_groups?: string[] }).target_age_groups ?? [])
+            : ["all"];
+          return groups.includes("all") || (tiflAgeGroup != null && groups.includes(tiflAgeGroup));
+        })
+        .map((h) => ({
         id: h.id,
         title: h.title,
         due_by: h.due_by,
         links: (h.links as string[]) ?? [],
         points_awarded: pointsByHomeworkId.get(h.id)?.points_awarded ?? null,
         submitted_at: pointsByHomeworkId.get(h.id)?.submitted_at ?? null,
-      }));
+        }));
     }
   }
 

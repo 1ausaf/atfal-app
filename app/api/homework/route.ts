@@ -4,20 +4,42 @@ import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { getStartOfTodayTorontoISO } from "@/lib/datetime";
 
+const VALID_AGE_GROUPS = ["all", "7-9", "10-11", "12-14"] as const;
+
+function normalizeTargetAgeGroups(input: unknown): Array<(typeof VALID_AGE_GROUPS)[number]> {
+  if (!Array.isArray(input) || input.length === 0) return ["all"];
+  const filtered = input
+    .map((value) => String(value))
+    .filter((value): value is (typeof VALID_AGE_GROUPS)[number] =>
+      (VALID_AGE_GROUPS as readonly string[]).includes(value)
+    );
+  if (filtered.length === 0) return ["all"];
+  if (filtered.includes("all")) return ["all"];
+  return [...new Set(filtered)];
+}
+
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const supabase = createSupabaseServerClient();
   let query = supabase
     .from("homework")
-    .select("id, majlis_id, title, description, due_by, links, release_at, lesson_activity_id, created_by, created_at")
+    .select("id, majlis_id, title, description, due_by, links, release_at, lesson_activity_id, target_age_groups, created_by, created_at")
     .order("due_by", { ascending: true });
   if (session.user.role === "tifl") {
     if (!session.user.majlisId) return NextResponse.json({ error: "No Majlis" }, { status: 403 });
+    const { data: tiflProfile } = await supabase
+      .from("users")
+      .select("age_group")
+      .eq("id", session.user.id)
+      .maybeSingle();
+    const tiflAgeGroup = tiflProfile?.age_group;
+    if (!tiflAgeGroup) return NextResponse.json({ error: "No age group assigned" }, { status: 403 });
     const nowIso = new Date().toISOString();
     query = query
       .or(`majlis_id.eq.${session.user.majlisId},majlis_id.is.null`)
-      .or(`release_at.is.null,release_at.lte.${nowIso}`);
+      .or(`release_at.is.null,release_at.lte.${nowIso}`)
+      .or(`target_age_groups.cs.{"all"},target_age_groups.cs.{"${tiflAgeGroup}"}`);
   } else if (session.user.role === "local_nazim") {
     if (!session.user.majlisId) return NextResponse.json({ error: "No Majlis" }, { status: 403 });
     query = query.eq("majlis_id", session.user.majlisId);
@@ -33,8 +55,9 @@ export async function POST(request: Request) {
   if (session.user.role !== "local_nazim" && session.user.role !== "regional_nazim" && session.user.role !== "admin")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const body = await request.json();
-  const { title, description, due_by, links, majlis_id, release_at, lesson_activity_id } = body;
+  const { title, description, due_by, links, majlis_id, release_at, lesson_activity_id, target_age_groups } = body;
   if (!title || !due_by) return NextResponse.json({ error: "Title and due_by required" }, { status: 400 });
+  const normalizedTargetAgeGroups = normalizeTargetAgeGroups(target_age_groups);
   let majlisId: string | null;
   if (session.user.role === "regional_nazim" || session.user.role === "admin") {
     majlisId = majlis_id === undefined ? session.user.majlisId : majlis_id;
@@ -71,6 +94,7 @@ export async function POST(request: Request) {
       links: Array.isArray(links) ? links : [],
       release_at: releaseAt,
       lesson_activity_id: lesson_activity_id || null,
+      target_age_groups: normalizedTargetAgeGroups,
       created_by: session.user.id,
     })
     .select("id")

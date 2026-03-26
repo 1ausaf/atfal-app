@@ -25,8 +25,22 @@ export async function POST(
   if (!answers || typeof answers !== "object") return NextResponse.json({ error: "answers required" }, { status: 400 });
 
   const supabase = createSupabaseServerClient();
-  const { data: activity } = await supabase.from("lesson_activities").select("id").eq("id", activityId).single();
+  const { data: activity } = await supabase
+    .from("lesson_activities")
+    .select("id, target_age_groups")
+    .eq("id", activityId)
+    .single();
   if (!activity) return NextResponse.json({ error: "Activity not found" }, { status: 404 });
+  const { data: profile } = await supabase
+    .from("users")
+    .select("age_group")
+    .eq("id", session.user.id)
+    .maybeSingle();
+  const tiflAgeGroup = profile?.age_group;
+  const targetAgeGroups = Array.isArray(activity.target_age_groups) ? (activity.target_age_groups as string[]) : ["all"];
+  if (!(targetAgeGroups.includes("all") || (tiflAgeGroup != null && targetAgeGroups.includes(tiflAgeGroup)))) {
+    return NextResponse.json({ error: "This lesson is not assigned to your age group" }, { status: 403 });
+  }
 
   const { data: questions } = await supabase
     .from("lesson_questions")

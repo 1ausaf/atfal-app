@@ -3,6 +3,20 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 
+const VALID_AGE_GROUPS = ["all", "7-9", "10-11", "12-14"] as const;
+
+function normalizeTargetAgeGroups(input: unknown): Array<(typeof VALID_AGE_GROUPS)[number]> {
+  if (!Array.isArray(input) || input.length === 0) return ["all"];
+  const filtered = input
+    .map((value) => String(value))
+    .filter((value): value is (typeof VALID_AGE_GROUPS)[number] =>
+      (VALID_AGE_GROUPS as readonly string[]).includes(value)
+    );
+  if (filtered.length === 0) return ["all"];
+  if (filtered.includes("all")) return ["all"];
+  return [...new Set(filtered)];
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -13,6 +27,18 @@ export async function GET(
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase.from("lesson_activities").select("*").eq("id", id).single();
   if (error || !data) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (session.user.role === "tifl") {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("age_group")
+      .eq("id", session.user.id)
+      .maybeSingle();
+    const tiflAgeGroup = profile?.age_group;
+    const targetAgeGroups = Array.isArray(data.target_age_groups) ? (data.target_age_groups as string[]) : ["all"];
+    if (!(targetAgeGroups.includes("all") || (tiflAgeGroup != null && targetAgeGroups.includes(tiflAgeGroup)))) {
+      return NextResponse.json({ error: "This lesson is not assigned to your age group" }, { status: 403 });
+    }
+  }
   const { data: questions } = await supabase
     .from("lesson_questions")
     .select("*")
@@ -35,7 +61,7 @@ export async function PATCH(
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await request.json();
-  const { title, description, link, type, thumbnail_url, section_id } = body;
+  const { title, description, link, type, thumbnail_url, section_id, target_age_groups } = body;
   if (!title) return NextResponse.json({ error: "Title required" }, { status: 400 });
   const activityType = type === "article" ? "article" : "video";
 
@@ -47,6 +73,7 @@ export async function PATCH(
   };
   if (thumbnail_url !== undefined)
     updates.thumbnail_url = thumbnail_url != null && thumbnail_url !== "" ? String(thumbnail_url).trim() : null;
+  if (target_age_groups !== undefined) updates.target_age_groups = normalizeTargetAgeGroups(target_age_groups);
   if (section_id !== undefined) {
     if (section_id == null || section_id === "") {
       updates.section_id = null;

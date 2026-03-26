@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+const AGE_GROUP_OPTIONS = [
+  { value: "all", label: "All age groups" },
+  { value: "7-9", label: "Ages 7-9" },
+  { value: "10-11", label: "Ages 10-11" },
+  { value: "12-14", label: "Ages 12-14" },
+] as const;
 
 export function CreateLessonForm() {
   const router = useRouter();
@@ -17,6 +23,7 @@ export function CreateLessonForm() {
   const [loading, setLoading] = useState(false);
   const [sections, setSections] = useState<{ id: string; title: string }[]>([]);
   const [sectionId, setSectionId] = useState<string>("");
+  const [targetAgeGroups, setTargetAgeGroups] = useState<string[]>(["all"]);
 
   useEffect(() => {
     fetch("/api/lessons/sections")
@@ -28,6 +35,18 @@ export function CreateLessonForm() {
       })
       .catch(() => {});
   }, []);
+
+  function toggleAgeGroup(value: string) {
+    setTargetAgeGroups((current) => {
+      if (value === "all") return ["all"];
+      const withoutAll = current.filter((item) => item !== "all");
+      if (withoutAll.includes(value)) {
+        const next = withoutAll.filter((item) => item !== value);
+        return next.length > 0 ? next : ["all"];
+      }
+      return [...withoutAll, value];
+    });
+  }
 
   async function handleThumbnailChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -72,6 +91,7 @@ export function CreateLessonForm() {
           type,
           thumbnail_url: thumbnailUrl || null,
           section_id: sectionId || null,
+          target_age_groups: targetAgeGroups,
         }),
       });
       if (!res.ok) {
@@ -148,6 +168,22 @@ export function CreateLessonForm() {
           </select>
         </div>
       )}
+      <div>
+        <label className="block text-sm font-medium mb-1">Age-group visibility</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {AGE_GROUP_OPTIONS.map((option) => (
+            <label key={option.value} className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={targetAgeGroups.includes(option.value)}
+                onChange={() => toggleAgeGroup(option.value)}
+                className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
       <div>
         <label className="block text-sm font-medium mb-1">Thumbnail (PNG, max 2MB)</label>
         <input

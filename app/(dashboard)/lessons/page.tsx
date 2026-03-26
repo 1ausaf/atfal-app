@@ -13,9 +13,19 @@ export default async function LessonsPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
   const supabase = createSupabaseServerClient();
+  const isTifl = session.user.role === "tifl";
+  let tiflAgeGroup: string | null = null;
+  if (isTifl) {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("age_group")
+      .eq("id", session.user.id)
+      .maybeSingle();
+    tiflAgeGroup = profile?.age_group ?? null;
+  }
   const { data: activities } = await supabase
     .from("lesson_activities")
-    .select("id, title, description, link, type, thumbnail_url, section_id, created_at")
+    .select("id, title, description, link, type, thumbnail_url, section_id, target_age_groups, created_at")
     .order("created_at", { ascending: false });
   const { data: sections } = await supabase
     .from("lesson_sections")
@@ -23,20 +33,28 @@ export default async function LessonsPage() {
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
   const isRegional = session.user.role === "regional_nazim" || session.user.role === "admin";
-  const isTifl = session.user.role === "tifl";
+  const canCreateLesson = session.user.role === "local_nazim" || isRegional;
+  const canGradeLessons = session.user.role === "local_nazim" || isRegional;
+  const visibleActivities =
+    isTifl && tiflAgeGroup != null
+      ? (activities ?? []).filter((activity) => {
+          const groups = Array.isArray(activity.target_age_groups) ? (activity.target_age_groups as string[]) : ["all"];
+          return groups.includes("all") || groups.includes(tiflAgeGroup!);
+        })
+      : activities ?? [];
 
-  let incompleteActivities = activities ?? [];
+  let incompleteActivities = visibleActivities;
   let pastActivities: typeof activities = [];
 
   let submissionByActivityId: Record<string, { points_awarded: number; created_at: string }> = {};
-  if (isTifl && activities?.length) {
+  if (isTifl && visibleActivities.length) {
     const { data: submissions } = await supabase
       .from("lesson_submissions")
       .select("activity_id, points_awarded, created_at")
       .eq("user_id", session.user.id);
     const submittedIds = new Set((submissions ?? []).map((s) => s.activity_id));
-    incompleteActivities = activities.filter((a) => !submittedIds.has(a.id));
-    pastActivities = activities.filter((a) => submittedIds.has(a.id));
+    incompleteActivities = visibleActivities.filter((a) => !submittedIds.has(a.id));
+    pastActivities = visibleActivities.filter((a) => submittedIds.has(a.id));
     for (const s of submissions ?? []) {
       submissionByActivityId[s.activity_id] = {
         points_awarded: s.points_awarded ?? 0,
@@ -45,7 +63,7 @@ export default async function LessonsPage() {
     }
   }
 
-  const activityIds = (activities ?? []).map((a) => a.id);
+  const activityIds = visibleActivities.map((a) => a.id);
   let pointsAvailableByActivityId: Record<string, number> = {};
   if (activityIds.length > 0) {
     const { data: questions } = await supabase
@@ -115,17 +133,19 @@ export default async function LessonsPage() {
       <div className="flex items-center justify-between mb-6 gap-4">
         <h1 className="text-2xl font-bold text-gta-text">Lesson activities</h1>
         <div className="flex items-center gap-3">
-          {isRegional && (
+          {canCreateLesson && (
             <>
               <Link href="/lessons/new" className="px-4 py-2 btn-kid-primary rounded-gta inline-block">
                 Create lesson
               </Link>
-              <Link
-                href="/lessons/submissions"
-                className="px-4 py-2 border-2 border-gta-primary text-gta-primary rounded-gta hover:bg-gta-surfaceSecondary transition-colors inline-block font-semibold"
-              >
-                Grade submissions
-              </Link>
+              {canGradeLessons && (
+                <Link
+                  href="/lessons/submissions"
+                  className="px-4 py-2 border-2 border-gta-primary text-gta-primary rounded-gta hover:bg-gta-surfaceSecondary transition-colors inline-block font-semibold"
+                >
+                  Grade submissions
+                </Link>
+              )}
             </>
           )}
         </div>
@@ -135,7 +155,7 @@ export default async function LessonsPage() {
 
       {isTifl ? (
         <LessonsTiflView
-          activities={activities ?? []}
+          activities={visibleActivities}
           sections={sections ?? []}
           incompleteActivities={incompleteActivities}
           pastActivities={pastActivities}
@@ -144,10 +164,10 @@ export default async function LessonsPage() {
         />
       ) : (
         <>
-          {!activities?.length ? (
+          {!visibleActivities.length ? (
             <p className="text-gta-textSecondary">No lesson activities yet.</p>
           ) : (
-            <LessonListAll items={activities} showThumb />
+            <LessonListAll items={visibleActivities} showThumb />
           )}
         </>
       )}
