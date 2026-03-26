@@ -71,9 +71,9 @@ export function LessonsTiflView({
   const visibleIncomplete =
     selectedSectionId != null
       ? incompleteActivities.filter((a) => a.section_id === selectedSectionId)
-      : [];
+      : incompleteActivities;
   const visiblePast =
-    selectedSectionId != null ? pastActivities.filter((a) => a.section_id === selectedSectionId) : [];
+    selectedSectionId != null ? pastActivities.filter((a) => a.section_id === selectedSectionId) : pastActivities;
 
   function LessonList({
     items,
@@ -241,17 +241,17 @@ export function LessonsTiflView({
         </div>
       </section>
 
-      {selectedSection && (
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-3 gap-2">
-            <div>
-              <h2 className="text-lg font-bold text-gta-text">
-                {selectedSection.title}
-              </h2>
-              <p className="text-xs text-gta-textSecondary dark:text-slate-400">
-                {visibleIncomplete.length} incomplete · {visiblePast.length} completed
-              </p>
-            </div>
+      <section className="mb-8">
+        <div className="flex items-center justify-between mb-3 gap-2">
+          <div>
+            <h2 className="text-lg font-bold text-gta-text">
+              {selectedSection ? selectedSection.title : "All lessons"}
+            </h2>
+            <p className="text-xs text-gta-textSecondary dark:text-slate-400">
+              {visibleIncomplete.length} incomplete · {visiblePast.length} completed
+            </p>
+          </div>
+          {selectedSection && (
             <button
               type="button"
               onClick={() => setSelectedSectionId(null)}
@@ -259,30 +259,30 @@ export function LessonsTiflView({
             >
               Back to sections
             </button>
-          </div>
-
-          {visibleIncomplete.length === 0 && visiblePast.length === 0 ? (
-            <p className="text-gta-textSecondary dark:text-slate-400 text-sm">
-              No lessons in this section yet.
-            </p>
-          ) : (
-            <>
-              {visibleIncomplete.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-base font-semibold text-gta-text mb-2">To complete</h3>
-                  <LessonList items={visibleIncomplete} />
-                </div>
-              )}
-              {visiblePast.length > 0 && (
-                <div>
-                  <h3 className="text-base font-semibold text-gta-text mb-2">Past lessons</h3>
-                  <LessonList items={visiblePast} />
-                </div>
-              )}
-            </>
           )}
-        </section>
-      )}
+        </div>
+
+        {visibleIncomplete.length === 0 && visiblePast.length === 0 ? (
+          <p className="text-gta-textSecondary dark:text-slate-400 text-sm">
+            No lessons available yet.
+          </p>
+        ) : (
+          <>
+            {visibleIncomplete.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-base font-semibold text-gta-text mb-2">To complete</h3>
+                <LessonList items={visibleIncomplete} />
+              </div>
+            )}
+            {visiblePast.length > 0 && (
+              <div>
+                <h3 className="text-base font-semibold text-gta-text mb-2">Past lessons</h3>
+                <LessonList items={visiblePast} />
+              </div>
+            )}
+          </>
+        )}
+      </section>
     </>
   );
 }
