@@ -39,7 +39,9 @@ export async function GET(request: Request) {
     query = query
       .or(`majlis_id.eq.${session.user.majlisId},majlis_id.is.null`)
       .or(`release_at.is.null,release_at.lte.${nowIso}`)
-      .or(`target_age_groups.cs.{"all"},target_age_groups.cs.{"${tiflAgeGroup}"}`);
+      .or(
+        `target_age_groups.cs.{"all"},target_age_groups.cs.{"${tiflAgeGroup}"},target_age_groups.is.null`
+      );
   } else if (session.user.role === "local_nazim") {
     if (!session.user.majlisId) return NextResponse.json({ error: "No Majlis" }, { status: 403 });
     query = query.eq("majlis_id", session.user.majlisId);

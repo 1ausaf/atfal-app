@@ -33,7 +33,9 @@ export async function GET() {
       .maybeSingle();
     const tiflAgeGroup = profile?.age_group;
     if (!tiflAgeGroup) return NextResponse.json({ error: "No age group assigned" }, { status: 403 });
-    query = query.or(`target_age_groups.cs.{"all"},target_age_groups.cs.{"${tiflAgeGroup}"}`);
+    query = query.or(
+      `target_age_groups.cs.{"all"},target_age_groups.cs.{"${tiflAgeGroup}"},target_age_groups.is.null`
+    );
   }
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
