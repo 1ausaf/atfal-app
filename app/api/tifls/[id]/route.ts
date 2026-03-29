@@ -14,9 +14,13 @@ export async function PATCH(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const body = await request.json();
-  const { majlis_id, deleted, name, date_of_birth, manual_points } = body;
+  const { majlis_id, deleted, name, date_of_birth, manual_points, banned, banned_reason } = body;
   const supabase = createSupabaseServerClient();
-  const { data: user } = await supabase.from("users").select("id, role, majlis_id, manual_points").eq("id", id).single();
+  const { data: user } = await supabase
+    .from("users")
+    .select("id, role, majlis_id, manual_points")
+    .eq("id", id)
+    .single();
   if (!user || user.role !== "tifl") return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const isLocalNazim = session.user.role === "local_nazim";
@@ -27,6 +31,18 @@ export async function PATCH(
     if (name !== undefined) updates.name = name ? String(name).trim() : null;
     if (date_of_birth !== undefined) updates.date_of_birth = date_of_birth ? String(date_of_birth).trim() : null;
     if (manual_points !== undefined) updates.manual_points = Math.max(0, Math.floor(Number(manual_points)));
+    if (banned === true) {
+      const reason = typeof banned_reason === "string" ? banned_reason.trim() : "";
+      if (!reason) return NextResponse.json({ error: "Ban reason is required" }, { status: 400 });
+      updates.banned_at = new Date().toISOString();
+      updates.banned_reason = reason;
+      updates.banned_by = session.user.id;
+    }
+    if (banned === false) {
+      updates.banned_at = null;
+      updates.banned_reason = null;
+      updates.banned_by = null;
+    }
     const { error } = await supabase.from("users").update(updates).eq("id", id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     if (manual_points !== undefined) {
@@ -51,6 +67,18 @@ export async function PATCH(
   if (deleted === true) updates.deleted_at = new Date().toISOString();
   if (deleted === false) updates.deleted_at = null;
   if (manual_points !== undefined) updates.manual_points = Math.max(0, Math.floor(Number(manual_points)));
+  if (banned === true) {
+    const reason = typeof banned_reason === "string" ? banned_reason.trim() : "";
+    if (!reason) return NextResponse.json({ error: "Ban reason is required" }, { status: 400 });
+    updates.banned_at = new Date().toISOString();
+    updates.banned_reason = reason;
+    updates.banned_by = session.user.id;
+  }
+  if (banned === false) {
+    updates.banned_at = null;
+    updates.banned_reason = null;
+    updates.banned_by = null;
+  }
   const { error } = await supabase.from("users").update(updates).eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (manual_points !== undefined) {

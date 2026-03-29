@@ -8,6 +8,7 @@ export default async function ProfileCompletePage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
   if (session.user.role !== "tifl") redirect("/dashboard");
+  if (session.user.isBanned) redirect("/banned");
   if (session.user.profile_completed) redirect("/dashboard");
 
   const supabase = createSupabaseServerClient();

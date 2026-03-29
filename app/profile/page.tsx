@@ -9,6 +9,7 @@ import Image from "next/image";
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
+  if (session.user.role === "tifl" && session.user.isBanned) redirect("/banned");
 
   const supabase = createSupabaseServerClient();
   const { data: user } = await supabase

@@ -12,6 +12,8 @@ declare module "next-auth" {
       role: string;
       majlisId: string | null;
       profile_completed: boolean;
+      isBanned: boolean;
+      bannedReason: string | null;
       name?: string | null;
       email?: string | null;
       image?: string | null;
@@ -25,6 +27,8 @@ declare module "next-auth/jwt" {
     role?: string;
     majlisId?: string | null;
     profile_completed?: boolean;
+    isBanned?: boolean;
+    bannedReason?: string | null;
   }
 }
 
@@ -41,7 +45,7 @@ export const authOptions: NextAuthOptions = {
         const supabase = createSupabaseServerClient();
         const { data: user, error } = await supabase
           .from("users")
-          .select("id, member_code, password_hash, role, majlis_id, name, profile_completed")
+          .select("id, member_code, password_hash, role, majlis_id, name, profile_completed, banned_at, banned_reason")
           .eq("member_code", credentials.member_code.trim())
           .is("deleted_at", null)
           .single();
@@ -55,6 +59,8 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           majlis_id: user.majlis_id,
           profile_completed: user.profile_completed ?? false,
+          is_banned: user.banned_at != null,
+          banned_reason: user.banned_reason ?? null,
         };
       },
     }),
@@ -125,6 +131,8 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as { role?: string }).role;
         token.majlisId = (user as { majlis_id?: string | null }).majlis_id ?? null;
         token.profile_completed = (user as { profile_completed?: boolean }).profile_completed ?? false;
+        token.isBanned = (user as { is_banned?: boolean }).is_banned ?? false;
+        token.bannedReason = (user as { banned_reason?: string | null }).banned_reason ?? null;
       }
       return token;
     },
@@ -134,6 +142,8 @@ export const authOptions: NextAuthOptions = {
         session.user.role = (token.role as string) ?? "tifl";
         session.user.majlisId = (token.majlisId as string | null) ?? null;
         session.user.profile_completed = (token.profile_completed as boolean) ?? false;
+        session.user.isBanned = (token.isBanned as boolean) ?? false;
+        session.user.bannedReason = (token.bannedReason as string | null) ?? null;
       }
       return session;
     },

@@ -12,6 +12,8 @@ interface TiflRow {
   majlis_id: string | null;
   date_of_birth: string | null;
   manual_points?: number;
+  banned_at?: string | null;
+  banned_reason?: string | null;
   created_at: string;
 }
 
@@ -32,6 +34,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
   const [pointsEditingId, setPointsEditingId] = useState<string | null>(null);
   const [pointsDelta, setPointsDelta] = useState("");
   const [pointsSubmitting, setPointsSubmitting] = useState(false);
+  const [banSubmittingId, setBanSubmittingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isRegional || !filterMajlis) {
@@ -121,6 +124,52 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
     }
   }
 
+  async function handleBan(tiflId: string, currentReason?: string | null) {
+    const reasonInput = prompt("Enter ban reason:", currentReason ?? "");
+    if (reasonInput === null) return;
+    const reason = reasonInput.trim();
+    if (!reason) {
+      alert("Ban reason is required.");
+      return;
+    }
+    setBanSubmittingId(tiflId);
+    try {
+      const res = await fetch(`/api/tifls/${tiflId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ banned: true, banned_reason: reason }),
+      });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const d = await res.json();
+        alert(d.error ?? "Failed to ban tifl");
+      }
+    } finally {
+      setBanSubmittingId(null);
+    }
+  }
+
+  async function handleUnban(tiflId: string) {
+    if (!confirm("Unban this Tifl?")) return;
+    setBanSubmittingId(tiflId);
+    try {
+      const res = await fetch(`/api/tifls/${tiflId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ banned: false }),
+      });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const d = await res.json();
+        alert(d.error ?? "Failed to unban tifl");
+      }
+    } finally {
+      setBanSubmittingId(null);
+    }
+  }
+
   return (
     <div className="space-y-4">
       {isRegional && (
@@ -181,6 +230,11 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                     <span className="text-slate-500 dark:text-slate-400 ml-2">Age {t.age ?? "—"} · {t.age_group ?? "—"}</span>
                     <span className="block text-sm text-slate-500 dark:text-slate-400">{t.majlis_id ? majlisMap.get(t.majlis_id) : "—"}</span>
                     <span className="text-sm text-slate-600 dark:text-slate-300">{(t.manual_points ?? 0)} pts</span>
+                    {t.banned_at && (
+                      <span className="block mt-1 text-xs font-medium text-red-700 dark:text-red-300">
+                        Banned: {t.banned_reason ?? "No reason provided"}
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     {pointsEditingId === t.id ? (
@@ -224,6 +278,25 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                     >
                       My Life
                     </Link>
+                    {t.banned_at ? (
+                      <button
+                        type="button"
+                        disabled={banSubmittingId === t.id}
+                        onClick={() => handleUnban(t.id)}
+                        className="px-3 py-1.5 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Unban
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={banSubmittingId === t.id}
+                        onClick={() => handleBan(t.id)}
+                        className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Ban
+                      </button>
+                    )}
                     {isRegional ? (
                       <>
                         <select

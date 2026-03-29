@@ -51,6 +51,9 @@ export default async function DashboardLayout({
   if (!session) redirect("/login");
 
   const supabase = createSupabaseServerClient();
+  if (session.user.role === "tifl" && session.user.isBanned) {
+    redirect("/banned");
+  }
   if (session.user.role === "tifl") {
     const { data: user } = await supabase
       .from("users")
