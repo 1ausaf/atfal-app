@@ -35,6 +35,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
   const [pointsDelta, setPointsDelta] = useState("");
   const [pointsSubmitting, setPointsSubmitting] = useState(false);
   const [banSubmittingId, setBanSubmittingId] = useState<string | null>(null);
+  const [resettingPointsId, setResettingPointsId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isRegional || !filterMajlis) {
@@ -170,6 +171,30 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
     }
   }
 
+  async function handleResetAllPoints(tiflId: string) {
+    if (
+      !confirm(
+        "Reset ALL points for this Tifl? This zeros manual points, homework and lesson awarded points, login/wordle activity points, login streak, and removes their Majlis competition ledger entries. Season 1 snapshot is not changed."
+      )
+    )
+      return;
+    setResettingPointsId(tiflId);
+    try {
+      const res = await fetch(`/api/tifls/${tiflId}/reset-points`, { method: "POST" });
+      if (res.ok) {
+        setPointsEditingId(null);
+        setPointsDelta("");
+        setTifls((prev) => prev.map((x) => (x.id === tiflId ? { ...x, manual_points: 0 } : x)));
+        router.refresh();
+      } else {
+        const d = await res.json();
+        alert(d.error ?? "Failed to reset points");
+      }
+    } finally {
+      setResettingPointsId(null);
+    }
+  }
+
   return (
     <div className="space-y-4">
       {isRegional && (
@@ -264,13 +289,23 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                         </button>
                       </div>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => openPoints(t)}
-                        className="px-3 py-1.5 bg-amber-500/80 text-white text-sm rounded-lg hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700"
-                      >
-                        Points
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => openPoints(t)}
+                          className="px-3 py-1.5 bg-amber-500/80 text-white text-sm rounded-lg hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700"
+                        >
+                          Points
+                        </button>
+                        <button
+                          type="button"
+                          disabled={resettingPointsId === t.id}
+                          onClick={() => handleResetAllPoints(t.id)}
+                          className="px-3 py-1.5 bg-slate-700 text-white text-sm rounded-lg hover:bg-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Reset all points
+                        </button>
+                      </>
                     )}
                     <Link
                       href={`/tifls/${t.id}/my-life`}
