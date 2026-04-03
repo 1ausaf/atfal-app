@@ -147,6 +147,7 @@ export function DashboardNav({
         )}
         <DropdownItem href="/activities/ijtima" label="IJTIMA" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/wordle" label="WORDLE" onNavigate={closeDropdown} />
+        <DropdownItem href="/activities/crossword" label="Crossword" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/read/newsletter" label="Newsletter" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/read/read" label="Read" onNavigate={closeDropdown} />
       </Dropdown>
@@ -227,6 +228,7 @@ export function DashboardNav({
           <DropdownItem href="/admin/analytics/lesson-completion" label="Lesson completion" onNavigate={closeDropdown} />
           <DropdownItem href="/admin/chats" label="All Chats" onNavigate={closeDropdown} />
           <DropdownItem href="/admin/wordle" label="Wordle" onNavigate={closeDropdown} />
+          <DropdownItem href="/admin/crossword" label="Crossword" onNavigate={closeDropdown} />
         </Dropdown>
       )}
 

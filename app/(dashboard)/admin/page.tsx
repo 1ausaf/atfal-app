@@ -37,6 +37,11 @@ export default async function AdminPage() {
             Wordle — Manage daily words
           </Link>
         </li>
+        <li>
+          <Link href="/admin/crossword" className="link-kid font-medium">
+            Crossword — Manage daily puzzles
+          </Link>
+        </li>
       </ul>
     </div>
   );

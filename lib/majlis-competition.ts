@@ -16,7 +16,7 @@ type CoefficientRow = {
   coefficient: number;
 };
 
-export type ContributionEventType = "login" | "wordle" | "homework" | "lesson" | "manual";
+export type ContributionEventType = "login" | "wordle" | "crossword" | "homework" | "lesson" | "manual";
 
 export function computeCoefficientFromCounts(memberCount: number, averageCount: number) {
   if (memberCount <= 0 || averageCount <= 0) return 0;

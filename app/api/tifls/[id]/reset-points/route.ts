@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 
-/** Zeros all sources that feed `leaderboard.total_points` for one tifl (manual, homework, lessons, login/wordle activity_log, streak). Removes their majlis competition ledger rows. */
+/** Zeros all sources that feed `leaderboard.total_points` for one tifl (manual, homework, lessons, login/wordle/crossword activity_log, streak). Removes their majlis competition ledger rows. */
 export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
