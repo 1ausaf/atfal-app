@@ -208,6 +208,66 @@ export function gridsMatchSolution(userGrid: string[][], puzzle: CrosswordPuzzle
   return true;
 }
 
+/** Full-word check only: every cell in the clue must be filled and match the solution (no partial credit). */
+export function getFullyCorrectClueNumbers(
+  userGrid: string[][],
+  puzzle: CrosswordPuzzleJson
+): { across: number[]; down: number[] } {
+  const { solution, clues } = puzzle;
+  const across: number[] = [];
+  const down: number[] = [];
+
+  for (const cl of clues.across) {
+    let ok = true;
+    for (let k = 0; k < cl.len; k++) {
+      const r = cl.row;
+      const c = cl.col + k;
+      const got = userGrid[r]?.[c] ?? "";
+      if (!/^[A-Z]$/.test(got)) {
+        ok = false;
+        break;
+      }
+      if (isBlock(solution[r]?.[c])) {
+        ok = false;
+        break;
+      }
+      const want = normLetter(solution[r][c]);
+      if (got !== want) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok) across.push(cl.n);
+  }
+
+  for (const cl of clues.down) {
+    let ok = true;
+    for (let k = 0; k < cl.len; k++) {
+      const r = cl.row + k;
+      const c = cl.col;
+      const got = userGrid[r]?.[c] ?? "";
+      if (!/^[A-Z]$/.test(got)) {
+        ok = false;
+        break;
+      }
+      if (isBlock(solution[r]?.[c])) {
+        ok = false;
+        break;
+      }
+      const want = normLetter(solution[r][c]);
+      if (got !== want) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok) down.push(cl.n);
+  }
+
+  across.sort((a, b) => a - b);
+  down.sort((a, b) => a - b);
+  return { across, down };
+}
+
 export function isGridComplete(userGrid: string[][], puzzle: CrosswordPuzzleJson): boolean {
   const { rows, cols, solution } = puzzle;
   for (let r = 0; r < rows; r++) {

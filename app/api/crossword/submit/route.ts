@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { getWordleDayToronto } from "@/lib/datetime";
 import { resolveDailyCrossword } from "@/lib/crossword-daily";
-import { gridsMatchSolution, normalizeUserGrid } from "@/lib/crossword";
+import { getFullyCorrectClueNumbers, gridsMatchSolution, normalizeUserGrid } from "@/lib/crossword";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
 
 const CROSSWORD_POINTS = 50;
@@ -27,7 +27,8 @@ export async function POST(request: Request) {
 
   const correct = gridsMatchSolution(norm.grid, puzzle);
   if (!correct) {
-    return NextResponse.json({ correct: false, pointsAwarded: 0 });
+    const wordFeedback = getFullyCorrectClueNumbers(norm.grid, puzzle);
+    return NextResponse.json({ correct: false, pointsAwarded: 0, wordFeedback });
   }
 
   let pointsAwarded = 0;

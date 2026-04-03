@@ -290,11 +290,80 @@ function placementsToPuzzle(grid: Cell[][], placements: Placement[]): CrosswordP
   acrossClues.sort((a, b) => a.n - b.n || a.row - b.row || a.col - b.col);
   downClues.sort((a, b) => a.n - b.n || a.row - b.row || a.col - b.col);
 
-  return {
+  return centerAndBalanceBuiltPuzzle({
     rows,
     cols,
     solution,
     clues: { across: acrossClues, down: downClues },
+  });
+}
+
+function isLetterSolutionCell(v: string | null | undefined): boolean {
+  if (v == null || v === "#") return false;
+  return /^[A-Z]$/.test(String(v).trim().toUpperCase());
+}
+
+/**
+ * Crop to the letter bounding box, then embed in a square with symmetric padding so the mesh is centered.
+ * Padding cells are blocks (null); interior blacks from the slice stay as word separators.
+ */
+function centerAndBalanceBuiltPuzzle(puzzle: CrosswordPuzzleJson): CrosswordPuzzleJson {
+  const { solution, clues } = puzzle;
+  const R = puzzle.rows;
+  const C = puzzle.cols;
+  let lr0 = R;
+  let lr1 = -1;
+  let lc0 = C;
+  let lc1 = -1;
+  for (let r = 0; r < R; r++) {
+    for (let c = 0; c < C; c++) {
+      if (isLetterSolutionCell(solution[r]?.[c])) {
+        lr0 = Math.min(lr0, r);
+        lr1 = Math.max(lr1, r);
+        lc0 = Math.min(lc0, c);
+        lc1 = Math.max(lc1, c);
+      }
+    }
+  }
+  if (lr1 < 0) return puzzle;
+
+  const h = lr1 - lr0 + 1;
+  const w = lc1 - lc0 + 1;
+  const sub: (string | null)[][] = [];
+  for (let r = lr0; r <= lr1; r++) {
+    const row: (string | null)[] = [];
+    for (let c = lc0; c <= lc1; c++) {
+      row.push(solution[r]?.[c] ?? null);
+    }
+    sub.push(row);
+  }
+
+  const S = Math.max(h, w) + 2;
+  const padTop = Math.floor((S - h) / 2);
+  const padLeft = Math.floor((S - w) / 2);
+  const out: (string | null)[][] = Array.from({ length: S }, () => Array<string | null>(S).fill(null));
+  for (let r = 0; r < h; r++) {
+    for (let c = 0; c < w; c++) {
+      out[padTop + r]![padLeft + c] = sub[r]![c]!;
+    }
+  }
+
+  const dr = padTop - lr0;
+  const dc = padLeft - lc0;
+  const mapClue = (cl: CrosswordClueEntry): CrosswordClueEntry => ({
+    ...cl,
+    row: cl.row + dr,
+    col: cl.col + dc,
+  });
+
+  return {
+    rows: S,
+    cols: S,
+    solution: out,
+    clues: {
+      across: clues.across.map(mapClue),
+      down: clues.down.map(mapClue),
+    },
   };
 }
 

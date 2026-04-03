@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePointsEarnedToast } from "@/components/points-earned-toast";
 
 type Clue = { n: number; clue: string; row: number; col: number; len: number };
@@ -29,6 +29,24 @@ function emptyGrid(rows: number, cols: number, blocked: boolean[][]): string[][]
   return g;
 }
 
+function buildClueNumberMaps(p: TodayPayload) {
+  const acrossN: number[][] = Array.from({ length: p.rows }, () => Array<number>(p.cols).fill(0));
+  const downN: number[][] = Array.from({ length: p.rows }, () => Array<number>(p.cols).fill(0));
+  for (const cl of p.clues.across) {
+    for (let k = 0; k < cl.len; k++) {
+      const c = cl.col + k;
+      if (cl.row >= 0 && cl.row < p.rows && c >= 0 && c < p.cols) acrossN[cl.row]![c] = cl.n;
+    }
+  }
+  for (const cl of p.clues.down) {
+    for (let k = 0; k < cl.len; k++) {
+      const r = cl.row + k;
+      if (r >= 0 && r < p.rows && cl.col >= 0 && cl.col < p.cols) downN[r]![cl.col] = cl.n;
+    }
+  }
+  return { acrossN, downN };
+}
+
 export function CrosswordGame() {
   const { showPointsEarned } = usePointsEarnedToast();
   const [loading, setLoading] = useState(true);
@@ -42,7 +60,11 @@ export function CrosswordGame() {
   const [completeOpen, setCompleteOpen] = useState(false);
   const [lastPoints, setLastPoints] = useState<number | null>(null);
   const [completeWasEligible, setCompleteWasEligible] = useState(false);
+  const [correctAcrossNs, setCorrectAcrossNs] = useState<Set<number>>(() => new Set());
+  const [correctDownNs, setCorrectDownNs] = useState<Set<number>>(() => new Set());
   const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+
+  const clueMaps = useMemo(() => (payload ? buildClueNumberMaps(payload) : null), [payload]);
 
   const setCellRef = useCallback((r: number, c: number, el: HTMLInputElement | null) => {
     const k = `${r}-${c}`;
@@ -60,6 +82,8 @@ export function CrosswordGame() {
       setPayload(data as TodayPayload);
       const p = data as TodayPayload;
       setGrid(emptyGrid(p.rows, p.cols, p.blocked));
+      setCorrectAcrossNs(new Set());
+      setCorrectDownNs(new Set());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
       setPayload(null);
@@ -161,6 +185,23 @@ export function CrosswordGame() {
       }
       if (!data.correct) {
         setSubmitError("Not quite right — check your letters and try again.");
+        const wf = data.wordFeedback as { across?: number[]; down?: number[] } | undefined;
+        if (wf) {
+          if (Array.isArray(wf.across)) {
+            setCorrectAcrossNs((prev) => {
+              const next = new Set(prev);
+              for (const n of wf.across!) next.add(n);
+              return next;
+            });
+          }
+          if (Array.isArray(wf.down)) {
+            setCorrectDownNs((prev) => {
+              const next = new Set(prev);
+              for (const n of wf.down!) next.add(n);
+              return next;
+            });
+          }
+        }
         return;
       }
       const pts = typeof data.pointsAwarded === "number" ? data.pointsAwarded : 0;
@@ -185,8 +226,20 @@ export function CrosswordGame() {
     );
 
   const p = payload;
+  const maps = clueMaps!;
   const sortedAcross = [...p.clues.across].sort((a, b) => a.n - b.n);
   const sortedDown = [...p.clues.down].sort((a, b) => a.n - b.n);
+
+  const cellInputBg = (r: number, c: number): string => {
+    const an = maps.acrossN[r]?.[c] ?? 0;
+    const dn = maps.downN[r]?.[c] ?? 0;
+    const aOk = an > 0 && correctAcrossNs.has(an);
+    const dOk = dn > 0 && correctDownNs.has(dn);
+    if (aOk && dOk) return "bg-emerald-200/90 dark:bg-emerald-900/45";
+    if (aOk) return "bg-emerald-100/95 dark:bg-emerald-950/40";
+    if (dOk) return "bg-sky-100/95 dark:bg-sky-950/35";
+    return "bg-transparent";
+  };
 
   return (
     <div className="space-y-6">
@@ -203,6 +256,8 @@ export function CrosswordGame() {
           onClick={() => {
             setGrid(emptyGrid(p.rows, p.cols, p.blocked));
             setSubmitError(null);
+            setCorrectAcrossNs(new Set());
+            setCorrectDownNs(new Set());
           }}
           className="px-4 py-2 rounded-gta border-2 border-gta-border text-gta-text hover:bg-gta-surfaceSecondary transition-colors font-semibold"
         >
@@ -257,7 +312,7 @@ export function CrosswordGame() {
                     onChange={(e) => handleCellChange(r, c, e.target.value, p)}
                     onKeyDown={(e) => handleKeyDown(e, r, c, p)}
                     disabled={p.alreadyCompleted}
-                    className="absolute inset-0 w-full h-full text-center text-base font-bold uppercase pt-3 bg-transparent border-0 text-slate-900 dark:text-white focus:ring-2 focus:ring-gta-primary focus:z-20 rounded-none disabled:opacity-60"
+                    className={`absolute inset-0 w-full h-full text-center text-base font-bold uppercase pt-3 border-0 text-slate-900 dark:text-white focus:ring-2 focus:ring-gta-primary focus:z-20 rounded-none disabled:opacity-60 ${cellInputBg(r, c)}`}
                     aria-label={`Cell row ${r + 1} column ${c + 1}`}
                   />
                 </div>
@@ -296,7 +351,10 @@ export function CrosswordGame() {
 
       {submitError && (
         <p className="text-red-600 dark:text-red-400 text-sm" role="alert">
-          {submitError}
+          {submitError}{" "}
+          <span className="text-slate-600 dark:text-slate-400 font-normal">
+            (A fully correct across or down word is highlighted after submit; partial words are not.)
+          </span>
         </p>
       )}
 
