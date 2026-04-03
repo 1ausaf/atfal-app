@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { parseCrosswordPuzzleJson } from "@/lib/crossword";
+import { resolveCrosswordPatchBody } from "@/lib/crossword-admin-resolve";
 
 export async function PATCH(
   request: Request,
@@ -16,17 +16,15 @@ export async function PATCH(
   const { id } = await params;
   const body = await request.json();
   const title = typeof body.title === "string" ? body.title.trim() || null : undefined;
-  const puzzleJson = body.puzzle_json;
+
+  const resolved = resolveCrosswordPatchBody(body);
+  if (!resolved.ok) return NextResponse.json({ error: resolved.error }, { status: 400 });
 
   const supabase = createSupabaseServerClient();
   const updates: { title?: string | null; puzzle_json?: Record<string, unknown> } = {};
 
   if (title !== undefined) updates.title = title;
-  if (puzzleJson !== undefined) {
-    const parsed = parseCrosswordPuzzleJson(puzzleJson);
-    if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 400 });
-    updates.puzzle_json = parsed.puzzle;
-  }
+  if (resolved.puzzle !== undefined) updates.puzzle_json = resolved.puzzle;
 
   if (Object.keys(updates).length === 0) return NextResponse.json({ error: "No updates" }, { status: 400 });
 

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { parseCrosswordPuzzleJson } from "@/lib/crossword";
+import { resolveCrosswordFromAdminBody } from "@/lib/crossword-admin-resolve";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -28,17 +28,16 @@ export async function POST(request: Request) {
 
   const body = await request.json();
   const title = typeof body.title === "string" ? body.title.trim() || null : null;
-  const puzzleJson = body.puzzle_json;
 
-  const parsed = parseCrosswordPuzzleJson(puzzleJson);
-  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 400 });
+  const resolved = resolveCrosswordFromAdminBody(body);
+  if (!resolved.ok) return NextResponse.json({ error: resolved.error }, { status: 400 });
 
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from("crossword_puzzles")
     .insert({
       title,
-      puzzle_json: parsed.puzzle,
+      puzzle_json: resolved.puzzle,
     })
     .select("id, title, puzzle_json, created_at")
     .single();

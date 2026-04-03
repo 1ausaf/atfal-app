@@ -1,3 +1,17 @@
+/** Minimum clues required for a puzzle to appear in the daily rotation (admin builder enforces on save). */
+export const CROSSWORD_MIN_ACROSS_CLUES = 4;
+export const CROSSWORD_MIN_DOWN_CLUES = 5;
+export const CROSSWORD_MAX_WORD_LEN = 15;
+export const CROSSWORD_MIN_WORD_LEN = 2;
+export const CROSSWORD_MAX_ENTRIES_PER_DIRECTION = 24;
+
+export function puzzleMeetsDailyMinimums(puzzle: CrosswordPuzzleJson): boolean {
+  return (
+    puzzle.clues.across.length >= CROSSWORD_MIN_ACROSS_CLUES &&
+    puzzle.clues.down.length >= CROSSWORD_MIN_DOWN_CLUES
+  );
+}
+
 /**
  * Crossword puzzle JSON (stored in crossword_puzzles.puzzle_json).
  * - solution[r][c]: "#" | null = black square; A–Z single letter otherwise.
