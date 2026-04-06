@@ -9,7 +9,8 @@ export async function LeaderboardWidget({ limit = 10 }: { limit?: number }) {
   const { data: rows } = await supabase
     .from("leaderboard")
     .select("*")
-    .order("total_points", { ascending: false })
+    .order("season_points", { ascending: false })
+    .order("all_time_points", { ascending: false })
     .limit(limit);
   const { data: majlis } = await supabase.from("majlis").select("id, name");
   const majlisMap = new Map((majlis ?? []).map((m) => [m.id, m.name]));
@@ -44,7 +45,10 @@ export async function LeaderboardWidget({ limit = 10 }: { limit?: number }) {
                 Age {r.age ?? "—"} · {r.majlis_id ? majlisMap.get(r.majlis_id) : "—"}
               </span>
             </span>
-            <span className="font-bold text-gta-primary">{r.total_points} pts</span>
+            <span className="text-right">
+              <span className="font-bold text-gta-primary block">{r.season_points ?? 0} season</span>
+              <span className="text-[11px] text-gta-textSecondary block">{r.all_time_points ?? 0} all-time</span>
+            </span>
           </li>
         );
       })}

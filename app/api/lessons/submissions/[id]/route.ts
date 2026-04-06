@@ -3,6 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
+import {
+  getActiveSeasonStartIso,
+  incrementUserSeason2Points,
+  isLessonSeasonEligibleByCutoff,
+} from "@/lib/season-points";
 
 function getSalatLessonMultiplier(user: { salat_star?: boolean; salat_superstar?: boolean } | null): number {
   if (!user) return 0;
@@ -24,8 +29,19 @@ export async function PATCH(
   const { manual_points, points_awarded: pointsAwardedOverride } = body;
   const supabase = createSupabaseServerClient();
   const isRegionalOrAdmin = session.user.role === "regional_nazim" || session.user.role === "admin";
-  const { data: sub } = await supabase.from("lesson_submissions").select("id, status, auto_points, user_id").eq("id", id).single();
+  const { data: sub } = await supabase
+    .from("lesson_submissions")
+    .select("id, status, auto_points, user_id, activity_id")
+    .eq("id", id)
+    .single();
   if (!sub) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const { data: activityRow } = await supabase
+    .from("lesson_activities")
+    .select("created_at")
+    .eq("id", (sub as { activity_id: string }).activity_id)
+    .maybeSingle();
+  const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+  const isSeasonEligible = isLessonSeasonEligibleByCutoff(activityRow?.created_at ?? null, activeSeasonStartIso);
 
   if (typeof pointsAwardedOverride === "number" && isRegionalOrAdmin) {
     const basePoints = Math.max(0, Math.floor(pointsAwardedOverride));
@@ -49,7 +65,8 @@ export async function PATCH(
       })
       .eq("id", id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    if (points > 0) {
+    if (points > 0 && isSeasonEligible) {
+      await incrementUserSeason2Points(supabase, (sub as { user_id: string }).user_id, points);
       await recordMajlisCompetitionContribution({
         userId: (sub as { user_id: string }).user_id,
         majlisId: userRow?.majlis_id ?? null,
@@ -83,7 +100,8 @@ export async function PATCH(
     })
     .eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  if (totalPoints > 0) {
+  if (totalPoints > 0 && isSeasonEligible) {
+    await incrementUserSeason2Points(supabase, (sub as { user_id: string }).user_id, totalPoints);
     await recordMajlisCompetitionContribution({
       userId: (sub as { user_id: string }).user_id,
       majlisId: userRow?.majlis_id ?? null,

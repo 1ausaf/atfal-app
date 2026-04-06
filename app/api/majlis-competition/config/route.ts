@@ -78,6 +78,11 @@ export async function POST(request: Request) {
   const supabase = createSupabaseServerClient();
   if (is_active) {
     await supabase.from("majlis_competition_seasons").update({ is_active: false }).eq("is_active", true);
+    await supabase
+      .from("users")
+      .update({ season2_points: 0, updated_at: new Date().toISOString() })
+      .eq("role", "tifl")
+      .is("deleted_at", null);
   }
 
   const { data: season, error: seasonError } = await supabase

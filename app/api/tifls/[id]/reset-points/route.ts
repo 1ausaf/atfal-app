@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 
-/** Zeros all sources that feed `leaderboard.total_points` for one tifl (manual, homework, lessons, login/wordle/crossword activity_log, streak). Removes their majlis competition ledger rows. */
+/** Zeros all scoring sources for one tifl, including season2_points and season ledger rows. */
 export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -25,7 +25,7 @@ export async function POST(
 
   const { error: uErr } = await supabase
     .from("users")
-    .update({ manual_points: 0, updated_at: new Date().toISOString() })
+    .update({ manual_points: 0, season2_points: 0, updated_at: new Date().toISOString() })
     .eq("id", id);
   if (uErr) return NextResponse.json({ error: uErr.message }, { status: 500 });
 

@@ -3,6 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
+import {
+  getActiveSeasonStartIso,
+  incrementUserSeason2Points,
+  isLessonSeasonEligibleByCutoff,
+} from "@/lib/season-points";
 
 function getSalatLessonMultiplier(user: { salat_star?: boolean; salat_superstar?: boolean } | null): number {
   if (!user) return 0;
@@ -27,7 +32,7 @@ export async function POST(
   const supabase = createSupabaseServerClient();
   const { data: activity } = await supabase
     .from("lesson_activities")
-    .select("id, target_age_groups")
+    .select("id, target_age_groups, created_at")
     .eq("id", activityId)
     .single();
   if (!activity) return NextResponse.json({ error: "Activity not found" }, { status: 404 });
@@ -98,13 +103,18 @@ export async function POST(
   const payload = data ?? { ok: true };
   if (status === "graded" && typeof pointsAwarded === "number") {
     if (pointsAwarded > 0) {
-      await recordMajlisCompetitionContribution({
-        userId: session.user.id,
-        majlisId: session.user.majlisId,
-        rawPoints: pointsAwarded,
-        homeworkPoints: 0,
-        eventType: "lesson",
-      });
+      const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+      const isSeasonEligible = isLessonSeasonEligibleByCutoff(activity.created_at, activeSeasonStartIso);
+      if (isSeasonEligible) {
+        await incrementUserSeason2Points(supabase, session.user.id, pointsAwarded);
+        await recordMajlisCompetitionContribution({
+          userId: session.user.id,
+          majlisId: session.user.majlisId,
+          rawPoints: pointsAwarded,
+          homeworkPoints: 0,
+          eventType: "lesson",
+        });
+      }
     }
     return NextResponse.json({ ...payload, points_awarded: pointsAwarded });
   }

@@ -14,7 +14,7 @@ export default async function ProfilePage() {
   const supabase = createSupabaseServerClient();
   const { data: user } = await supabase
     .from("users")
-    .select("id, name, age, age_group, majlis_id, date_of_birth, salat_star, salat_superstar, season1_points, season1_player_badge")
+    .select("id, name, age, age_group, majlis_id, date_of_birth, salat_star, salat_superstar, season1_points, season1_player_badge, season2_points")
     .eq("id", session.user.id)
     .single();
 
@@ -24,6 +24,13 @@ export default async function ProfilePage() {
   const salatSuperstar = (user as { salat_superstar?: boolean }).salat_superstar === true;
   const season1PlayerBadge = (user as { season1_player_badge?: boolean }).season1_player_badge === true;
   const season1Points = (user as { season1_points?: number | null }).season1_points ?? 0;
+  const season2Points = (user as { season2_points?: number | null }).season2_points ?? 0;
+  const { data: leaderboardRow } = await supabase
+    .from("leaderboard")
+    .select("all_time_points")
+    .eq("id", session.user.id)
+    .maybeSingle();
+  const allTimePoints = Number((leaderboardRow as { all_time_points?: number } | null)?.all_time_points ?? 0);
 
   const { data: majlisList } = await supabase.from("majlis").select("id, name").order("name");
 
@@ -62,6 +69,15 @@ export default async function ProfilePage() {
           Season 1 points (locked)
         </p>
         <p className="text-2xl font-bold text-sky-900 dark:text-sky-100">{season1Points}</p>
+      </div>
+      <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-300 dark:bg-emerald-900/40 dark:border-emerald-600">
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-200">
+          All-time points
+        </p>
+        <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">{allTimePoints}</p>
+        <p className="text-xs text-emerald-700/80 dark:text-emerald-200/80 mt-1">
+          Current season points: {season2Points}
+        </p>
       </div>
       {(salatStar || salatSuperstar) && (
         <p className="text-sm text-gta-textSecondary mb-4">
