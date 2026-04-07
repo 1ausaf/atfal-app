@@ -61,9 +61,9 @@ SELECT
   u.majlis_id,
   COALESCE(u.salat_star, false) AS salat_star,
   COALESCE(u.salat_superstar, false) AS salat_superstar,
-  COALESCE(u.season2_points, 0)::integer AS season_points,
-  COALESCE(at.all_time_points, 0)::integer AS all_time_points,
-  COALESCE(at.all_time_points, 0)::integer AS total_points
+  COALESCE(at.all_time_points, 0)::integer AS total_points,     -- keep old column in old slot
+  COALESCE(u.season2_points, 0)::integer AS season_points,      -- new appended
+  COALESCE(at.all_time_points, 0)::integer AS all_time_points   -- new appended
 FROM users u
 LEFT JOIN tifl_points_all_time at ON at.user_id = u.id
 WHERE u.role = 'tifl' AND u.deleted_at IS NULL;

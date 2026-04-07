@@ -146,8 +146,7 @@ export function DashboardNav({
           />
         )}
         <DropdownItem href="/activities/ijtima" label="IJTIMA" onNavigate={closeDropdown} />
-        <DropdownItem href="/activities/wordle" label="WORDLE" onNavigate={closeDropdown} />
-        <DropdownItem href="/activities/crossword" label="Crossword" onNavigate={closeDropdown} />
+        <DropdownItem href="/activities" label="Games" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/read/newsletter" label="Newsletter" onNavigate={closeDropdown} />
         <DropdownItem href="/activities/read/read" label="Read" onNavigate={closeDropdown} />
       </Dropdown>
