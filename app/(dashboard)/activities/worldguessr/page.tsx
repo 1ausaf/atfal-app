@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { WorldguessrChatPopup } from "@/components/worldguessr/worldguessr-chat-popup";
 
 export default async function WorldGuessrPage() {
   const session = await getServerSession(authOptions);
@@ -26,6 +27,7 @@ export default async function WorldGuessrPage() {
           If this game does not load, the provider may be blocking iframe embeds.
         </p>
       </div>
+      <WorldguessrChatPopup currentUserId={session.user.id} />
     </div>
   );
 }
