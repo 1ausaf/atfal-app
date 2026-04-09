@@ -69,6 +69,9 @@ export default async function ProfilePage() {
           Season 1 points (locked)
         </p>
         <p className="text-2xl font-bold text-sky-900 dark:text-sky-100">{season1Points}</p>
+        <p className="text-xs text-sky-800/80 dark:text-sky-200/80 mt-2 leading-relaxed">
+          Snapshot from the end of Season 1. It does not change when you earn new points.
+        </p>
       </div>
       <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-300 dark:bg-emerald-900/40 dark:border-emerald-600">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-200">
@@ -77,6 +80,11 @@ export default async function ProfilePage() {
         <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">{allTimePoints}</p>
         <p className="text-xs text-emerald-700/80 dark:text-emerald-200/80 mt-1">
           Current season points: {season2Points}
+        </p>
+        <p className="text-xs text-emerald-800/80 dark:text-emerald-200/80 mt-2 leading-relaxed">
+          All-time is <strong>Season 1 (locked)</strong> plus <strong>current season points</strong> above. It updates
+          whenever you earn points that count toward this season. Season 1 alone does not change; only the current
+          season total grows.
         </p>
       </div>
       {(salatStar || salatSuperstar) && (

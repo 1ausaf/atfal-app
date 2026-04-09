@@ -86,7 +86,8 @@ export default async function LeaderboardPage({
       {mode === "tifl" ? (
         <div className="card-kid overflow-hidden p-0 max-w-2xl mx-auto">
           <p className="px-4 py-2 text-xs text-gta-textSecondary border-b border-gta-border">
-            Ranking uses <strong>Season 2 points</strong>. All-time points are shown as secondary text.
+            Ranking uses <strong>current season points</strong>. <strong>All-time</strong> is Season 1 (locked) plus
+            current season; it goes up whenever you earn season points.
           </p>
           {!rows?.length ? (
             <p className="p-6 text-gta-textSecondary">No scores in this group yet.</p>

@@ -1,5 +1,35 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+const TORONTO_TZ = "America/Toronto";
+
+/** YYYY-MM-DD in Toronto for an ISO timestamp (e.g. season starts_at). */
+export function toTorontoYmdFromIso(iso: string): string {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: TORONTO_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const parts = formatter.formatToParts(new Date(iso));
+  const y = parts.find((p) => p.type === "year")!.value;
+  const m = parts.find((p) => p.type === "month")!.value;
+  const d = parts.find((p) => p.type === "day")!.value;
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * True when activity_date (YYYY-MM-DD, Toronto calendar day) is on or after
+ * the active season's start date in Toronto (same string format).
+ */
+export function isTorontoActivityDateInActiveSeason(
+  activityDateYmd: string,
+  activeSeasonStartIso: string | null
+): boolean {
+  if (!activeSeasonStartIso) return false;
+  const seasonStartYmd = toTorontoYmdFromIso(activeSeasonStartIso);
+  return activityDateYmd >= seasonStartYmd;
+}
+
 export async function getActiveSeasonStartIso(
   supabase: SupabaseClient
 ): Promise<string | null> {

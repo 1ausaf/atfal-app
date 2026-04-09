@@ -6,6 +6,11 @@ import { getWordleDayToronto } from "@/lib/datetime";
 import { resolveDailyCrossword } from "@/lib/crossword-daily";
 import { getFullyCorrectClueNumbers, gridsMatchSolution, normalizeUserGrid } from "@/lib/crossword";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
+import {
+  getActiveSeasonStartIso,
+  incrementUserSeason2Points,
+  isTorontoActivityDateInActiveSeason,
+} from "@/lib/season-points";
 
 const CROSSWORD_POINTS = 50;
 
@@ -59,6 +64,10 @@ export async function POST(request: Request) {
         homeworkPoints: 0,
         eventType: "crossword",
       });
+      const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+      if (isTorontoActivityDateInActiveSeason(wordleDay, activeSeasonStartIso)) {
+        await incrementUserSeason2Points(supabase, session.user.id, CROSSWORD_POINTS);
+      }
     }
   }
 

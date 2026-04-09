@@ -3,6 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
+import { getTodayToronto } from "@/lib/datetime";
+import {
+  getActiveSeasonStartIso,
+  incrementUserSeason2Points,
+  isTorontoActivityDateInActiveSeason,
+} from "@/lib/season-points";
 
 export async function GET(
   _request: Request,
@@ -56,6 +62,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       homeworkPoints: points,
       eventType: "homework",
     });
+    const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+    const todayToronto = getTodayToronto();
+    if (isTorontoActivityDateInActiveSeason(todayToronto, activeSeasonStartIso)) {
+      await incrementUserSeason2Points(supabase, (sub as { user_id: string }).user_id, points);
+    }
   }
   return NextResponse.json({ ok: true });
 }

@@ -6,6 +6,11 @@ import { getWordleDayToronto } from "@/lib/datetime";
 import { getWordIndexFromSeed, getFeedback } from "@/lib/wordle";
 import { WORDLE_FALLBACK_WORDS } from "@/lib/wordle-fallback-words";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
+import {
+  getActiveSeasonStartIso,
+  incrementUserSeason2Points,
+  isTorontoActivityDateInActiveSeason,
+} from "@/lib/season-points";
 
 const WORDLE_POINTS = 50;
 
@@ -84,6 +89,10 @@ export async function POST(request: Request) {
         homeworkPoints: 0,
         eventType: "wordle",
       });
+      const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+      if (isTorontoActivityDateInActiveSeason(wordleDay, activeSeasonStartIso)) {
+        await incrementUserSeason2Points(supabase, session.user.id, WORDLE_POINTS);
+      }
     }
   }
 

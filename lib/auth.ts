@@ -3,6 +3,11 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { getTodayToronto, getYesterdayToronto } from "@/lib/datetime";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
+import {
+  getActiveSeasonStartIso,
+  incrementUserSeason2Points,
+  isTorontoActivityDateInActiveSeason,
+} from "@/lib/season-points";
 import bcrypt from "bcryptjs";
 
 declare module "next-auth" {
@@ -118,6 +123,10 @@ export const authOptions: NextAuthOptions = {
               homeworkPoints: 0,
               eventType: "login",
             });
+            const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+            if (isTorontoActivityDateInActiveSeason(today, activeSeasonStartIso)) {
+              await incrementUserSeason2Points(supabase, user.id, points);
+            }
           }
         }
       } catch {

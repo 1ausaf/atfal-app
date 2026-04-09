@@ -3,6 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
+import { getTodayToronto } from "@/lib/datetime";
+import {
+  getActiveSeasonStartIso,
+  incrementUserSeason2Points,
+  isTorontoActivityDateInActiveSeason,
+} from "@/lib/season-points";
 
 export async function PATCH(
   request: Request,
@@ -57,6 +63,10 @@ export async function PATCH(
           homeworkPoints: 0,
           eventType: "manual",
         });
+        const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+        if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
+          await incrementUserSeason2Points(supabase, id, delta);
+        }
       }
     }
     return NextResponse.json({ ok: true });
@@ -94,6 +104,10 @@ export async function PATCH(
         homeworkPoints: 0,
         eventType: "manual",
       });
+      const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+      if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
+        await incrementUserSeason2Points(supabase, id, delta);
+      }
     }
   }
   return NextResponse.json({ ok: true });
