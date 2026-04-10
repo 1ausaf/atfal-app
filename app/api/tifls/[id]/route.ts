@@ -5,8 +5,8 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
 import { getTodayToronto } from "@/lib/datetime";
 import {
+  applyUserSeason2PointsDelta,
   getActiveSeasonStartIso,
-  incrementUserSeason2Points,
   isTorontoActivityDateInActiveSeason,
 } from "@/lib/season-points";
 
@@ -65,7 +65,12 @@ export async function PATCH(
         });
         const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
         if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-          await incrementUserSeason2Points(supabase, id, delta);
+          await applyUserSeason2PointsDelta(supabase, id, delta);
+        }
+      } else if (delta < 0) {
+        const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+        if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
+          await applyUserSeason2PointsDelta(supabase, id, delta);
         }
       }
     }
@@ -106,7 +111,12 @@ export async function PATCH(
       });
       const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
       if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-        await incrementUserSeason2Points(supabase, id, delta);
+        await applyUserSeason2PointsDelta(supabase, id, delta);
+      }
+    } else if (delta < 0) {
+      const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+      if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
+        await applyUserSeason2PointsDelta(supabase, id, delta);
       }
     }
   }

@@ -72,3 +72,28 @@ export async function incrementUserSeason2Points(
     })
     .eq("id", userId);
 }
+
+export async function applyUserSeason2PointsDelta(
+  supabase: SupabaseClient,
+  userId: string,
+  by: number
+): Promise<void> {
+  const delta = Math.floor(Number(by) || 0);
+  if (delta === 0) return;
+
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("season2_points")
+    .eq("id", userId)
+    .maybeSingle();
+
+  const current = Math.max(0, Number(userRow?.season2_points ?? 0));
+  const next = Math.max(0, current + delta);
+  await supabase
+    .from("users")
+    .update({
+      season2_points: next,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", userId);
+}
