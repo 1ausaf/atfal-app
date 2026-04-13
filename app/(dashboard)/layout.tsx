@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { UserRole } from "@/lib/db-types";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { MyLifeStar } from "@/components/my-life-star";
+import { TiflAnnouncementDialog } from "@/components/tifl-announcement-dialog";
 
 async function getNavCounts(
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
@@ -75,6 +76,31 @@ export default async function DashboardLayout({
 
   const navCounts = await getNavCounts(supabase, role, session.user.id, session.user.majlisId);
 
+  let tiflAnnouncementInitial: { id: string; title: string | null; body: string } | null = null;
+  if (isTifl) {
+    const { data: latest } = await supabase
+      .from("tifl_announcements")
+      .select("id, title, body")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (latest) {
+      const { data: dismissed } = await supabase
+        .from("tifl_announcement_dismissals")
+        .select("user_id")
+        .eq("user_id", session.user.id)
+        .eq("announcement_id", latest.id)
+        .maybeSingle();
+      if (!dismissed) {
+        tiflAnnouncementInitial = {
+          id: latest.id,
+          title: latest.title,
+          body: latest.body,
+        };
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-gta-border bg-gta-surface/95 shadow-gta rounded-b-2xl mx-2 md:mx-4 mt-0">
@@ -93,6 +119,7 @@ export default async function DashboardLayout({
         </div>
       </header>
       <main className="flex-1 p-4 md:p-8 bg-gradient-to-b from-transparent to-gta-surfaceSecondary/50">{children}</main>
+      {isTifl && <TiflAnnouncementDialog initialAnnouncement={tiflAnnouncementInitial} />}
       {isTifl && <MyLifeStar />}
     </div>
   );
