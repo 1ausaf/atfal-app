@@ -12,6 +12,7 @@ interface TiflRow {
   majlis_id: string | null;
   date_of_birth: string | null;
   manual_points?: number;
+  season2_points?: number;
   banned_at?: string | null;
   banned_reason?: string | null;
   created_at: string;
@@ -111,7 +112,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
       });
       if (res.ok) {
         setTifls((prev) =>
-          prev.map((x) => (x.id === tiflId ? { ...x, manual_points: newValue } : x))
+          prev.map((x) => (x.id === tiflId ? { ...x, manual_points: newValue, season2_points: newValue } : x))
         );
         setPointsEditingId(null);
         setPointsDelta("");
@@ -184,7 +185,9 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
       if (res.ok) {
         setPointsEditingId(null);
         setPointsDelta("");
-        setTifls((prev) => prev.map((x) => (x.id === tiflId ? { ...x, manual_points: 0 } : x)));
+        setTifls((prev) =>
+          prev.map((x) => (x.id === tiflId ? { ...x, manual_points: 0, season2_points: 0 } : x))
+        );
         router.refresh();
       } else {
         const d = await res.json();
@@ -254,7 +257,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                     <span className="block text-sm text-slate-500 dark:text-slate-400">@{"member_code" in t ? (t as { member_code?: string }).member_code ?? "—" : "—"}</span>
                     <span className="text-slate-500 dark:text-slate-400 ml-2">Age {t.age ?? "—"} · {t.age_group ?? "—"}</span>
                     <span className="block text-sm text-slate-500 dark:text-slate-400">{t.majlis_id ? majlisMap.get(t.majlis_id) : "—"}</span>
-                    <span className="text-sm text-slate-600 dark:text-slate-300">{(t.manual_points ?? 0)} pts</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">{(t.season2_points ?? 0)} pts</span>
                     {t.banned_at && (
                       <span className="block mt-1 text-xs font-medium text-red-700 dark:text-red-300">
                         Banned: {t.banned_reason ?? "No reason provided"}
@@ -264,7 +267,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                   <div className="flex items-center gap-2 flex-wrap">
                     {pointsEditingId === t.id ? (
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm text-slate-500 dark:text-slate-400">Current: {(t.manual_points ?? 0)}</span>
+                        <span className="text-sm text-slate-500 dark:text-slate-400">Current: {(t.season2_points ?? 0)}</span>
                         <input
                           type="number"
                           value={pointsDelta}
@@ -275,7 +278,7 @@ export function TiflsList({ initialTifls, majlisList, isRegional, majlisMap }: T
                         <button
                           type="button"
                           disabled={pointsSubmitting}
-                          onClick={() => savePoints(t.id, t.manual_points ?? 0)}
+                          onClick={() => savePoints(t.id, t.season2_points ?? 0)}
                           className="px-3 py-1.5 btn-kid-primary text-sm rounded-xl disabled:opacity-50 disabled:transform-none"
                         >
                           Update

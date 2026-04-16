@@ -19,7 +19,7 @@ export async function PATCH(
   const supabase = createSupabaseServerClient();
   const { data: user } = await supabase
     .from("users")
-    .select("id, role, majlis_id, manual_points")
+    .select("id, role, majlis_id, manual_points, season2_points")
     .eq("id", id)
     .single();
   if (!user || user.role !== "tifl") return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -48,7 +48,7 @@ export async function PATCH(
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     if (manual_points !== undefined) {
       try {
-        const previous = Math.max(0, Number(user.manual_points ?? 0));
+        const previous = Math.max(0, Number(user.season2_points ?? 0));
         const next = Math.max(0, Math.floor(Number(manual_points)));
         const delta = next - previous;
         if (delta > 0) {
@@ -95,7 +95,7 @@ export async function PATCH(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (manual_points !== undefined) {
     try {
-      const previous = Math.max(0, Number(user.manual_points ?? 0));
+      const previous = Math.max(0, Number(user.season2_points ?? 0));
       const next = Math.max(0, Math.floor(Number(manual_points)));
       const delta = next - previous;
       if (delta > 0) {

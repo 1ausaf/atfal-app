@@ -12,7 +12,7 @@ export default async function TiflsPage() {
   const supabase = createSupabaseServerClient();
   let query = supabase
     .from("users")
-    .select("id, name, age, age_group, majlis_id, date_of_birth, manual_points, created_at, banned_at, banned_reason")
+    .select("id, name, age, age_group, majlis_id, date_of_birth, manual_points, season2_points, created_at, banned_at, banned_reason")
     .eq("role", "tifl")
     .is("deleted_at", null)
     .order("name");
