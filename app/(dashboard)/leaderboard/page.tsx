@@ -30,10 +30,9 @@ export default async function LeaderboardPage({
   const supabase = createSupabaseServerClient();
   const { data: rows } = await supabase
     .from("leaderboard")
-    .select("id, name, member_code, age, age_group, majlis_id, season_points, all_time_points, salat_star, salat_superstar")
+    .select("id, name, member_code, age, age_group, majlis_id, season_points, salat_star, salat_superstar")
     .eq("age_group", currentGroup)
     .order("season_points", { ascending: false })
-    .order("all_time_points", { ascending: false })
     .limit(100);
 
   const { data: majlis } = await supabase.from("majlis").select("id, name");
@@ -86,8 +85,7 @@ export default async function LeaderboardPage({
       {mode === "tifl" ? (
         <div className="card-kid overflow-hidden p-0 max-w-2xl mx-auto">
           <p className="px-4 py-2 text-xs text-gta-textSecondary border-b border-gta-border">
-            Ranking uses <strong>current season points</strong>. <strong>All-time</strong> is Season 1 (locked) plus
-            current season; it goes up whenever you earn season points.
+            Ranking uses <strong>current season points</strong>.
           </p>
           {!rows?.length ? (
             <p className="p-6 text-gta-textSecondary">No scores in this group yet.</p>
@@ -122,7 +120,6 @@ export default async function LeaderboardPage({
                     </span>
                     <span className="shrink-0 text-right">
                       <span className="font-bold text-gta-primary block">{r.season_points ?? 0} season pts</span>
-                      <span className="text-[11px] text-gta-textSecondary block">{r.all_time_points ?? 0} all-time</span>
                     </span>
                   </li>
                 );

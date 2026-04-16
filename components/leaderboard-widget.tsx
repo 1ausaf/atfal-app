@@ -8,9 +8,8 @@ export async function LeaderboardWidget({ limit = 10 }: { limit?: number }) {
   const supabase = createSupabaseServerClient();
   const { data: rows } = await supabase
     .from("leaderboard")
-    .select("*")
+    .select("id, name, member_code, age, majlis_id, season_points, salat_star, salat_superstar")
     .order("season_points", { ascending: false })
-    .order("all_time_points", { ascending: false })
     .limit(limit);
   const { data: majlis } = await supabase.from("majlis").select("id, name");
   const majlisMap = new Map((majlis ?? []).map((m) => [m.id, m.name]));
@@ -47,7 +46,6 @@ export async function LeaderboardWidget({ limit = 10 }: { limit?: number }) {
             </span>
             <span className="text-right">
               <span className="font-bold text-gta-primary block">{r.season_points ?? 0} season</span>
-              <span className="text-[11px] text-gta-textSecondary block">{r.all_time_points ?? 0} all-time</span>
             </span>
           </li>
         );

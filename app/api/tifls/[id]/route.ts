@@ -3,12 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { recordMajlisCompetitionContribution } from "@/lib/majlis-competition";
-import { getTodayToronto } from "@/lib/datetime";
-import {
-  applyUserSeason2PointsDelta,
-  getActiveSeasonStartIso,
-  isTorontoActivityDateInActiveSeason,
-} from "@/lib/season-points";
+import { applyUserSeason2PointsDelta } from "@/lib/season-points";
 
 export async function PATCH(
   request: Request,
@@ -64,15 +59,9 @@ export async function PATCH(
             homeworkPoints: 0,
             eventType: "manual",
           });
-          const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
-          if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-            await applyUserSeason2PointsDelta(supabase, id, delta);
-          }
+          await applyUserSeason2PointsDelta(supabase, id, delta);
         } else if (delta < 0) {
-          const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
-          if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-            await applyUserSeason2PointsDelta(supabase, id, delta);
-          }
+          await applyUserSeason2PointsDelta(supabase, id, delta);
         }
       } catch (seasonSyncError) {
         const message =
@@ -118,15 +107,9 @@ export async function PATCH(
           homeworkPoints: 0,
           eventType: "manual",
         });
-        const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
-        if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-          await applyUserSeason2PointsDelta(supabase, id, delta);
-        }
+        await applyUserSeason2PointsDelta(supabase, id, delta);
       } else if (delta < 0) {
-        const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
-        if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-          await applyUserSeason2PointsDelta(supabase, id, delta);
-        }
+        await applyUserSeason2PointsDelta(supabase, id, delta);
       }
     } catch (seasonSyncError) {
       const message =

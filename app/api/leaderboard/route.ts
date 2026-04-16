@@ -18,10 +18,9 @@ export async function GET(request: Request) {
   const supabase = createSupabaseServerClient();
   const { data: rows, error } = await supabase
     .from("leaderboard")
-    .select("id, name, age, age_group, majlis_id, season_points, all_time_points, total_points")
+    .select("id, name, age, age_group, majlis_id, season_points")
     .eq("age_group", ageGroup)
     .order("season_points", { ascending: false })
-    .order("all_time_points", { ascending: false })
     .limit(100);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

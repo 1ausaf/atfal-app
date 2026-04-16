@@ -11,9 +11,8 @@ export async function GET() {
 
   const { data: winnerRow, error: winnerError } = await supabase
     .from("leaderboard")
-    .select("id, name, age, majlis_id, season_points, all_time_points")
+    .select("id, name, age, majlis_id, season_points")
     .order("season_points", { ascending: false })
-    .order("all_time_points", { ascending: false })
     .order("id", { ascending: true })
     .limit(1)
     .maybeSingle();
@@ -88,7 +87,6 @@ export async function GET() {
       age: winnerRow.age ?? null,
       majlis: majlisName,
       points: winnerRow.season_points ?? 0,
-      all_time_points: winnerRow.all_time_points ?? 0,
       lessonsCompletedPct,
       averageMarksPct,
     },
