@@ -52,26 +52,34 @@ export async function PATCH(
     const { error } = await supabase.from("users").update(updates).eq("id", id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     if (manual_points !== undefined) {
-      const previous = Math.max(0, Number(user.manual_points ?? 0));
-      const next = Math.max(0, Math.floor(Number(manual_points)));
-      const delta = next - previous;
-      if (delta > 0) {
-        await recordMajlisCompetitionContribution({
-          userId: id,
-          majlisId: user.majlis_id,
-          rawPoints: delta,
-          homeworkPoints: 0,
-          eventType: "manual",
-        });
-        const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
-        if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-          await applyUserSeason2PointsDelta(supabase, id, delta);
+      try {
+        const previous = Math.max(0, Number(user.manual_points ?? 0));
+        const next = Math.max(0, Math.floor(Number(manual_points)));
+        const delta = next - previous;
+        if (delta > 0) {
+          await recordMajlisCompetitionContribution({
+            userId: id,
+            majlisId: user.majlis_id,
+            rawPoints: delta,
+            homeworkPoints: 0,
+            eventType: "manual",
+          });
+          const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+          if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
+            await applyUserSeason2PointsDelta(supabase, id, delta);
+          }
+        } else if (delta < 0) {
+          const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+          if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
+            await applyUserSeason2PointsDelta(supabase, id, delta);
+          }
         }
-      } else if (delta < 0) {
-        const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
-        if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-          await applyUserSeason2PointsDelta(supabase, id, delta);
-        }
+      } catch (seasonSyncError) {
+        const message =
+          seasonSyncError instanceof Error
+            ? seasonSyncError.message
+            : "Failed to sync season points";
+        return NextResponse.json({ error: message }, { status: 500 });
       }
     }
     return NextResponse.json({ ok: true });
@@ -97,27 +105,35 @@ export async function PATCH(
   const { error } = await supabase.from("users").update(updates).eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (manual_points !== undefined) {
-    const previous = Math.max(0, Number(user.manual_points ?? 0));
-    const next = Math.max(0, Math.floor(Number(manual_points)));
-    const delta = next - previous;
-    if (delta > 0) {
-      const effectiveMajlisId = (updates.majlis_id as string | null | undefined) ?? user.majlis_id;
-      await recordMajlisCompetitionContribution({
-        userId: id,
-        majlisId: effectiveMajlisId ?? null,
-        rawPoints: delta,
-        homeworkPoints: 0,
-        eventType: "manual",
-      });
-      const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
-      if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-        await applyUserSeason2PointsDelta(supabase, id, delta);
+    try {
+      const previous = Math.max(0, Number(user.manual_points ?? 0));
+      const next = Math.max(0, Math.floor(Number(manual_points)));
+      const delta = next - previous;
+      if (delta > 0) {
+        const effectiveMajlisId = (updates.majlis_id as string | null | undefined) ?? user.majlis_id;
+        await recordMajlisCompetitionContribution({
+          userId: id,
+          majlisId: effectiveMajlisId ?? null,
+          rawPoints: delta,
+          homeworkPoints: 0,
+          eventType: "manual",
+        });
+        const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+        if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
+          await applyUserSeason2PointsDelta(supabase, id, delta);
+        }
+      } else if (delta < 0) {
+        const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
+        if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
+          await applyUserSeason2PointsDelta(supabase, id, delta);
+        }
       }
-    } else if (delta < 0) {
-      const activeSeasonStartIso = await getActiveSeasonStartIso(supabase);
-      if (isTorontoActivityDateInActiveSeason(getTodayToronto(), activeSeasonStartIso)) {
-        await applyUserSeason2PointsDelta(supabase, id, delta);
-      }
+    } catch (seasonSyncError) {
+      const message =
+        seasonSyncError instanceof Error
+          ? seasonSyncError.message
+          : "Failed to sync season points";
+      return NextResponse.json({ error: message }, { status: 500 });
     }
   }
   return NextResponse.json({ ok: true });

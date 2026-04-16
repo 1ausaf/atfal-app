@@ -81,19 +81,25 @@ export async function applyUserSeason2PointsDelta(
   const delta = Math.floor(Number(by) || 0);
   if (delta === 0) return;
 
-  const { data: userRow } = await supabase
+  const { data: userRow, error: userSelectError } = await supabase
     .from("users")
     .select("season2_points")
     .eq("id", userId)
     .maybeSingle();
+  if (userSelectError) {
+    throw new Error(userSelectError.message);
+  }
 
   const current = Math.max(0, Number(userRow?.season2_points ?? 0));
   const next = Math.max(0, current + delta);
-  await supabase
+  const { error: userUpdateError } = await supabase
     .from("users")
     .update({
       season2_points: next,
       updated_at: new Date().toISOString(),
     })
     .eq("id", userId);
+  if (userUpdateError) {
+    throw new Error(userUpdateError.message);
+  }
 }
