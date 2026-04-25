@@ -639,3 +639,63 @@ html.dark .rk-memorize-strip {
     border: 1px solid #e5e7eb;
   }
 }
+
+/* Season over recap: ambient motion */
+@keyframes seasonOverFloat {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-14px) translateX(8px);
+    opacity: 0.95;
+  }
+}
+
+@keyframes seasonOverOrbDrift {
+  0%,
+  100% {
+    transform: translate(-12%, -6%) scale(1);
+  }
+  50% {
+    transform: translate(8%, 10%) scale(1.08);
+  }
+}
+
+.season-over-star {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(167, 243, 208, 0.4) 55%, transparent 70%);
+  animation-name: seasonOverFloat;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.35);
+}
+
+.season-over-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(72px);
+  pointer-events: none;
+  z-index: 0;
+  animation: seasonOverOrbDrift 22s ease-in-out infinite;
+}
+
+.season-over-orb-a {
+  width: min(72vw, 520px);
+  height: min(72vw, 520px);
+  left: -18%;
+  top: -12%;
+  background: radial-gradient(circle at 30% 30%, rgba(52, 211, 153, 0.45), rgba(6, 78, 59, 0.15) 70%, transparent 72%);
+}
+
+.season-over-orb-b {
+  width: min(68vw, 480px);
+  height: min(68vw, 480px);
+  right: -20%;
+  bottom: -8%;
+  background: radial-gradient(circle at 50% 40%, rgba(56, 189, 248, 0.4), rgba(30, 58, 138, 0.2) 65%, transparent 70%);
+  animation-delay: -7s;
+  animation-duration: 26s;
+}
